@@ -1,6 +1,13 @@
 import produce from 'immer';
 import { applyStep, applyTransaction } from '../transaction/transactions';
-import { State, Node, EventHandler, History, HistoryItem } from './types';
+import {
+    State,
+    Node,
+    EventHandler,
+    History,
+    HistoryItem,
+    TextType,
+} from './types';
 import { TransactionBuilder } from '../transaction/TransactionBuilder';
 import { Transaction } from '../transaction/types';
 import { NodesExplorer } from './NodesExplorer';
@@ -49,8 +56,8 @@ export class Editor {
         if (transaction.keepHistory) {
             this.history = produce(this.history, (history) => {
                 history.items.push({
-                    transaction: appliedTransaction,
-                    state: previousState,
+                    transaction: appliedTransaction as any,
+                    state: previousState as any,
                 });
             });
         }
@@ -113,7 +120,7 @@ function getNodeJson(state: State, node: Node) {
     type JsonNode = {
         id: string;
         type: string;
-        text?: string;
+        text?: TextType;
         title?: string;
         children?: JsonNode[];
     };

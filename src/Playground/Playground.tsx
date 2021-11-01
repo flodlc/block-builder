@@ -7,7 +7,7 @@ function Playground() {
     const [editor] = useState(
         new Editor({
             rootId: 'doc',
-            nodes: PLAYGROUND_DATA,
+            nodes: PLAYGROUND_DATA as any,
         })
     );
 

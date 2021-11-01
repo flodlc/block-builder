@@ -1,10 +1,15 @@
+import REACT_MARKS from '../../params/REACT_MARKS';
 import { AppliedTransaction } from '../transaction/types';
+
+export type TextType =
+    | string
+    | { text?: string; component?: keyof typeof REACT_MARKS }[];
 
 export interface Node {
     id: string;
     type: string;
     childrenIds?: string[];
-    text?: string;
+    text?: TextType;
     title?: string;
 }
 

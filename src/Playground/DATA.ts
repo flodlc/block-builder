@@ -32,7 +32,13 @@ export const PLAYGROUND_DATA = {
     mamma: {
         id: 'mamma',
         type: 'titledList',
-        text: 'A Toggle is a text + children',
+        text: [
+            {
+                text: 'A Toggle is a text + children <strong>This is bold</strong> ',
+            },
+            { component: 'reference' },
+            { text: 'some other text' },
+        ],
         childrenIds: ['poa'],
     },
     sdfkjsdkfj: {

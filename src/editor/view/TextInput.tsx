@@ -1,4 +1,6 @@
 import React, { useContext, useLayoutEffect, useRef } from 'react';
+import REACT_MARKS from '../../params/REACT_MARKS';
+import { TextType } from '../model/types';
 import { EditorContext } from './EditorContext';
 
 export const TextInput = ({
@@ -12,7 +14,7 @@ export const TextInput = ({
 }: {
     onInput: (value: string, focusOffset?: number) => void;
     onKeyDown: (e: React.KeyboardEvent) => undefined;
-    value?: string;
+    value?: TextType;
     focusOffset?: number;
     style?: any;
     id?: string;
@@ -38,7 +40,8 @@ export const TextInput = ({
     const handleKeyDown = (e: React.KeyboardEvent) => {
         onKeyDown(e);
     };
-
+    
+    // DOESN'T WORK WITH MARKS YET
     const saveDomSelection = () => {
         if (ref.current) {
             const focusOffset = getFocusOffset(ref.current);
@@ -49,21 +52,46 @@ export const TextInput = ({
         }
     };
 
+    const finalValue = React.useMemo(() => {
+        if (typeof value === 'string') {
+            return <>{value}</>;
+        }
+        return (
+            <>
+                {value.map((val, i) => {
+                    if (val.text)
+                        return (
+                            <span
+                                key={i}
+                                dangerouslySetInnerHTML={{ __html: val.text }}
+                            />
+                        );
+                    if (val.component) {
+                        const Comp = REACT_MARKS[val.component];
+                        if (Comp) return <Comp key={i} />;
+                    }
+                    return <React.Fragment key={i} />;
+                }, '')}
+            </>
+        );
+    }, []);
+
     return (
         <div
-            onSelect={saveDomSelection}
+            // onSelect={saveDomSelection} // DOESN'T WORK WITH MARKS
             onKeyDownCapture={handleKeyDown}
             onKeyUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
             }}
-            dangerouslySetInnerHTML={{ __html: value }}
             ref={ref}
             onInput={handleInput}
             contentEditable={true}
             style={{ ...style, outline: 'none' }}
             id={id || undefined}
-        />
+        >
+            {finalValue}
+        </div>
     );
 };
 
