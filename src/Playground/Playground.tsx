@@ -1,7 +1,12 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { Editor } from '../editor/model/Editor';
 import { View } from '../editor/view/View';
-import { PLAYGROUND_DATA } from './DATA';
+import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
+import { toggleItalic } from '../editor/model/commands/toggleItalic.command';
+import { toggleBold } from '../editor/model/commands/toggleBold.command';
+import { toggleUnderline } from '../editor/model/commands/toggleUnderline.command';
+import { insertMention } from '../extensions/mention/insertMention.command';
+import { mentionPlugin } from '../extensions/mention/mention.plugin';
 
 function Playground() {
     const [editor] = useState(
@@ -29,8 +34,20 @@ function Playground() {
                 <button onClick={log.state}>Log state</button>
                 <button onClick={log.json}>Log json tree</button>
                 <button onClick={editor.back}>Undo</button>
+                <button onClick={() => editor.runCommand(insertMention())}>
+                    Mention
+                </button>
+                <button onClick={() => editor.runCommand(toggleBold())}>
+                    Bold
+                </button>
+                <button onClick={() => editor.runCommand(toggleItalic())}>
+                    italic
+                </button>
+                <button onClick={() => editor.runCommand(toggleUnderline())}>
+                    underline
+                </button>
             </div>
-            <View editor={editor} />
+            <View viewPlugins={[mentionPlugin]} editor={editor} />
         </div>
     );
 }

@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
-import { StateContext } from './StateContext';
-import { componentMap } from '../../components/component.map';
-import { State } from '../model/types';
+import React, { useContext, useEffect, useState } from 'react';
+import { Node } from '../model/types';
+import { EditorContext } from './contexts/EditorContext';
+import { ViewContext } from './contexts/ViewContext';
 
 export const Children = ({
     childrenIds,
@@ -10,39 +10,42 @@ export const Children = ({
     childrenIds?: string[];
     parentId: string;
 }) => {
-    const state = useContext(StateContext);
     return (
         <>
             {childrenIds &&
                 childrenIds.map((childId) => (
                     <Child
-                        state={state}
                         key={childId}
                         parentId={parentId}
+                        // node={nodes[childId]}
                         nodeId={childId}
+                        // nodeSelection={blockIds?.[childId]}
                     />
                 ))}
         </>
     );
 };
 
-const Child = ({
-    nodeId,
-    parentId,
-    state,
-}: {
-    nodeId: string;
-    parentId: string;
-    state: State;
-}) => {
-    const node = state.nodes[nodeId];
-    const Compo = componentMap[node.type];
-
-    return (
-        <Compo
-            parentId={parentId}
-            node={node}
-            selection={state.selection?.blockIds?.[nodeId]}
-        />
-    );
-};
+export const Child = React.memo(
+    ({ parentId, nodeId }: { parentId: string; nodeId: string }) => {
+        const editor = useContext(EditorContext);
+        const view = useContext(ViewContext);
+        const [node, setNode] = useState<Node>(editor.state.nodes[nodeId]);
+        const [nodeSelection, setNodeSelection] = useState<Node>(
+            editor.state.selection?.blockIds?.[nodeId]
+        );
+        useEffect(() => {
+            const onChange = () => {
+                setNode(editor.state.nodes[nodeId]);
+                setNodeSelection(editor.state.selection?.blockIds?.[nodeId]);
+            };
+            editor.on('change', onChange);
+            return () => editor.off('change', onChange);
+        }, []);
+        if (!node) return <></>;
+        const Compo = view.blocks[node.type] ?? <></>;
+        return (
+            <Compo parentId={parentId} node={node} selection={nodeSelection} />
+        );
+    }
+);

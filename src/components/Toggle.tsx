@@ -1,10 +1,14 @@
 import React, { KeyboardEvent, useContext, useState } from 'react';
-import { CustomSelection, Node } from '../editor/model/types';
-import { EditorContext } from '../editor/view/EditorContext';
-import { TextInput } from '../editor/view/TextInput';
+import { MarkedText, Node } from '../editor/model/types';
+import { EditorContext } from '../editor/view/contexts/EditorContext';
+import { TextInput } from '../editor/view/TextInput/TextInput';
 import { SCHEMA } from './schema';
 import { Children } from '../editor/view/Children';
-import { findDeepTarget } from './utils/findDeepTarget';
+import { TextSelection } from '../editor/view/types';
+import { joinMarkedTexts } from '../editor/transaction/MarkedText/joinMarkedTexts';
+import { getMarkedTextLength } from '../editor/transaction/MarkedText/getMarkedTextLength';
+import { cutMarkedText } from '../editor/transaction/MarkedText/cutMarkedText';
+import { previousEditable } from '../editor/model/queries/previousEditable';
 
 export const Toggle = React.memo(
     ({
@@ -14,38 +18,32 @@ export const Toggle = React.memo(
     }: {
         node: Node;
         parentId: string;
-        selection?: CustomSelection;
+        selection?: TextSelection;
     }) => {
         const [visible, setVisible] = useState(true);
 
         const editor = useContext(EditorContext);
-        const onTitleInput = (value: string, focusOffset?: number) => {
+        const onTitleInput = (
+            value: MarkedText,
+            currentSelection?: TextSelection
+        ) => {
             editor
                 .createTransaction()
                 .patch({
                     nodeId: node.id,
                     patch: { text: value },
                 })
-                .focus({ [node.id]: { focusOffset } })
+                .focus({ [node.id]: currentSelection })
                 .dispatch();
-            return undefined;
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
             switch (e.key) {
                 case 'Enter':
-                    e.preventDefault();
-                    const startText = node.text?.slice(
-                        0,
-                        selection?.focusOffset
-                    );
-                    const endText = node.text?.slice(selection?.focusOffset);
-
                     const newNode: Node = SCHEMA['text'].create();
-                    newNode.text = endText;
-
-                    const target = findDeepTarget(node.id, 1);
-                    if (!target) return;
+                    newNode.text = cutMarkedText(node.text, {
+                        from: selection?.to,
+                    });
 
                     editor
                         .createTransaction()
@@ -56,18 +54,21 @@ export const Toggle = React.memo(
                         })
                         .patch({
                             nodeId: node.id,
-                            patch: { text: startText },
+                            patch: {
+                                text: cutMarkedText(node.text, {
+                                    to: selection?.to,
+                                }),
+                            },
                         })
-                        .focus({ [newNode.id]: { focusOffset: 0 } })
+                        .focus({ [newNode.id]: { to: 0 } })
                         .dispatch();
-                    break;
+                    return true;
                 case 'Backspace':
-                    if (selection?.focusOffset === 0) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        const target = findDeepTarget(node.id, -1);
-                        if (!target) return;
+                    if (selection?.to === 0) {
+                        const target = editor.runQuery(
+                            previousEditable(node.id)
+                        );
+                        if (!target) return true;
 
                         editor
                             .createTransaction()
@@ -75,20 +76,26 @@ export const Toggle = React.memo(
                                 parentId,
                                 nodeId: node.id,
                             })
+                            .patch({
+                                nodeId: target.id,
+                                patch: {
+                                    text: joinMarkedTexts(
+                                        target.text,
+                                        node.text
+                                    ),
+                                },
+                            })
                             .focus({
                                 [target.id]: {
-                                    focusOffset:
-                                        target.element.innerText?.length,
+                                    to: getMarkedTextLength(target.text),
                                 },
                             })
                             .dispatch();
                     }
-                    break;
+                    return true;
             }
             return undefined;
         };
-
-        const toggle = () => setVisible(!visible);
 
         return (
             <div
@@ -106,7 +113,7 @@ export const Toggle = React.memo(
                         transition: 'transform 300ms',
                         transform: visible ? 'rotate(90deg)' : '',
                     }}
-                    onClick={toggle}
+                    onClick={() => setVisible(!visible)}
                 >
                     {'>'}
                 </div>
@@ -121,12 +128,13 @@ export const Toggle = React.memo(
                     <TextInput
                         style={{
                             fontSize: '16px',
+                            whiteSpace: 'break-spaces',
                             flex: 1,
                         }}
                         onKeyDown={onKeyDown}
                         onInput={onTitleInput}
                         value={node.text}
-                        focusOffset={selection?.focusOffset}
+                        selection={selection}
                         nodeId={node.id}
                     />
                     {visible && (

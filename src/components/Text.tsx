@@ -1,9 +1,13 @@
 import React, { KeyboardEvent, useContext } from 'react';
-import { EditorContext } from '../editor/view/EditorContext';
-import { TextInput } from '../editor/view/TextInput';
+import { EditorContext } from '../editor/view/contexts/EditorContext';
+import { TextInput } from '../editor/view/TextInput/TextInput';
 import { SCHEMA } from './schema';
-import { CustomSelection, Node } from '../editor/model/types';
-import { findDeepTarget } from './utils/findDeepTarget';
+import { MarkedText, Node } from '../editor/model/types';
+import { TextSelection } from '../editor/view/types';
+import { cutMarkedText } from '../editor/transaction/MarkedText/cutMarkedText';
+import { joinMarkedTexts } from '../editor/transaction/MarkedText/joinMarkedTexts';
+import { getMarkedTextLength } from '../editor/transaction/MarkedText/getMarkedTextLength';
+import { previousEditable } from '../editor/model/queries/previousEditable';
 
 export const Text = React.memo(
     ({
@@ -13,32 +17,30 @@ export const Text = React.memo(
     }: {
         node: Node;
         parentId: string;
-        selection?: CustomSelection;
+        selection?: TextSelection;
     }) => {
         const editor = useContext(EditorContext);
-        const oninput = (value: string, focusOffset?: number) => {
+        const oninput = (
+            value: MarkedText,
+            currentSelection?: TextSelection
+        ) => {
             editor
                 .createTransaction()
                 .patch({
                     nodeId: node.id,
                     patch: { text: value },
                 })
-                .focus({ [node.id]: { focusOffset } })
+                .focus({ [node.id]: currentSelection })
                 .dispatch();
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
             switch (e.key) {
                 case 'Enter':
-                    e.preventDefault();
-                    const startText = node.text?.slice(
-                        0,
-                        selection?.focusOffset
-                    );
-                    const endText = node.text?.slice(selection?.focusOffset);
-
                     const newNode: Node = SCHEMA['text'].create();
-                    newNode.text = endText || '';
+                    newNode.text = cutMarkedText(node.text, {
+                        from: selection?.to,
+                    });
 
                     editor
                         .createTransaction()
@@ -49,18 +51,21 @@ export const Text = React.memo(
                         })
                         .patch({
                             nodeId: node.id,
-                            patch: { text: startText },
+                            patch: {
+                                text: cutMarkedText(node.text, {
+                                    to: selection?.to,
+                                }),
+                            },
                         })
-                        .focus({ [newNode.id]: { focusOffset: 0 } })
+                        .focus({ [newNode.id]: { to: 0 } })
                         .dispatch();
-                    break;
+                    return true;
                 case 'Backspace':
-                    if (selection?.focusOffset === 0) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        const target = findDeepTarget(node.id, -1);
-                        if (!target) return;
+                    if (selection?.to === 0) {
+                        const target = editor.runQuery(
+                            previousEditable(node.id)
+                        );
+                        if (!target) return true;
 
                         editor
                             .createTransaction()
@@ -71,16 +76,19 @@ export const Text = React.memo(
                             .patch({
                                 nodeId: target.id,
                                 patch: {
-                                    text: target.element.innerText + node.text,
+                                    text: joinMarkedTexts(
+                                        target.text,
+                                        node.text
+                                    ),
                                 },
                             })
                             .focus({
                                 [target.id]: {
-                                    focusOffset:
-                                        target.element.innerText?.length,
+                                    to: getMarkedTextLength(target.text),
                                 },
                             })
                             .dispatch();
+                        return true;
                     }
                     break;
             }
@@ -92,9 +100,9 @@ export const Text = React.memo(
                 <TextInput
                     onKeyDown={onKeyDown}
                     onInput={oninput}
-                    style={{ padding: '5px 0' }}
+                    style={{ padding: '4px 0', whiteSpace: 'break-spaces' }}
                     value={node.text}
-                    focusOffset={selection?.focusOffset}
+                    selection={selection}
                     nodeId={node.id}
                 />
             </div>

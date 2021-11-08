@@ -47,23 +47,45 @@ export class NodesExplorer {
             : undefined;
     }
 
-    constructor(state: State, nodeId: string) {
+    constructor(resolvedState: ResolvedState, state: State, nodeId: string) {
+        this.resolvedState = resolvedState;
         this.state = state;
-        this.resolvedState = resolveState(state);
         this.currentId = nodeId;
     }
 }
 
-interface ResolvedNode extends Node {
+export interface ResolvedNode extends Node {
     parentId?: string;
     index?: number;
+    previousId?: string;
+    nextId?: string;
 }
 
-interface ResolvedState extends State {
-    nodes: Record<string, ResolvedNode>;
+export type ResolvedNodes = Record<string, ResolvedNode>;
+
+export interface ResolvedState extends State {
+    nodes: ResolvedNodes;
+    flatTree: string[];
 }
 
-function resolveState(state: State): ResolvedState {
+const dive = (
+    parent: ResolvedNode,
+    index: number,
+    resolvedNodes: ResolvedNodes,
+    callback: (nodeId: string) => void
+) => {
+    if (parent?.childrenIds) {
+        for (let i = 0; i < parent?.childrenIds.length; i++) {
+            const childId = parent?.childrenIds?.[i];
+            if (childId) {
+                callback(childId);
+                dive(resolvedNodes[childId], i, resolvedNodes, callback);
+            }
+        }
+    }
+};
+
+export function resolveState(state: State): ResolvedState {
     const draft = JSON.parse(JSON.stringify(state)) as State;
     const nodes = draft.nodes;
     Object.values(nodes).forEach((node) => {
@@ -72,8 +94,18 @@ function resolveState(state: State): ResolvedState {
                 const childNode: ResolvedNode = nodes[childId];
                 childNode.parentId = node.id;
                 childNode.index = index;
+                childNode.previousId = node.childrenIds?.[index - 1];
+                childNode.nextId = node.childrenIds?.[index + 1];
             });
         }
     });
-    return draft;
+    const flatTree: string[] = [];
+    dive(draft.nodes[draft.rootId], 0, draft.nodes, (nodeId) =>
+        flatTree.push(nodeId)
+    );
+
+    return {
+        ...draft,
+        flatTree,
+    };
 }

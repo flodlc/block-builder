@@ -5,14 +5,15 @@ export const SCHEMA = {
         create: () => ({
             id: uuidv4(),
             type: 'text',
-            text: '',
+            text: [{ s: 'salutation ' }],
         }),
     },
-    titledList: {
+    toggle: {
         create: () => ({
             id: uuidv4(),
-            type: 'titledList',
-            title: '',
+            type: 'toggle',
+            text: [{ s: 'salutation ', m: [{ t: 'b' }] }],
+            childrenIds: [],
         }),
     },
     button: {

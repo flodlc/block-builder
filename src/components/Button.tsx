@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { CustomSelection, Node } from '../editor/model/types';
-import { EditorContext } from '../editor/view/EditorContext';
+import { Node } from '../editor/model/types';
+import { EditorContext } from '../editor/view/contexts/EditorContext';
 
 export const Button = ({
     node,
@@ -8,13 +8,13 @@ export const Button = ({
 }: {
     node: Node;
     parentId: string;
-    selection?: CustomSelection;
+    selection?: boolean;
 }) => {
     const editor = useContext(EditorContext);
     const onClick = () => {
         editor
             .createTransaction()
-            .focus({ [node.id]: {} })
+            .focus({ [node.id]: !selection })
             .dispatch(true);
     };
 

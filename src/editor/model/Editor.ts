@@ -1,14 +1,21 @@
 import produce from 'immer';
 import { applyStep, applyTransaction } from '../transaction/transactions';
-import { State, Node, EventHandler, History, HistoryItem } from './types';
+import {
+    State,
+    Node,
+    EventHandler,
+    History,
+    HistoryItem,
+    MarkedText,
+} from './types';
 import { TransactionBuilder } from '../transaction/TransactionBuilder';
 import { Transaction } from '../transaction/types';
-import { NodesExplorer } from './NodesExplorer';
+import { ResolvedState, resolveState } from './NodesExplorer';
 
 export class Editor {
     state: State;
+    resolvedState?: ResolvedState;
     history: History;
-    commands = {};
 
     getJson = () => {
         return getNodeJson(this.state, this.state.nodes[this.state.rootId]);
@@ -16,7 +23,19 @@ export class Editor {
 
     private observers = {
         change: [] as EventHandler[],
+        nodes: {} as Record<string, EventHandler[]>,
         tr: [] as EventHandler[],
+    };
+
+    runQuery = <T>(
+        query: (resolvedState: ResolvedState, state: State) => T
+    ): T => {
+        this.resolvedState = this.resolvedState ?? resolveState(this.state);
+        return query(this.resolvedState, this.state);
+    };
+
+    runCommand = (command: (editor: Editor) => void) => {
+        command(this);
     };
 
     on = (eventName: 'change' | 'tr', handler: EventHandler) => {
@@ -54,6 +73,8 @@ export class Editor {
                 });
             });
         }
+
+        delete this.resolvedState;
         this.observers.change.forEach((handlers) => handlers());
     }
 
@@ -72,15 +93,12 @@ export class Editor {
                 draft = newState;
             });
         this.state = { ...draft, selection: item.state.selection };
+        delete this.resolvedState;
         this.observers.change.forEach((handlers) => handlers());
     }
 
     createTransaction() {
         return new TransactionBuilder(this);
-    }
-
-    createNodeExplorer(nodeId: string) {
-        return new NodesExplorer(this.state, nodeId);
     }
 
     constructor({
@@ -113,7 +131,7 @@ function getNodeJson(state: State, node: Node) {
     type JsonNode = {
         id: string;
         type: string;
-        text?: string;
+        text?: MarkedText;
         title?: string;
         children?: JsonNode[];
     };

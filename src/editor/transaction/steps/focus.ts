@@ -1,4 +1,4 @@
-import { CustomSelection, State } from '../../model/types';
+import { State } from '../../model/types';
 import produce from 'immer';
 
 export const focus = ({
@@ -6,13 +6,13 @@ export const focus = ({
     blockIds,
 }: {
     state: State;
-    blockIds: Record<string, CustomSelection>;
+    blockIds: Record<string, any>;
 }) => {
     return {
-        state: produce(state, (state) => {
-            state.selection = {
-                blockIds,
-            };
+        state: produce(state, (draftState) => {
+            draftState.selection.blockIds = JSON.parse(
+                JSON.stringify(blockIds)
+            );
         }),
         inversedStep: {
             name: 'focus',
