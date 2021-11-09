@@ -26,4 +26,5 @@
 [ ] Selection and caret navigation over React component not editable
 [ ] Collab
 [ ] Add comment on text
-[ ] Content editable false but only for some marks
+[ ] possibility to execute some define marks on content editable false 
+[ ] hook that listened suggestion (char+text+space+text) from outside the editor
