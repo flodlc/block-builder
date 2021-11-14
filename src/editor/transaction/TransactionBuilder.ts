@@ -1,6 +1,7 @@
 import { Editor } from '../model/Editor';
-import { Node, Selection } from '../model/types';
+import { Node } from '../model/types';
 import { Step } from './types';
+import { AbstractSelection } from '../model/Selection';
 
 export class TransactionBuilder {
     patch = ({
@@ -37,8 +38,8 @@ export class TransactionBuilder {
         this.steps.push({ name: 'insertAfter', node, after, parent });
         return this;
     };
-    focus = (blockIds: Selection['blockIds']): TransactionBuilder => {
-        this.steps.push({ name: 'focus', blockIds });
+    focus = (selection?: AbstractSelection): TransactionBuilder => {
+        this.steps.push({ name: 'focus', selection });
         return this;
     };
 

@@ -1,6 +1,6 @@
-import { Node } from '../editor/model/types';
-import { Children } from '../editor/view/Children';
 import React from 'react';
+import { Children } from '../../editor/view/Children';
+import { Node } from '../../editor/model/types';
 
 export const Callout = ({ node }: { node: Node; parentId: string }) => {
     return (

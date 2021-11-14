@@ -1,4 +1,4 @@
-import { SCHEMA } from '../components/schema';
+import { SCHEMA } from './schema';
 import { MarkedText } from '../editor/model/types';
 
 export const BIG_DATA = (() => {
@@ -32,8 +32,9 @@ export const PLAYGROUND_DATA = {
             'fjsnsjdnf',
             'dsdffze',
             'abc',
-            'mamma',
             'njnfjn',
+            'mamma',
+            'kdsfkdf',
         ],
     },
     aqdfsd: {
@@ -47,6 +48,15 @@ export const PLAYGROUND_DATA = {
     },
     fjsnsjdnf: {
         id: 'fjsnsjdnf',
+        type: 'text',
+        text: [
+            {
+                s: 'Harum voluptas eum nulla harum necessitatibus. Corrupti fugiat modi doloribus officia voluptatem suscipit.',
+            },
+        ],
+    },
+    kdsfkdf: {
+        id: 'kdsfkdf',
         type: 'text',
         text: [
             {

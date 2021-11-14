@@ -4,23 +4,22 @@ import { TextRenderer } from './TextRenderer';
 import { MarkedText } from '../../model/types';
 import { getElementSelection } from './utils/getElementSelection';
 import { restoreSelection } from './utils/restoreSelection';
-import { TextSelection } from '../types';
 import { keyBinder } from './keyActions';
-import { ViewContext } from '../contexts/ViewContext';
+import { Range, TextSelection } from '../../model/Selection';
 
 export const TextInput = ({
-    onInput = () => undefined,
+    onChange = () => undefined,
     onKeyDown = () => undefined,
     value = [],
-    selection,
+    range,
     style = {},
     id = undefined,
     nodeId,
 }: {
-    onInput: (value: MarkedText, selection?: TextSelection) => void;
+    onChange: (value: MarkedText, range?: Range) => void;
     onKeyDown: (e: React.KeyboardEvent) => boolean | undefined;
     value?: MarkedText;
-    selection?: TextSelection;
+    range?: Range;
     style?: any;
     id?: string;
     nodeId: string;
@@ -29,26 +28,26 @@ export const TextInput = ({
     const ref = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
-        if (ref.current) {
-            if (selection) {
-                restoreSelection(ref.current, selection);
-            }
-        }
-    }, [selection]);
+        if (!ref.current || !range) return;
+        restoreSelection(ref.current, range);
+    }, [range]);
 
     const editor = useContext(EditorContext);
-    const view = useContext(ViewContext);
+
+    const onInput = (newValue: MarkedText, newRange?: Range) => {
+        onChange(newValue, newRange);
+    };
 
     const handleCompositionEnd = (e: React.FormEvent) => {
         setComposing(false);
-        if (selection) {
+        if (range) {
             const newTextState = keyBinder({
                 value,
                 e: e.nativeEvent,
-                selection,
+                range,
             });
             if (newTextState) {
-                onInput(newTextState.value, newTextState.selection);
+                onInput(newTextState.value, newTextState.range);
             }
         }
     };
@@ -58,28 +57,17 @@ export const TextInput = ({
     };
 
     const handleInput = (e: React.FormEvent) => {
-        if (selection) {
+        if (range) {
             const newTextState = keyBinder({
                 value,
                 e: e.nativeEvent,
-                selection,
+                range,
             });
-            if (newTextState) {
-                onInput(newTextState.value, newTextState.selection);
-            }
-        }
 
-        const text = ref.current?.textContent ?? '';
-        if ((e.nativeEvent as InputEvent).inputType === 'insertText') {
-            view.inputRules.some((inputRule) => {
-                return inputRule.regex.some((regex) => {
-                    const result = regex.exec(text);
-                    if (result) {
-                        inputRule.callback(editor, result);
-                        return true;
-                    }
-                });
-            });
+            if (newTextState) {
+                onInput(newTextState.value, newTextState.range);
+                editor.trigger('input');
+            }
         }
     };
 
@@ -88,14 +76,15 @@ export const TextInput = ({
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (!onKeyDown(e) && selection) {
+        if (!editor.state.selection?.isText()) return;
+        if (!onKeyDown(e) && range) {
             const newTextState = keyBinder({
                 value,
                 e: e.nativeEvent,
-                selection,
+                range,
             });
             if (newTextState) {
-                onInput(newTextState.value, newTextState.selection);
+                onInput(newTextState.value, newTextState.range);
             }
         } else {
             e.preventDefault();
@@ -104,42 +93,29 @@ export const TextInput = ({
 
     const saveDomSelection = () => {
         if (composing) return;
-        editor
-            .createTransaction()
-            .focus({
-                [nodeId]: getElementSelection(ref.current as HTMLDivElement),
-            })
-            .dispatch(false);
+        const range = getElementSelection(ref.current as HTMLDivElement);
+        if (!range) return;
+        const newTextSelection = new TextSelection(nodeId, 'text', range);
+        if (newTextSelection.isSame(editor.state.selection)) return;
+        editor.createTransaction().focus(newTextSelection).dispatch(false);
     };
 
-    const onPaste = (e: React.ClipboardEvent) => {
-        const wrapper = document.createElement('div');
-        wrapper.innerHTML = e.clipboardData.getData('text/html');
-        wrapper.querySelector('meta')?.remove();
-        console.log(wrapper);
-        e.preventDefault();
-    };
-
-    /** The key is used to force react to
-     *  rerender and prevent duplicate characters
-     *  (from keyboard and rendered by react */
     const key = JSON.stringify(value);
     return (
         <div
-            onPaste={onPaste}
             onCompositionEnd={handleCompositionEnd}
             onCompositionStart={handleCompositionStart}
             key={key}
+            contentEditable={true}
             suppressContentEditableWarning={true}
             onSelect={saveDomSelection}
-            onKeyDownCapture={handleKeyDown}
+            onKeyDown={handleKeyDown}
             onKeyUp={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
             }}
             ref={ref}
             onInput={handleInput}
-            contentEditable={true}
             style={{ ...style, outline: 'none' }}
             id={id}
         >

@@ -25,11 +25,12 @@ code {
 }
 
 .view {
+    position: relative;
     flex: 1;
     overflow: auto;
     background-color: #2f3437;
     color: white;
-    padding: 40px;
+    padding: 40px calc(50% - 360px);
     font-size: 16px;
     -webkit-font-smoothing: auto;
     line-height: 1.5;

@@ -1,33 +1,34 @@
 import { MarkedNode, MarkedText } from '../../model/types';
 import { splitMarkedText } from './splitMarkedText';
 import { minifyMarkedText } from './minifyMarkedText';
+import { Range } from '../../model/Selection';
 
-export const insertText = (
+export const spliceText = (
     text: MarkedText,
-    { textInput, from, to }: { textInput: string; from: number; to: number }
+    { textInput, range }: { textInput: string; range: Range }
 ) => {
     const splittedNodes = splitMarkedText(text);
     const updatedText: MarkedText = splittedNodes.slice();
 
-    const previousCharNode = updatedText[from - 1];
+    const previousCharNode = updatedText[range[0] - 1];
     // Todo: change the way we identify a previous dynamic node
     const isPreviousCharText = previousCharNode && previousCharNode.s !== 'm';
     const newSection: MarkedNode = isPreviousCharText
         ? {
-              ...updatedText[from - 1],
+              ...updatedText[range[0] - 1],
               s: textInput,
           }
         : {
               s: textInput,
               m: [],
           };
-    from = Math.max(from, 0);
-    updatedText.splice(from, to - from, newSection);
+    range[0] = Math.max(range[0], 0);
+    updatedText.splice(range[0], range[1] - range[0], newSection);
     return {
         value: minifyMarkedText(updatedText),
-        selection: {
-            to: to + textInput.length - (to - from),
-            from: from + textInput.length,
-        },
+        range: [
+            range[0] + textInput.length,
+            range[1] + textInput.length - (range[1] - range[0]),
+        ] as Range,
     };
 };

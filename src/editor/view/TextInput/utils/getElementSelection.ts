@@ -1,9 +1,9 @@
 import { getPosition } from './getPosition';
-import { TextSelection } from '../../types';
+import { Range } from '../../../model/Selection';
 
 export const getElementSelection = (
     container: HTMLElement | null
-): TextSelection | undefined => {
+): Range | undefined => {
     const selection = document.getSelection();
     const focusNode = selection?.focusNode;
     if (
@@ -27,8 +27,8 @@ export const getElementSelection = (
           })
         : undefined;
 
-    return {
-        from: Math.min(anchorPosition ?? 0, focusPosition),
-        to: Math.max(anchorPosition ?? 0, focusPosition),
-    };
+    return [
+        Math.min(anchorPosition ?? 0, focusPosition),
+        Math.max(anchorPosition ?? 0, focusPosition),
+    ];
 };

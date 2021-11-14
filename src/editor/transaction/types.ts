@@ -1,4 +1,5 @@
 import { Node } from '../model/types';
+import { AbstractSelection } from '../model/Selection';
 
 interface PatchStep {
     name: 'patch';
@@ -21,7 +22,7 @@ interface InsertAfterStep {
 
 interface FocusStep {
     name: 'focus';
-    blockIds: Record<string, any>;
+    selection?: AbstractSelection;
 }
 
 export type Step = RemoveFromStep | InsertAfterStep | PatchStep | FocusStep;

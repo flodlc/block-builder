@@ -1,16 +1,16 @@
-import { TextSelection } from '../types';
-import { insertText } from '../../transaction/MarkedText/insertText';
+import { spliceText } from '../../transaction/MarkedText/spliceText';
 import { MarkedText } from '../../model/types';
+import { Range, TextSelection } from '../../model/Selection';
 
 export const keyBinder = ({
-    selection,
+    range,
     e,
     value,
 }: {
-    selection: TextSelection;
+    range: Range;
     e: Event;
     value: MarkedText;
-}): { value: MarkedText; selection?: TextSelection } | undefined => {
+}): { value: MarkedText; range?: Range } | undefined => {
     let newLocalState:
         | { value: MarkedText; selection?: TextSelection }
         | undefined = undefined;
@@ -18,7 +18,7 @@ export const keyBinder = ({
     config.some((eventConfig) => {
         if (eventConfig.match(e)) {
             newLocalState = eventConfig.callback({
-                selection,
+                range,
                 e,
                 value,
             });
@@ -31,42 +31,40 @@ export const keyBinder = ({
 const config: {
     match: (e: Event) => boolean;
     callback: ({
-        selection,
+        range,
         e,
         value,
     }: {
-        selection: TextSelection;
+        range: Range;
         e: Event;
         value: MarkedText;
-    }) => { value: MarkedText; selection: TextSelection };
+    }) => { value: MarkedText; range: Range };
 }[] = [
     {
         match: (e) =>
             e.type === 'keydown' && (e as KeyboardEvent).key === 'Backspace',
-        callback: ({ value, selection, e }) => {
+        callback: ({ value, range, e }) => {
             e.preventDefault();
-            return insertText(value, {
+            return spliceText(value, {
                 textInput: '',
-                to: selection.to,
-                from:
-                    selection.from < selection.to
-                        ? selection.from
-                        : selection.from - 1,
+                range: [
+                    range[0] < range[1] ? range[0] : range[0] - 1,
+                    range[1],
+                ],
             });
         },
     },
     {
         match: (e) =>
             e.type === 'keydown' && (e as KeyboardEvent).key === 'Delete',
-        callback: ({ value, selection, e }) => {
+        callback: ({ value, range, e }) => {
             e.preventDefault();
-            return insertText(value, {
+            return spliceText(value, {
                 textInput: '',
-                to:
-                    selection.from < selection.to
-                        ? selection.to
-                        : selection.to + 1,
-                from: selection.from,
+                range: [
+                    range[0],
+                    range[0] < range[1] ? range[1] : range[1] + 1,
+                ],
             });
         },
     },
@@ -74,19 +72,19 @@ const config: {
         match: (e) =>
             e.type === 'input' &&
             ['insertText'].includes((e as InputEvent).inputType),
-        callback: ({ value, selection, e }) => {
-            return insertText(value, {
+        callback: ({ value, range, e }) => {
+            return spliceText(value, {
                 textInput: (e as InputEvent).data ?? '',
-                ...selection,
+                range,
             });
         },
     },
     {
         match: (e) => e.type === 'compositionend',
-        callback: ({ value, selection, e }) => {
-            return insertText(value, {
+        callback: ({ value, range, e }) => {
+            return spliceText(value, {
                 textInput: (e as CompositionEvent).data ?? '',
-                ...selection,
+                range,
             });
         },
     },

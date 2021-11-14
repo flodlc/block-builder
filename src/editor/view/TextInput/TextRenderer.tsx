@@ -47,8 +47,7 @@ export const TextRenderer = React.memo(
             (mark: Mark) => {
                 const updatedMarkedText = markText(text as MarkedText, {
                     mark,
-                    from,
-                    to,
+                    range: [from, to],
                 });
                 onChange(updatedMarkedText);
             };

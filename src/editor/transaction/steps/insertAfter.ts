@@ -16,7 +16,8 @@ export const insertAfter = ({
         state: produce(state, (draftState) => {
             draftState.nodes[node.id] = node;
             const parentNode = draftState.nodes[parent];
-            if (parentNode.childrenIds) {
+
+            if (parentNode?.childrenIds) {
                 const index = after
                     ? parentNode.childrenIds.indexOf(after)
                     : -1;

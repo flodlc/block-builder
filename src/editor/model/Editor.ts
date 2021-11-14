@@ -12,6 +12,8 @@ import { TransactionBuilder } from '../transaction/TransactionBuilder';
 import { Transaction } from '../transaction/types';
 import { ResolvedState, resolveState } from './NodesExplorer';
 
+export type EditorEvent = 'change' | 'tr' | 'input' | string;
+
 export class Editor {
     state: State;
     resolvedState?: ResolvedState;
@@ -21,10 +23,10 @@ export class Editor {
         return getNodeJson(this.state, this.state.nodes[this.state.rootId]);
     };
 
-    private observers = {
-        change: [] as EventHandler[],
-        nodes: {} as Record<string, EventHandler[]>,
-        tr: [] as EventHandler[],
+    private observers: Record<string, EventHandler[]> = {
+        change: [],
+        tr: [],
+        input: [],
     };
 
     runQuery = <T>(
@@ -38,13 +40,19 @@ export class Editor {
         command(this);
     };
 
-    on = (eventName: 'change' | 'tr', handler: EventHandler) => {
+    on = <T>(eventName: EditorEvent, handler: EventHandler<T>) => {
+        this.observers[eventName] = this.observers[eventName] ?? [];
         this.observers[eventName].push(handler);
     };
 
-    off = (eventName: 'change', handler: EventHandler) => {
+    off = (eventName: EditorEvent, handler: EventHandler) => {
         const index = this.observers[eventName].indexOf(handler);
         this.observers[eventName].splice(index, 1);
+    };
+
+    trigger = <T = any>(eventName: EditorEvent, data?: T) => {
+        this.observers?.[eventName]?.forEach((handlers) => handlers(data));
+        return data as T;
     };
 
     back = () => {
@@ -59,12 +67,15 @@ export class Editor {
 
     applyTransaction(transaction: Transaction) {
         const previousState = this.state;
-        this.observers.tr.forEach((handlers) => handlers());
         const { state, appliedTransaction } = applyTransaction({
             state: this.state,
             transaction,
         });
         this.state = state;
+        delete this.resolvedState;
+
+        this.observers.tr.forEach((handlers) => handlers(undefined));
+
         if (transaction.keepHistory) {
             this.history = produce(this.history, (history) => {
                 history.items.push({
@@ -72,10 +83,9 @@ export class Editor {
                     state: previousState,
                 });
             });
-        }
 
-        delete this.resolvedState;
-        this.observers.change.forEach((handlers) => handlers());
+            this.trigger('change');
+        }
     }
 
     private reverseTransaction(state: State, item: HistoryItem) {
@@ -94,7 +104,8 @@ export class Editor {
             });
         this.state = { ...draft, selection: item.state.selection };
         delete this.resolvedState;
-        this.observers.change.forEach((handlers) => handlers());
+        this.trigger('tr');
+        this.trigger('change');
     }
 
     createTransaction() {
@@ -112,10 +123,9 @@ export class Editor {
             items: [],
         };
         this.state = nodes
-            ? { selection: { blockIds: {} }, rootId, nodes }
+            ? { rootId, nodes }
             : {
                   rootId: 'doc',
-                  selection: { blockIds: {} },
                   nodes: {
                       doc: {
                           id: 'doc',

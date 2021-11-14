@@ -2,11 +2,17 @@ import React, { useLayoutEffect, useState } from 'react';
 import { Editor } from '../editor/model/Editor';
 import { View } from '../editor/view/View';
 import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
-import { toggleItalic } from '../editor/model/commands/toggleItalic.command';
-import { toggleBold } from '../editor/model/commands/toggleBold.command';
-import { toggleUnderline } from '../editor/model/commands/toggleUnderline.command';
-import { insertMention } from '../extensions/mention/insertMention.command';
-import { mentionPlugin } from '../extensions/mention/mention.plugin';
+import { MentionPlugin } from '../extensions/mention/mention.plugin';
+import { BlockSelectionPlugin } from '../extensions/blockSelection/blockSelection.plugin';
+import { SuggestionPlugin } from '../extensions/suggestion/suggestion.plugin';
+import { HistoryShortcutsPlugin } from '../extensions/historyShortcuts/historyShortcuts.plugin';
+import { CalloutPlugin } from '../extensions/callout/callout.plugin';
+import { TextPlugin } from '../extensions/text/text.plugin';
+import { BoldPlugin } from '../extensions/bold/bold.plugin';
+import { toggleBold } from '../extensions/bold/toggleBold.command';
+import { BlockSelectionShortcutsPlugin } from '../extensions/blockSelectionShortcuts/blockSelectionShortcuts.plugin';
+import { ArrowNavigationPlugin } from '../extensions/arrowNavigation/arrowNavigation.plugin';
+import { CopyPastePlugin } from '../extensions/copyPaste/copyPaste.plugin';
 
 function Playground() {
     const [editor] = useState(
@@ -34,20 +40,25 @@ function Playground() {
                 <button onClick={log.state}>Log state</button>
                 <button onClick={log.json}>Log json tree</button>
                 <button onClick={editor.back}>Undo</button>
-                <button onClick={() => editor.runCommand(insertMention())}>
-                    Mention
-                </button>
                 <button onClick={() => editor.runCommand(toggleBold())}>
                     Bold
                 </button>
-                <button onClick={() => editor.runCommand(toggleItalic())}>
-                    italic
-                </button>
-                <button onClick={() => editor.runCommand(toggleUnderline())}>
-                    underline
-                </button>
             </div>
-            <View viewPlugins={[mentionPlugin]} editor={editor} />
+            <View
+                plugins={[
+                    MentionPlugin(),
+                    BlockSelectionPlugin(),
+                    SuggestionPlugin(),
+                    HistoryShortcutsPlugin(),
+                    CalloutPlugin(),
+                    TextPlugin(),
+                    BoldPlugin(),
+                    BlockSelectionShortcutsPlugin(),
+                    ArrowNavigationPlugin(),
+                    CopyPastePlugin(),
+                ]}
+                editor={editor}
+            />
         </div>
     );
 }

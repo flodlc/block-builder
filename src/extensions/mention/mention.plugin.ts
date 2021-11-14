@@ -1,10 +1,19 @@
-import { mentionInputRules } from './mention.inputRules';
 import { Mention } from './Mention';
-import { ViewPlugin } from '../../editor/view/types';
+import { PluginFactory } from '../../editor/view/plugin/types';
+import { onChange } from './onChange';
 
-export const mentionPlugin: ViewPlugin = {
-    addInputRules: () => mentionInputRules,
-    addMarks: () => ({
-        mention: Mention,
-    }),
-};
+export const MentionPlugin: PluginFactory =
+    () =>
+    ({ editor }) => {
+        const handler = onChange({ editor });
+        editor.on('change', handler);
+        return {
+            key: 'mention',
+            addMarks: () => ({
+                mention: Mention,
+            }),
+            destroy: () => {
+                editor.off('change', handler);
+            },
+        };
+    };

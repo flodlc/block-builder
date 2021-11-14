@@ -1,4 +1,5 @@
 import { AppliedTransaction } from '../transaction/types';
+import { AbstractSelection } from './Selection';
 
 export type MarkedText = MarkedNode[];
 
@@ -20,11 +21,7 @@ export interface Node {
 export interface State {
     nodes: Record<string, Node>;
     rootId: string;
-    selection: Selection;
-}
-
-export interface Selection {
-    blockIds: Record<string, any>;
+    selection?: AbstractSelection;
 }
 
 export interface HistoryItem {
@@ -36,4 +33,4 @@ export interface History {
     items: HistoryItem[];
 }
 
-export type EventHandler = () => void;
+export type EventHandler<T = any> = (data: T) => void;

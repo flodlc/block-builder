@@ -1,19 +1,15 @@
 import { State } from '../../model/types';
-import produce from 'immer';
+import { AbstractSelection } from '../../model/Selection';
 
 export const focus = ({
     state,
-    blockIds,
+    selection,
 }: {
     state: State;
-    blockIds: Record<string, any>;
+    selection: AbstractSelection;
 }) => {
     return {
-        state: produce(state, (draftState) => {
-            draftState.selection.blockIds = JSON.parse(
-                JSON.stringify(blockIds)
-            );
-        }),
+        state: { ...state, selection: selection && selection.clone() },
         inversedStep: {
             name: 'focus',
             ...state.selection,

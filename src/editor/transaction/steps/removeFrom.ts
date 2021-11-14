@@ -13,7 +13,8 @@ export const removeFrom = ({
     const data = {} as { removedNode: Node; beforeId: string };
     const newState = produce(state, (draftState) => {
         const parentNode = draftState.nodes[parentId];
-        if (parentNode.childrenIds) {
+
+        if (parentNode?.childrenIds) {
             const index = parentNode.childrenIds.indexOf(nodeId);
             data.beforeId = parentNode.childrenIds[index - 1];
             parentNode.childrenIds.splice(index, 1);

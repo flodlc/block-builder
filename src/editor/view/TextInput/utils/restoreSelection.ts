@@ -1,14 +1,12 @@
 import { getTextNodes } from './getTextNodes';
-import { TextSelection } from '../../types';
+import { Range as PositionRange } from '../../../model/Selection';
 
 export const restoreSelection = (
     container: HTMLDivElement,
-    selection: TextSelection
+    textRange: PositionRange
 ) => {
-    const { from = selection.to, to } = selection;
     const docSelection = window.getSelection() as Selection;
     const nodes = getTextNodes({ node: container });
-
     if (!nodes.length) {
         container.focus();
         return;
@@ -25,22 +23,22 @@ export const restoreSelection = (
         const isLastNode = index === nodes.length - 1;
         const nodeLength = isTextNode ? node?.textContent?.length ?? 1 : 1;
 
-        if (!fromReady && pos + nodeLength >= from) {
+        if (!fromReady && pos + nodeLength >= textRange[0]) {
             fromReady = setStart({
                 range,
                 node,
                 isTextNode,
-                offset: from - pos,
+                offset: textRange[0] - pos,
                 isLastNode,
             });
         }
 
-        if (!toReady && pos + nodeLength >= to) {
+        if (!toReady && pos + nodeLength >= textRange[1]) {
             toReady = setEnd({
                 range,
                 node,
                 isTextNode,
-                offset: to - pos,
+                offset: textRange[1] - pos,
                 isLastNode,
             });
         }

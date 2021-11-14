@@ -1,52 +1,72 @@
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Editor } from '../model/Editor';
 import { EditorContext } from './contexts/EditorContext';
 import { Child } from './Children';
 import { ViewContext } from './contexts/ViewContext';
-import { ViewPlugin } from './types';
-import { viewConfig } from './configConfig';
+import { defaultViewConfig } from './defaultViewConfig';
+import { Plugin, RegisteredPlugin } from './plugin/types';
+import { registerPlugins } from './plugin/registerPlugins';
+import { ViewConfig } from './types';
 
 export const View = ({
     editor,
-    viewPlugins = [],
+    plugins = [],
 }: {
     editor: Editor;
-    viewPlugins?: ViewPlugin[];
+    plugins?: Plugin[];
 }) => {
-    useEffect(() => {
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'z' && e.metaKey) {
-                e.preventDefault();
-                e.stopPropagation();
-                editor.back();
-            }
-        };
-        document.addEventListener('keydown', onKeyDown, { capture: true });
+    const [viewConfig, setViewConfig] = useState<ViewConfig | undefined>(
+        undefined
+    );
+    const ref = useRef<HTMLDivElement>(null);
+
+    const [registeredPlugins, setRegisteredPlugins] = useState<
+        RegisteredPlugin[] | undefined
+    >(undefined);
+
+    useLayoutEffect(() => {
+        if (!ref.current) return;
+        const viewConfig = defaultViewConfig;
+        setRegisteredPlugins(
+            registerPlugins({
+                editor,
+                viewConfig,
+                plugins,
+                dom: ref.current,
+            })
+        );
+        setViewConfig(viewConfig);
         return () =>
-            document.removeEventListener('keydown', onKeyDown, {
-                capture: true,
-            });
+            registeredPlugins?.forEach((registeredPlugin) =>
+                registeredPlugin.destroy?.()
+            );
     }, []);
 
-    viewPlugins.forEach((viewPlugin) => {
-        viewConfig.inputRules.push(...(viewPlugin.addInputRules?.() ?? []));
-        viewConfig.marks = { ...viewConfig.marks, ...viewPlugin.addMarks?.() };
-        viewConfig.blocks = {
-            ...viewConfig.blocks,
-            ...viewPlugin.addBlocks?.(),
-        };
-    });
-
     const rootNode = editor.state.nodes[editor.state.rootId];
+
     return (
-        <ViewContext.Provider value={viewConfig}>
-            <EditorContext.Provider value={editor}>
-                <div className="view">
-                    {rootNode.childrenIds && (
-                        <Child parentId={'undefined'} nodeId={rootNode.id} />
-                    )}
-                </div>
-            </EditorContext.Provider>
-        </ViewContext.Provider>
+        <div className="view" ref={ref}>
+            {viewConfig && (
+                <>
+                    <ViewContext.Provider value={viewConfig}>
+                        <EditorContext.Provider value={editor}>
+                            {rootNode.childrenIds && (
+                                <Child
+                                    parentId={'undefined'}
+                                    nodeId={rootNode.id}
+                                />
+                            )}
+                        </EditorContext.Provider>
+                    </ViewContext.Provider>
+
+                    {registeredPlugins
+                        ?.filter((item) => item.Component)
+                        ?.map(({ Component }, i) => {
+                            Component = Component as React.FC;
+                            return <Component key={i} editor={editor} />;
+                        })}
+                </>
+            )}
+        </div>
     );
 };

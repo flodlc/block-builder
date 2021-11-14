@@ -1,13 +1,13 @@
 import React, { KeyboardEvent, useContext } from 'react';
-import { EditorContext } from '../editor/view/contexts/EditorContext';
-import { TextInput } from '../editor/view/TextInput/TextInput';
-import { SCHEMA } from './schema';
-import { MarkedText, Node } from '../editor/model/types';
-import { TextSelection } from '../editor/view/types';
-import { cutMarkedText } from '../editor/transaction/MarkedText/cutMarkedText';
-import { joinMarkedTexts } from '../editor/transaction/MarkedText/joinMarkedTexts';
-import { getMarkedTextLength } from '../editor/transaction/MarkedText/getMarkedTextLength';
-import { previousEditable } from '../editor/model/queries/previousEditable';
+import { TextSelection, Range } from '../../editor/model/Selection';
+import { MarkedText, Node } from '../../editor/model/types';
+import { EditorContext } from '../../editor/view/contexts/EditorContext';
+import { SCHEMA } from '../../Playground/schema';
+import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
+import { previousEditable } from '../../editor/model/queries/previousEditable';
+import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
+import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
+import { TextInput } from '../../editor/view/TextInput/TextInput';
 
 export const Text = React.memo(
     ({
@@ -20,27 +20,25 @@ export const Text = React.memo(
         selection?: TextSelection;
     }) => {
         const editor = useContext(EditorContext);
-        const oninput = (
-            value: MarkedText,
-            currentSelection?: TextSelection
-        ) => {
+        const oninput = (value: MarkedText, currentRange?: Range) => {
             editor
                 .createTransaction()
                 .patch({
                     nodeId: node.id,
                     patch: { text: value },
                 })
-                .focus({ [node.id]: currentSelection })
+                .focus(currentRange && selection?.setRange(currentRange))
                 .dispatch();
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
+            selection = selection as TextSelection;
             switch (e.key) {
                 case 'Enter':
                     const newNode: Node = SCHEMA['text'].create();
-                    newNode.text = cutMarkedText(node.text, {
-                        from: selection?.to,
-                    });
+                    newNode.text = cutMarkedText(node.text, [
+                        selection?.range[0],
+                    ]);
 
                     editor
                         .createTransaction()
@@ -52,16 +50,17 @@ export const Text = React.memo(
                         .patch({
                             nodeId: node.id,
                             patch: {
-                                text: cutMarkedText(node.text, {
-                                    to: selection?.to,
-                                }),
+                                text: cutMarkedText(node.text, [
+                                    undefined,
+                                    selection?.range?.[0],
+                                ]),
                             },
                         })
-                        .focus({ [newNode.id]: { to: 0 } })
+                        .focus(new TextSelection(newNode.id, 'text', [0, 0]))
                         .dispatch();
                     return true;
                 case 'Backspace':
-                    if (selection?.to === 0) {
+                    if (selection?.range?.[0] === 0) {
                         const target = editor.runQuery(
                             previousEditable(node.id)
                         );
@@ -82,11 +81,12 @@ export const Text = React.memo(
                                     ),
                                 },
                             })
-                            .focus({
-                                [target.id]: {
-                                    to: getMarkedTextLength(target.text),
-                                },
-                            })
+                            .focus(
+                                new TextSelection(target.id, 'text', [
+                                    getMarkedTextLength(target.text) ?? 0,
+                                    getMarkedTextLength(target.text) ?? 0,
+                                ])
+                            )
                             .dispatch();
                         return true;
                     }
@@ -96,13 +96,13 @@ export const Text = React.memo(
         };
 
         return (
-            <div data-uid={node.id}>
+            <div data-uid={node.id} style={{ padding: '3px' }}>
                 <TextInput
                     onKeyDown={onKeyDown}
-                    onInput={oninput}
+                    onChange={oninput}
                     style={{ padding: '4px 0', whiteSpace: 'break-spaces' }}
                     value={node.text}
-                    selection={selection}
+                    range={selection?.range}
                     nodeId={node.id}
                 />
             </div>

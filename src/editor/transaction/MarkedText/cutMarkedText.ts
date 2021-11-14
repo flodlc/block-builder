@@ -4,11 +4,11 @@ import { splitMarkedText } from './splitMarkedText';
 
 export const cutMarkedText = (
     text: MarkedText | undefined,
-    { from, to }: { from?: number; to?: number }
+    range: [number | undefined, number] | [number | undefined]
 ) => {
     const splittedNodes = splitMarkedText(text ?? []).slice(
-        from ?? 0,
-        to ?? undefined
+        range[0] ?? 0,
+        range[1] ?? undefined
     );
     return minifyMarkedText(splittedNodes);
 };
