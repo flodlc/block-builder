@@ -83,8 +83,12 @@ export const Text = React.memo(
                             })
                             .focus(
                                 new TextSelection(target.id, 'text', [
-                                    getMarkedTextLength(target.text) ?? 0,
-                                    getMarkedTextLength(target.text) ?? 0,
+                                    target.text
+                                        ? getMarkedTextLength(target.text)
+                                        : 0,
+                                    target.text
+                                        ? getMarkedTextLength(target.text)
+                                        : 0,
                                 ])
                             )
                             .dispatch();
