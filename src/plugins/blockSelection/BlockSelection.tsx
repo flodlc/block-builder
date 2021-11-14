@@ -5,12 +5,11 @@ import { BLOCK_SELECTION_EVENTS, DraggingState } from './blockSelection.plugin';
 export const BlockSelectionWrapper = ({ editor }: { editor: Editor }) => {
     const [draggingState, setDraggingState] = useState<DraggingState | void>();
     useEffect(() => {
-        editor.on<DraggingState>(
-            BLOCK_SELECTION_EVENTS.changed,
-            (draggingState) => {
-                setDraggingState({ ...draggingState });
-            }
-        );
+        const handler = (draggingState: DraggingState) => {
+            setDraggingState({ ...draggingState });
+        };
+        editor.on(BLOCK_SELECTION_EVENTS.changed, handler);
+        return () => editor.off(BLOCK_SELECTION_EVENTS.changed, handler);
     }, []);
     return (
         <BlockSelection

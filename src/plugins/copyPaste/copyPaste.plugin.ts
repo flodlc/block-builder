@@ -35,8 +35,8 @@ const insertInline = ({ editor, text }: { editor: Editor; text: string }) => {
     const newText = joinMarkedTexts(editor.state.nodes[selection.nodeId].text, [
         { s: text },
     ]);
-
     const newTextLength = getMarkedTextLength(newText);
+
     editor
         .createTransaction()
         .patch({

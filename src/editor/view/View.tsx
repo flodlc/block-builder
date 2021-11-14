@@ -27,14 +27,13 @@ export const View = ({
     useLayoutEffect(() => {
         if (!ref.current) return;
         const viewConfig = defaultViewConfig;
-        setRegisteredPlugins(
-            registerPlugins({
-                editor,
-                viewConfig,
-                plugins,
-                dom: ref.current,
-            })
-        );
+        const registeredPlugins = registerPlugins({
+            editor,
+            viewConfig,
+            plugins,
+            dom: ref.current,
+        });
+        setRegisteredPlugins(registeredPlugins);
         setViewConfig(viewConfig);
         return () =>
             registeredPlugins?.forEach((registeredPlugin) =>

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Editor } from '../editor/model/Editor';
 import { View } from '../editor/view/View';
 import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
@@ -33,6 +33,13 @@ function Playground() {
         json: () => console.log(JSON.parse(JSON.stringify(editor.getJson()))),
     };
 
+    const [dis, setDis] = useState(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setDis(false);
+        }, 2000);
+    }, []);
+
     return (
         <div className="editor">
             <div className="header">
@@ -44,21 +51,23 @@ function Playground() {
                     Bold
                 </button>
             </div>
-            <View
-                plugins={[
-                    MentionPlugin(),
-                    BlockSelectionPlugin(),
-                    SuggestionPlugin(),
-                    HistoryShortcutsPlugin(),
-                    CalloutPlugin(),
-                    TextPlugin(),
-                    BoldPlugin(),
-                    BlockSelectionShortcutsPlugin(),
-                    ArrowNavigationPlugin(),
-                    CopyPastePlugin(),
-                ]}
-                editor={editor}
-            />
+            {dis && (
+                <View
+                    plugins={[
+                        MentionPlugin(),
+                        BlockSelectionPlugin(),
+                        SuggestionPlugin(),
+                        HistoryShortcutsPlugin(),
+                        CalloutPlugin(),
+                        TextPlugin(),
+                        BoldPlugin(),
+                        BlockSelectionShortcutsPlugin(),
+                        ArrowNavigationPlugin(),
+                        CopyPastePlugin(),
+                    ]}
+                    editor={editor}
+                />
+            )}
         </div>
     );
 }
