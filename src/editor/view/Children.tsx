@@ -56,17 +56,12 @@ export const Child = React.memo(
         );
 
         useEffect(() => {
-            const isBlockSelection = editor.state.selection?.isBlock();
-            const blockSelection =
-                editor.state.selection?.getNodeSelection(nodeId);
-            setNodeSelection(!isBlockSelection ? blockSelection : undefined);
-            setBlockSelected(Boolean(isBlockSelection && blockSelection));
             const onChange = () => {
-                setNode(editor.state.nodes[nodeId]);
                 const selectionTypes = getSelection({
                     nodeId,
                     selection: editor.state.selection,
                 });
+                setNode(editor.state.nodes[nodeId]);
                 setNodeSelection(selectionTypes.insideSelection);
                 setBlockSelected(selectionTypes.blockSelection);
             };

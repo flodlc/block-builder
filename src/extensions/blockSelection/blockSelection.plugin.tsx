@@ -1,6 +1,6 @@
 import React from 'react';
 import { PluginFactory } from '../../editor/view/plugin/types';
-import { BBlockSelection } from '../../editor/model/Selection';
+import { BlockSelection } from '../../editor/model/Selection';
 import { BlockSelectionWrapper } from './BlockSelection';
 import { Editor } from '../../editor/model/Editor';
 
@@ -120,8 +120,8 @@ const createCurrentSelection = ({
     return (
         editor.state.selection?.isBlock()
             ? editor.state.selection
-            : new BBlockSelection(startNodeId ? { [startNodeId]: true } : {})
-    ) as BBlockSelection;
+            : new BlockSelection(startNodeId ? [startNodeId] : [])
+    ) as BlockSelection;
 };
 
 const getNodeIdFromPoint = (x: number, y: number) => {

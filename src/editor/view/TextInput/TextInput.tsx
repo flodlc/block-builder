@@ -12,6 +12,7 @@ export const TextInput = ({
     onKeyDown = () => undefined,
     value = [],
     range,
+    field,
     style = {},
     id = undefined,
     nodeId,
@@ -20,6 +21,7 @@ export const TextInput = ({
     onKeyDown: (e: React.KeyboardEvent) => boolean | undefined;
     value?: MarkedText;
     range?: Range;
+    field: string;
     style?: any;
     id?: string;
     nodeId: string;
@@ -95,7 +97,7 @@ export const TextInput = ({
         if (composing) return;
         const range = getElementSelection(ref.current as HTMLDivElement);
         if (!range) return;
-        const newTextSelection = new TextSelection(nodeId, 'text', range);
+        const newTextSelection = new TextSelection(nodeId, field, range);
         if (newTextSelection.isSame(editor.state.selection)) return;
         editor.createTransaction().focus(newTextSelection).dispatch(false);
     };

@@ -20,25 +20,33 @@ export abstract class AbstractSelection {
     abstract getNodeSelection(nodeId: string): any;
 }
 
-export class BBlockSelection extends AbstractSelection {
-    readonly nodeIds: Record<string, boolean>;
+export class BlockSelection extends AbstractSelection {
+    readonly nodeIds: Map<string, string>;
 
-    constructor(nodeIds: Record<string, boolean>) {
+    constructor(nodeIds: string[] | Map<string, string>) {
         super();
         this.type = 'block';
-        this.nodeIds = nodeIds;
+        if (Array.isArray(nodeIds)) {
+            this.nodeIds = new Map<string, string>(
+                nodeIds.map((nodeId) => [nodeId, nodeId])
+            );
+        } else {
+            this.nodeIds = new Map<string, string>(nodeIds);
+        }
     }
 
     getNodeSelection(nodeId: string) {
-        return this.nodeIds[nodeId];
+        return Boolean(this.nodeIds.get(nodeId));
     }
 
     addBlockToSelection(nodeId: string) {
-        return new BBlockSelection({ ...this.nodeIds, [nodeId]: true });
+        const newMap = new Map<string, string>(this.nodeIds);
+        newMap.set(nodeId, nodeId);
+        return new BlockSelection(newMap);
     }
 
     clone() {
-        return new BBlockSelection(this.nodeIds);
+        return new BlockSelection(this.nodeIds);
     }
 }
 

@@ -7,6 +7,7 @@ export const SCHEMA = {
             type: 'text',
             text: [{ s: 'salutation ' }],
         }),
+        fields: ['text'],
     },
     toggle: {
         create: () => ({

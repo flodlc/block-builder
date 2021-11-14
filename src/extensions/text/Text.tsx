@@ -102,7 +102,12 @@ export const Text = React.memo(
                     onChange={oninput}
                     style={{ padding: '4px 0', whiteSpace: 'break-spaces' }}
                     value={node.text}
-                    range={selection?.range}
+                    range={
+                        selection?.field === 'text'
+                            ? selection?.range
+                            : undefined
+                    }
+                    field={'text'}
                     nodeId={node.id}
                 />
             </div>

@@ -1,11 +1,11 @@
 import { Editor } from '../../editor/model/Editor';
-import { BBlockSelection } from '../../editor/model/Selection';
+import { BlockSelection } from '../../editor/model/Selection';
 
 export const onBackspace = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as BBlockSelection;
+    const selection = editor.state.selection as BlockSelection;
     const transaction = editor.createTransaction();
 
-    Object.keys(selection.nodeIds).forEach((nodeId) => {
+    selection.nodeIds.forEach((nodeId) => {
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[nodeId].parentId
         );
