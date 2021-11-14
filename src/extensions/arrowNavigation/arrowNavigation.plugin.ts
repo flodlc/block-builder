@@ -18,5 +18,8 @@ export const ArrowNavigationPlugin: PluginFactory =
 
         return {
             key: 'arrowPlugin',
+            destroy: () => {
+                dom.removeEventListener('keydown', onKeyDown);
+            },
         };
     };

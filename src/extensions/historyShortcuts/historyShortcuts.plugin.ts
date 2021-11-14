@@ -15,7 +15,7 @@ export const HistoryShortcutsPlugin: PluginFactory =
         return {
             key: 'historyShortcutsPlugin',
             destroy: () => {
-                document.addEventListener('keydown', onKeyDown, {
+                document.removeEventListener('keydown', onKeyDown, {
                     capture: false,
                 });
             },
