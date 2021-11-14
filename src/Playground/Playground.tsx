@@ -33,13 +33,6 @@ function Playground() {
         json: () => console.log(JSON.parse(JSON.stringify(editor.getJson()))),
     };
 
-    const [dis, setDis] = useState(true);
-    useEffect(() => {
-        setTimeout(() => {
-            setDis(false);
-        }, 2000);
-    }, []);
-
     return (
         <div className="editor">
             <div className="header">
@@ -51,23 +44,21 @@ function Playground() {
                     Bold
                 </button>
             </div>
-            {dis && (
-                <View
-                    plugins={[
-                        MentionPlugin(),
-                        BlockSelectionPlugin(),
-                        SuggestionPlugin(),
-                        HistoryShortcutsPlugin(),
-                        CalloutPlugin(),
-                        TextPlugin(),
-                        BoldPlugin(),
-                        BlockSelectionShortcutsPlugin(),
-                        ArrowNavigationPlugin(),
-                        CopyPastePlugin(),
-                    ]}
-                    editor={editor}
-                />
-            )}
+            <View
+                plugins={[
+                    MentionPlugin(),
+                    BlockSelectionPlugin(),
+                    SuggestionPlugin(),
+                    HistoryShortcutsPlugin(),
+                    CalloutPlugin(),
+                    TextPlugin(),
+                    BoldPlugin(),
+                    BlockSelectionShortcutsPlugin(),
+                    ArrowNavigationPlugin(),
+                    CopyPastePlugin(),
+                ]}
+                editor={editor}
+            />
         </div>
     );
 }
