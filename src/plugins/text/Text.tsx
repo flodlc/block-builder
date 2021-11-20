@@ -60,7 +60,10 @@ export const Text = React.memo(
                         .dispatch();
                     return true;
                 case 'Backspace':
-                    if (selection?.range?.[0] === 0) {
+                    if (
+                        selection?.range?.[0] === 0 &&
+                        selection?.range?.[1] === 0
+                    ) {
                         const target = editor.runQuery(
                             previousEditable(node.id)
                         );

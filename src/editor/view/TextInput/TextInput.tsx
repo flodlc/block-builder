@@ -26,15 +26,14 @@ export const TextInput = ({
     id?: string;
     nodeId: string;
 }) => {
-    const [composing, setComposing] = useState(false);
+    const editor = useContext(EditorContext);
     const ref = useRef<HTMLDivElement>(null);
+    const [composing, setComposing] = useState(false);
 
     useLayoutEffect(() => {
         if (!ref.current || !range) return;
         restoreSelection(ref.current, range);
     }, [range]);
-
-    const editor = useContext(EditorContext);
 
     const onInput = (newValue: MarkedText, newRange?: Range) => {
         onChange(newValue, newRange);
