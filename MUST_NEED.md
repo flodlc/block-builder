@@ -5,23 +5,22 @@
 - [x] Card
 - [ ] Task
 - [x] Shortcut bold, heading1, ...
-- [ ] Insertion HTML
+- [ ] ✨ Insertion HTML
 - [x] Mention Placeholder
 - [x] possibility to execute some define marks on content editable false 
 - [x] hook that listened suggestion (char+text+space+text) from outside the editor
 - [ ] Todo as card with content
-- [ ] Image / Files
+- [ ] ✨  Image / Files
     - [ ] Copy past link
     - [ ] Drop Image
 - [ ] Editor API available from the DOM element
-- [ ] Copy Past from multiple source
-- [ ] Copy Past from multiple source
-- [ ] Link 
+- [ ] ✨  Copy Past from multiple source
+- [ ] ✨ Link 
      - [ ] Copy past
      - [ ] Markdown
      - [ ] Popover edition
      - [ ] Menu option on past
-- [ ] Indent/outdent
+- [ ] ✨ Indent/outdent
 - [ ] Selection and caret navigation over React component not editable
 
     
