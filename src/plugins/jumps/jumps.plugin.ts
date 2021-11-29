@@ -2,6 +2,7 @@ import { PluginFactory } from '../../editor/view/plugin/types';
 import { onBackspace } from './onBackspace';
 import { onTab } from './onTab';
 import { onEnter } from './onEnter';
+import { onDelete } from './onDelete';
 
 export const JumpsPlugin: PluginFactory =
     () =>
@@ -13,6 +14,7 @@ export const JumpsPlugin: PluginFactory =
                 Backspace: () => onBackspace({ e, editor }),
                 Tab: () => onTab({ e, editor }),
                 Enter: () => onEnter({ e, editor }),
+                Delete: () => onDelete({ e, editor }),
             }[e.key];
 
             handler?.();

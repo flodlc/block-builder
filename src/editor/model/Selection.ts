@@ -1,5 +1,4 @@
-import { MarkedText, State } from './types';
-import { Editor } from './Editor';
+import { State } from './types';
 import { getMarkedTextLength } from '../transaction/MarkedText/getMarkedTextLength';
 
 export abstract class AbstractSelection {

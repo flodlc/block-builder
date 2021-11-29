@@ -32,7 +32,7 @@ export const compileSchema = ({
                     });
 
                     return {
-                        id: uuidv4(),
+                        id: node?.id ?? uuidv4(),
                         type,
                         text: node?.text ?? [],
                         childrenIds: [],

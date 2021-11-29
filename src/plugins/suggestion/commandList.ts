@@ -13,7 +13,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
                 .createTransaction()
                 .patch({
                     nodeId,
-                    patch: editor.schema.heading.patch({
+                    patch: editor.schema.heading.create({
                         ...editor.state.nodes[nodeId],
                         attrs: { level: 1 },
                     }),
@@ -30,7 +30,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
                 .createTransaction()
                 .patch({
                     nodeId,
-                    patch: editor.schema.heading.patch({
+                    patch: editor.schema.heading.create({
                         ...editor.state.nodes[nodeId],
                         attrs: { level: 2 },
                     }),
@@ -47,7 +47,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
                 .createTransaction()
                 .patch({
                     nodeId,
-                    patch: editor.schema.text.patch({
+                    patch: editor.schema.text.create({
                         ...editor.state.nodes[nodeId],
                     }),
                 })

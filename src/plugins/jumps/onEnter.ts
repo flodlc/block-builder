@@ -16,7 +16,7 @@ export const onEnter = ({
 
     const tr = editor.createTransaction();
 
-    if (node.type !== 'card') {
+    if (!node.childrenIds?.length) {
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[node.id].parentId
         );

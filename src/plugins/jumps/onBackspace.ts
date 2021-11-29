@@ -12,31 +12,54 @@ export const onBackspace = ({
     editor: Editor;
     e: KeyboardEvent;
 }) => {
+    const selection = editor.state.selection as TextSelection;
+    if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0) return;
+
     if (tryUnwrap({ e, editor })) {
+        return;
+    } else if (tryReset({ e, editor })) {
         return;
     } else if (tryDelete({ e, editor })) {
         return;
     }
 };
 
+const tryReset = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
+    const selection = editor.state.selection as TextSelection;
+    const node = editor.state.nodes[selection.nodeId];
+
+    if (node.type !== 'text') {
+        editor
+            .createTransaction()
+            .patch({
+                nodeId: node.id,
+                patch: editor.schema.text.create(node),
+            })
+            .dispatch();
+        e.preventDefault();
+        e.stopPropagation();
+        return true;
+    }
+    return false;
+};
+
 const tryUnwrap = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     const selection = editor.state.selection as TextSelection;
-    if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0)
-        return false;
 
     const parentId = editor.runQuery(
         (resolvedState) => resolvedState.nodes[selection.nodeId].parentId
     );
-
     if (!parentId) return false;
     const parent = editor.state.nodes[parentId];
 
     const currentIndex = parent.childrenIds?.indexOf(selection.nodeId) ?? -1;
-    if (currentIndex < (parent.childrenIds?.length ?? 0) - 1) return false;
-
-    const unwraped = editor.runCommand(unwrap({ nodeId: selection.nodeId }));
-    if (unwraped === false) return false;
-
+    if (
+        currentIndex > 0 &&
+        currentIndex < (parent.childrenIds?.length ?? 0) - 1
+    )
+        return false;
+    const unwrapped = editor.runCommand(unwrap({ nodeId: selection.nodeId }));
+    if (unwrapped === false) return false;
     e.preventDefault();
     e.stopPropagation();
     return true;
@@ -44,10 +67,8 @@ const tryUnwrap = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
 
 const tryDelete = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     const selection = editor.state.selection as TextSelection;
-    if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0)
-        return false;
-
     const node = editor.state.nodes[selection.nodeId];
+
     const target = editor.runQuery(previousEditable(node.id));
     if (!target) return false;
 
@@ -56,8 +77,19 @@ const tryDelete = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     );
     if (!parentId) return false;
 
-    editor
-        .createTransaction()
+    const transaction = editor.createTransaction();
+
+    (node.childrenIds ?? []).forEach((childId) => {
+        const child = editor.state.nodes[childId];
+        transaction
+            .removeFrom({
+                parentId: node.id,
+                nodeId: childId,
+            })
+            .insertAfter({ node: child, parent: parentId, after: node.id });
+    });
+
+    transaction
         .removeFrom({
             parentId,
             nodeId: node.id,

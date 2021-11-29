@@ -5,6 +5,7 @@ export interface ResolvedNode extends Node {
     index?: number;
     previousId?: string;
     nextId?: string;
+    depth?: number;
 }
 
 export type ResolvedNodes = Record<string, ResolvedNode>;
@@ -45,15 +46,23 @@ const dive = (
     parent: ResolvedNode,
     index: number,
     resolvedNodes: ResolvedNodes,
-    callback: (nodeId: string) => void
+    callback: (nodeId: string) => void,
+    depth = 0
 ) => {
     if (parent?.childrenIds) {
         for (let i = 0; i < parent?.childrenIds.length; i++) {
             const childId = parent?.childrenIds?.[i];
             if (childId) {
                 callback(childId);
-                dive(resolvedNodes[childId], i, resolvedNodes, callback);
+                dive(
+                    resolvedNodes[childId],
+                    i,
+                    resolvedNodes,
+                    callback,
+                    depth + 1
+                );
             }
         }
     }
+    parent.depth = depth;
 };

@@ -3,7 +3,6 @@ import React, {
     useContext,
     useEffect,
     useLayoutEffect,
-    useMemo,
     useRef,
     useState,
 } from 'react';
@@ -62,10 +61,7 @@ export const TextInput = ({
     const ref = useRef<HTMLDivElement>(null);
     const [composing] = useState({ state: false });
     const decorations = useDecorations({ editor, nodeId });
-    const textContent = useMemo(
-        () => value.reduce((prev, cur) => prev + cur.s, ''),
-        [value]
-    );
+
     useLayoutEffect(() => {
         if (!ref.current) return;
         restoreSelection(ref.current, range);
