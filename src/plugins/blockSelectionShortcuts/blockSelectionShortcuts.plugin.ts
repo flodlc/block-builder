@@ -25,7 +25,7 @@ export const BlockSelectionShortcutsPlugin: PluginFactory =
 
         document.addEventListener('keydown', onKeyDown);
         return {
-            key: 'Backspace',
+            key: 'BlockSelectionKeyDown',
             destroy() {
                 document.removeEventListener('keydown', onKeyDown);
             },

@@ -15,6 +15,9 @@ export class TransactionBuilder {
         return this;
     };
 
+    /**
+     * Remove Node
+     */
     removeFrom = ({
         nodeId,
         parentId,
@@ -26,6 +29,9 @@ export class TransactionBuilder {
         return this;
     };
 
+    /**
+     * Insert Node
+     */
     insertAfter = ({
         node,
         after,

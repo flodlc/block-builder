@@ -42,10 +42,7 @@ const insertInline = ({ editor, text }: { editor: Editor; text: string }) => {
         .createTransaction()
         .patch({
             patch: {
-                text: joinMarkedTexts(
-                    editor.state.nodes[selection.nodeId].text,
-                    [{ s: text }]
-                ),
+                text: newText,
             },
             nodeId: selection.nodeId,
         })
