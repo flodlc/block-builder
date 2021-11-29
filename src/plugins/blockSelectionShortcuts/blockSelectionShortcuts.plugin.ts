@@ -15,6 +15,7 @@ export const BlockSelectionShortcutsPlugin: PluginFactory =
 
             const handler = {
                 Backspace: () => onBackspace({ editor }),
+                Delete: () => onBackspace({ editor }),
                 Escape: () => onEscape({ editor }),
                 Enter: () => onEnter({ editor }),
             }[e.key];
