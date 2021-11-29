@@ -1,16 +1,18 @@
-import { SCHEMA } from './schema';
 import { MarkedText } from '../editor/model/types';
+import { SCHEMA } from './SCHEMA';
+import { compileSchema } from '../editor/model/schema';
 
 export const BIG_DATA = (() => {
+    const schema = compileSchema({ schema: SCHEMA });
     const nodes: any = {};
     const docNode: any = {
         id: 'doc',
-        type: 'doc',
+        type: 'card',
         childrenIds: [],
     };
     nodes['doc'] = docNode;
     for (let i = 0; i < 1000; i++) {
-        const newNode = SCHEMA.text.create();
+        const newNode = schema.text.create();
         newNode.text = [
             {
                 s: 'Suite aux faux pas de Nice, le club rhodanien voulait faire la bonne opération dans la course au podium.',
@@ -25,24 +27,41 @@ export const BIG_DATA = (() => {
 export const PLAYGROUND_DATA = {
     doc: {
         id: 'doc',
-        type: 'doc',
+        type: 'card',
+        text: [{ s: 'My first note' }],
         childrenIds: [
-            'aqdfsd',
+            'abcaa',
             'sdfsffs',
             'fjsnsjdnf',
             'dsdffze',
+            'aqdfsd',
             'abc',
-            'njnfjn',
-            'mamma',
+            'skdfsdf',
             'kdsfkdf',
         ],
     },
-    aqdfsd: {
-        id: 'aqdfsd',
+    abcaa: {
+        id: 'abcaa',
+        type: 'quote',
+        childrenIds: ['bcdaa', 'bcadaa'],
+    },
+    bcdaa: {
+        id: 'bcdaa',
         type: 'text',
+        text: [{ s: 'Clipped content from a blog article' }],
+    },
+    bcadaa: {
+        id: 'bcadaa',
+        type: 'text',
+        text: [{ s: 'Thank you for reading' }],
+    },
+    sdfsffs: {
+        id: 'sdfsffs',
+        type: 'heading',
+        attrs: { level: 2 },
         text: [
             {
-                s: 'Quas praesentium culpa dolor qui. Qui quia velit qui molestias est maiores excepturi consequatur.',
+                s: 'How to take smart notes ?',
             },
         ],
     },
@@ -51,7 +70,7 @@ export const PLAYGROUND_DATA = {
         type: 'text',
         text: [
             {
-                s: 'Harum voluptas eum nulla harum necessitatibus. Corrupti fugiat modi doloribus officia voluptatem suscipit.',
+                s: 'Harum voluptas eum nulla harum necessitatibus. ',
             },
         ],
     },
@@ -64,35 +83,26 @@ export const PLAYGROUND_DATA = {
             },
         ],
     },
-    sdfsffs: {
-        id: 'sdfsffs',
+    aqdfsd: {
+        id: 'aqdfsd',
         type: 'text',
-        text: [
-            {
-                s: 'Alias veniam hic consequuntur molestiae est. Est dicta qui rerum hic illum.',
-            },
-        ],
-    },
-    mamma: {
-        id: 'mamma',
-        type: 'toggle',
-        text: [{ s: 'Toggle list' }],
-        childrenIds: ['poa'],
+        text: [],
     },
     abc: {
         id: 'abc',
         type: 'callout',
+        attrs: { emoji: '👽' },
         childrenIds: ['bcd'],
+    },
+    skdfsdf: {
+        id: 'skdfsdf',
+        type: 'text',
+        text: [],
     },
     bcd: {
         id: 'bcd',
         type: 'text',
         text: [{ s: 'Child of callout' }],
-    },
-    poa: {
-        id: 'poa',
-        type: 'text',
-        text: [{ s: 'Child' }],
     },
     dsdffze: {
         id: 'dsdffze',
@@ -102,9 +112,5 @@ export const PLAYGROUND_DATA = {
                 s: 'Expedita cupiditate facilis ut minus neque. Eum ut non ipsa debitis.',
             },
         ],
-    },
-    njnfjn: {
-        id: 'njnfjn',
-        type: 'button',
     },
 };

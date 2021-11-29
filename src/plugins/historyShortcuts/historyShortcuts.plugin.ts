@@ -11,13 +11,11 @@ export const HistoryShortcutsPlugin: PluginFactory =
             }
         };
 
-        document.addEventListener('keydown', onKeyDown, { capture: false });
+        document.addEventListener('keydown', onKeyDown);
         return {
             key: 'historyShortcutsPlugin',
             destroy: () => {
-                document.removeEventListener('keydown', onKeyDown, {
-                    capture: false,
-                });
+                document.removeEventListener('keydown', onKeyDown);
             },
         };
     };

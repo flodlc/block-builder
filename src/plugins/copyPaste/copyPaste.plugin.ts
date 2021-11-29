@@ -20,6 +20,7 @@ export const CopyPastePlugin: PluginFactory =
             insertInline({ editor, text });
         };
         dom.addEventListener('paste', pasteHandler);
+
         return {
             key: 'copyPaste',
             destroy() {

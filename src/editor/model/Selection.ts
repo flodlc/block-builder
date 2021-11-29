@@ -1,4 +1,6 @@
 import { MarkedText, State } from './types';
+import { Editor } from './Editor';
+import { getMarkedTextLength } from '../transaction/MarkedText/getMarkedTextLength';
 
 export abstract class AbstractSelection {
     protected type?: 'text' | 'block';
@@ -54,23 +56,18 @@ export type Range = [number, number];
 
 export class TextSelection extends AbstractSelection {
     readonly nodeId: string;
-    readonly field: string;
     readonly range: Range;
 
-    constructor(nodeId: string, field: string, range: Range) {
+    constructor(nodeId: string, range: Range) {
         super();
         this.type = 'text';
         this.nodeId = nodeId;
-        this.field = field;
         this.range = range;
     }
 
     getCurrentText(state: State) {
         const node = state.nodes[this.nodeId];
-        return ((node as any)[this.field] as MarkedText)?.reduce(
-            (prev, curr) => prev + curr.s,
-            ''
-        );
+        return node.text?.reduce((prev, curr) => prev + curr.s, '') ?? '';
     }
 
     getTextBefore(state: State) {
@@ -78,19 +75,40 @@ export class TextSelection extends AbstractSelection {
         return text.slice(0, this.range[0]);
     }
 
+    getTextLength(state: State) {
+        const node = state.nodes[this.nodeId];
+        return getMarkedTextLength(node.text ?? []);
+    }
+
+    isSame(selection?: AbstractSelection) {
+        if (!selection?.isText()) return false;
+        const s = selection as TextSelection;
+        return (
+            this.nodeId === s.nodeId &&
+            TextSelection.areSameRange(this.range, s.range)
+        );
+    }
+
     getNodeSelection(nodeId: string) {
         return nodeId === this.nodeId ? this : undefined;
     }
 
     clone() {
-        return new TextSelection(this.nodeId, this.field, [...this.range]);
+        return new TextSelection(this.nodeId, [...this.range]);
     }
 
     setRange(range: Range) {
-        return new TextSelection(this.nodeId, this.field, [...range]);
+        return new TextSelection(this.nodeId, [...range]);
     }
 
     setCollapsedRange(position: number) {
-        return new TextSelection(this.nodeId, this.field, [position, position]);
+        return new TextSelection(this.nodeId, [position, position]);
+    }
+
+    static areSameRange(rangeA: Range, rangeB: Range) {
+        return (
+            (rangeA[0] === rangeB[0] && rangeA[1] === rangeB[1]) ||
+            (rangeA[0] === rangeB[1] && rangeA[1] === rangeB[0])
+        );
     }
 }

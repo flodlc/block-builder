@@ -1,23 +1,99 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Children } from '../../editor/view/Children';
-import { Node } from '../../editor/model/types';
+import { EditorContext } from '../../editor/view/contexts/EditorContext';
+import { SelectionHalo } from '../../editor/view/SelectionHalo';
+import { BlockComponentAttrs } from '../../editor/view/types';
 
-export const Callout = ({ node }: { node: Node; parentId: string }) => {
+const EMOJIS = [
+    '👌',
+    '😄',
+    '🐥',
+    '😵‍',
+    '💫',
+    '☘️',
+    '😺',
+    '🐠',
+    '👽',
+    '🔎',
+    '🐝',
+    '🙌',
+    '😻',
+    '😸',
+    '😴',
+    '😴',
+    '💤',
+    '😭',
+    '😂',
+    '❤️',
+    '😍',
+    '😒',
+    '☺️',
+    '😊',
+    '😘',
+    '😩',
+    '💕',
+    '😔',
+    '😀',
+    '😃',
+    '😄',
+    '😁',
+    '😆',
+    '😅',
+    '😂',
+    '🤣',
+    '🥲',
+    '☺️',
+    '😙',
+    '😜',
+    '😝',
+    '🤪',
+];
+
+export const Callout: React.FC<BlockComponentAttrs> = ({
+    node,
+    blockSelected,
+}) => {
+    const editor = useContext(EditorContext);
+    const onClick = () => {
+        const emoji = EMOJIS.sort(() => 0.5 - Math.random())[0];
+        editor
+            .createTransaction()
+            .patch({
+                nodeId: node.id,
+                patch: { attrs: { ...node.attrs, emoji } },
+            })
+            .dispatch();
+    };
+
     return (
         <div
             style={{
-                background: 'rgb(69, 58, 91)',
-                padding: '20px',
-                margin: '20px 0',
+                position: 'relative',
+                background: 'rgb(43 43 50)',
+                borderRadius: '3px',
+                padding: '13px 20px',
+                margin: '4px 0',
                 display: 'flex',
             }}
             data-uid={node.id}
             className="callout"
         >
-            <div style={{ marginRight: '15px' }}>👌</div>
+            <div
+                onClick={onClick}
+                style={{
+                    marginRight: '15px',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    paddingTop: '5px',
+                    alignSelf: 'flex-start',
+                }}
+            >
+                {node.attrs?.emoji}
+            </div>
             <div style={{ flex: 1 }}>
                 <Children parentId={node.id} childrenIds={node.childrenIds} />
             </div>
+            <SelectionHalo blockSelected={blockSelected} />
         </div>
     );
 };

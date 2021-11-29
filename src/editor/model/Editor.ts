@@ -7,10 +7,12 @@ import {
     History,
     HistoryItem,
     MarkedText,
+    Schema,
 } from './types';
 import { TransactionBuilder } from '../transaction/TransactionBuilder';
 import { Transaction } from '../transaction/types';
-import { ResolvedState, resolveState } from './NodesExplorer';
+import { ResolvedState, resolveState } from './StateResolver';
+import { compileSchema, CompiledSchema } from './schema';
 
 export type EditorEvent = 'change' | 'tr' | 'input' | string;
 
@@ -18,10 +20,24 @@ export class Editor {
     state: State;
     resolvedState?: ResolvedState;
     history: History;
+    schema: CompiledSchema;
 
-    getJson = () => {
-        return getNodeJson(this.state, this.state.nodes[this.state.rootId]);
-    };
+    constructor({
+        rootId,
+        nodes,
+        schema,
+    }: {
+        rootId: string;
+        nodes: Record<string, Node>;
+        schema: Schema;
+    }) {
+        this.schema = compileSchema({ schema });
+        this.history = { items: [] };
+        this.state = nodes ? { rootId, nodes } : { rootId: 'doc', nodes: {} };
+    }
+
+    getJson = () =>
+        getNodeJson(this.state, this.state.nodes[this.state.rootId]);
 
     private observers: Record<string, EventHandler[]> = {
         change: [],
@@ -30,15 +46,13 @@ export class Editor {
     };
 
     runQuery = <T>(
-        query: (resolvedState: ResolvedState, state: State) => T
+        query: (resolvedState: ResolvedState, editor: Editor) => T
     ): T => {
         this.resolvedState = this.resolvedState ?? resolveState(this.state);
-        return query(this.resolvedState, this.state);
+        return query(this.resolvedState, this);
     };
 
-    runCommand = (command: (editor: Editor) => void) => {
-        command(this);
-    };
+    runCommand = (command: (editor: Editor) => void | boolean) => command(this);
 
     on = <T>(eventName: EditorEvent, handler: EventHandler<T>) => {
         this.observers[eventName] = this.observers[eventName] ?? [];
@@ -65,6 +79,8 @@ export class Editor {
         }
     };
 
+    createTransaction = () => new TransactionBuilder(this);
+
     applyTransaction(transaction: Transaction) {
         const previousState = this.state;
         const { state, appliedTransaction } = applyTransaction({
@@ -74,7 +90,7 @@ export class Editor {
         this.state = state;
         delete this.resolvedState;
 
-        this.observers.tr.forEach((handlers) => handlers(undefined));
+        this.trigger('tr');
 
         if (transaction.keepHistory) {
             this.history = produce(this.history, (history) => {
@@ -107,34 +123,6 @@ export class Editor {
         this.trigger('tr');
         this.trigger('change');
     }
-
-    createTransaction() {
-        return new TransactionBuilder(this);
-    }
-
-    constructor({
-        rootId,
-        nodes,
-    }: {
-        rootId: string;
-        nodes: Record<string, Node>;
-    }) {
-        this.history = {
-            items: [],
-        };
-        this.state = nodes
-            ? { rootId, nodes }
-            : {
-                  rootId: 'doc',
-                  nodes: {
-                      doc: {
-                          id: 'doc',
-                          type: 'doc',
-                          childrenIds: [],
-                      },
-                  },
-              };
-    }
 }
 
 function getNodeJson(state: State, node: Node) {
@@ -142,7 +130,6 @@ function getNodeJson(state: State, node: Node) {
         id: string;
         type: string;
         text?: MarkedText;
-        title?: string;
         children?: JsonNode[];
     };
 
@@ -153,7 +140,6 @@ function getNodeJson(state: State, node: Node) {
 
     if (node.text) {
         nodeJson.text = node.text;
-        nodeJson.title = node.title;
     }
 
     if (node.childrenIds) {

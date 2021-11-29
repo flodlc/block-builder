@@ -1,6 +1,6 @@
 import React from 'react';
 import { PluginFactory } from '../../editor/view/plugin/types';
-import { BlockSelection } from '../../editor/model/Selection';
+import { BlockSelection, TextSelection } from '../../editor/model/Selection';
 import { BlockSelectionWrapper } from './BlockSelection';
 import { Editor } from '../../editor/model/Editor';
 
@@ -26,12 +26,21 @@ export const BlockSelectionPlugin: PluginFactory =
         let hasSelectedBlocks = false;
         let draggingState: DraggingState | void;
 
+        const onkeydown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && editor.state.selection?.isText()) {
+                e.preventDefault();
+                e.stopPropagation();
+                const selection = editor.state.selection as TextSelection;
+                editor
+                    .createTransaction()
+                    .focus(new BlockSelection([selection.nodeId]))
+                    .dispatch(false);
+            }
+        };
+
         const onMouseDown = (e: MouseEvent) => {
             draggingState = editor.trigger(BLOCK_SELECTION_EVENTS.changed, {
-                start: {
-                    x: e.pageX,
-                    y: e.pageY,
-                },
+                start: { x: e.pageX, y: e.pageY },
             });
             startNodeId = getNodeIdFromPoint(e.pageX, e.pageY);
             if (editor.state.selection?.isBlock()) {
@@ -39,18 +48,12 @@ export const BlockSelectionPlugin: PluginFactory =
             }
         };
 
-        const onClick = (e: MouseEvent) => {
+        const stopSelection = (e: MouseEvent) => {
             if (hasSelectedBlocks) {
                 e.stopPropagation();
                 e.preventDefault();
             }
-        };
-
-        const onMouseUp = (e: MouseEvent) => {
-            if (hasSelectedBlocks) {
-                e.stopPropagation();
-                e.preventDefault();
-            }
+            if (!draggingState) return;
             draggingState = editor.trigger(
                 BLOCK_SELECTION_EVENTS.changed,
                 undefined
@@ -71,57 +74,63 @@ export const BlockSelectionPlugin: PluginFactory =
 
             draggingState = editor.trigger(BLOCK_SELECTION_EVENTS.changed, {
                 ...draggingState,
-                current: {
-                    x: e.pageX,
-                    y: e.pageY,
-                },
+                current: { x: e.pageX, y: e.pageY },
             });
 
             getSelection()?.removeAllRanges();
             if (!nodeId) return;
+            if (nodeId === editor.state.rootId) return;
 
-            const currentSelection = createCurrentSelection({
-                startNodeId,
-                editor,
-            });
+            let selectedIds = getSelectedIds({ editor });
+            if (
+                !selectedIds.length &&
+                startNodeId &&
+                startNodeId !== editor.state.rootId
+            ) {
+                selectedIds = [startNodeId];
+            }
 
-            if (!currentSelection.getNodeSelection(nodeId)) {
+            if (selectedIds.indexOf(nodeId) < 0) {
+                selectedIds = sortSelectedIds([...selectedIds, nodeId], editor);
                 hasSelectedBlocks = true;
                 editor
                     .createTransaction()
-                    .focus(currentSelection.addBlockToSelection(nodeId))
+                    .focus(new BlockSelection(selectedIds))
                     .dispatch(false);
             }
         };
 
         dom.addEventListener('mousedown', onMouseDown);
-        dom.addEventListener('click', onClick);
-        dom.addEventListener('mouseup', onMouseUp);
-        dom.addEventListener('mousemove', onMouseMove);
+        dom.addEventListener('keydown', onkeydown);
+        dom.addEventListener('click', stopSelection);
+        window.addEventListener('contextmenu', stopSelection);
+        window.addEventListener('mouseup', stopSelection);
+        window.addEventListener('mousemove', onMouseMove);
         return {
             key: 'block_selection',
             Component: () => <BlockSelectionWrapper editor={editor} />,
             destroy: () => {
                 dom.removeEventListener('mousedown', onMouseDown);
-                dom.removeEventListener('click', onClick);
-                dom.removeEventListener('mouseup', onMouseUp);
-                dom.removeEventListener('mousemove', onMouseMove);
+                dom.removeEventListener('keydown', onkeydown);
+                dom.removeEventListener('click', stopSelection);
+                window.removeEventListener('contextmenu', stopSelection);
+                window.removeEventListener('mouseup', stopSelection);
+                window.removeEventListener('mousemove', onMouseMove);
             },
         };
     };
 
-const createCurrentSelection = ({
-    startNodeId,
-    editor,
-}: {
-    startNodeId?: string;
-    editor: Editor;
-}) => {
-    return (
-        editor.state.selection?.isBlock()
-            ? editor.state.selection
-            : new BlockSelection(startNodeId ? [startNodeId] : [])
-    ) as BlockSelection;
+const getSelectedIds = ({ editor }: { editor: Editor }) => {
+    if (!editor.state.selection?.isBlock()) return [];
+    const selection = editor.state.selection as BlockSelection;
+    return Array.from(selection.nodeIds.values());
+};
+
+const sortSelectedIds = (nodeIds: string[], editor: Editor) => {
+    const flatTree = editor.runQuery((resolvedState) => resolvedState.flatTree);
+    return nodeIds.slice().sort((a, b) => {
+        return flatTree.indexOf(a) > flatTree.indexOf(b) ? 1 : -1;
+    });
 };
 
 const getNodeIdFromPoint = (x: number, y: number) => {

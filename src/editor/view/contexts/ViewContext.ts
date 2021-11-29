@@ -1,6 +1,6 @@
 import React from 'react';
-import { ViewConfig } from '../types';
+import { View } from '../View';
 
-export const ViewContext = React.createContext<ViewConfig>(
+export const ViewContext = React.createContext<View>(
     undefined as unknown as any
 );

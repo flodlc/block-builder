@@ -21,10 +21,8 @@ export const patch = ({
                     [key]: node[key],
                 };
             }, {});
-            draftState.nodes[nodeId] = {
-                ...draftState.nodes[nodeId],
-                ...patch,
-            };
+            const draftNode = { ...draftState.nodes[nodeId], ...patch };
+            draftState.nodes[nodeId] = draftNode;
         }),
         inversedStep: { name: 'patch', nodeId, patch: reversePatch },
     };

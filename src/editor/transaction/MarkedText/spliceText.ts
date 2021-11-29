@@ -22,7 +22,7 @@ export const spliceText = (
               s: textInput,
               m: [],
           };
-    range[0] = Math.max(range[0], 0);
+    range = [Math.max(range[0], 0), range[1]];
     updatedText.splice(range[0], range[1] - range[0], newSection);
     return {
         value: minifyMarkedText(updatedText),

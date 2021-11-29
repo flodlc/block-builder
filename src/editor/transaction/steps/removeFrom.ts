@@ -21,7 +21,7 @@ export const removeFrom = ({
         }
 
         data.removedNode = state.nodes[nodeId];
-        delete draftState.nodes[nodeId];
+        // delete draftState.nodes[nodeId];
     });
     return {
         state: newState,

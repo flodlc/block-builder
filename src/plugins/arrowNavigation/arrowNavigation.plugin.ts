@@ -1,21 +1,29 @@
 import { PluginFactory } from '../../editor/view/plugin/types';
-import { moveCarretUp } from './moveCarretUp';
-import { moveCarretDown } from './moveCarretDown';
+import { onArrowUp } from './onArrowUp';
+import { onArrowDown } from './onArrowDown';
+import { onArrrowLeft } from './onArrrowLeft';
+import { onArrowRight } from './onArrowRight';
 
 export const ArrowNavigationPlugin: PluginFactory =
     () =>
-    ({ dom }) => {
+    ({ dom, editor }) => {
         const onKeyDown = (e: KeyboardEvent) => {
+            if (!editor.state.selection?.isText()) return;
             if (e.key === 'ArrowUp') {
-                moveCarretUp(e);
+                onArrowUp(e, editor);
             }
             if (e.key === 'ArrowDown') {
-                moveCarretDown(e);
+                onArrowDown(e, editor);
+            }
+            if (e.key === 'ArrowLeft') {
+                onArrrowLeft(e, editor);
+            }
+            if (e.key === 'ArrowRight') {
+                onArrowRight(e, editor);
             }
         };
 
         dom.addEventListener('keydown', onKeyDown);
-
         return {
             key: 'arrowPlugin',
             destroy: () => {

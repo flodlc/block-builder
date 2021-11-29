@@ -19,29 +19,96 @@ code {
 }
 
 .header {
+    position: relative;
+    justify-content: center;
     display: flex;
     padding: 20px 40px;
-    box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.1);
+    background-color: #1e2023;
 }
 
 .view {
+    background-color: #1e2023;
     position: relative;
     flex: 1;
     overflow: auto;
-    background-color: #2f3437;
-    color: white;
-    padding: 40px calc(50% - 360px);
+    color: rgba(255, 255, 255, 0.92);
+    padding: 70px calc(50% - 360px) 40px;
     font-size: 16px;
     -webkit-font-smoothing: auto;
     line-height: 1.5;
+    letter-spacing: 0.004em;
 }
 
 .header > button {
     margin-right: 20px;
-    padding: 8px 16px;
-    border: none;
+    padding: 7px 10px;
+    border: 1px solid rgb(60, 63, 68);
     border-radius: 5px;
-    background-color: cornflowerblue;
-    color: white;
+    box-shadow: rgba(0 0 0 0.25) 0 1px 1px;
+    color: rgb(215, 216, 219);
     cursor: pointer;
+    background: transparent;
 }
+
+[contenteditable=false] ~ .placeholdera {
+    display: none !important;
+}
+
+[contenteditable=true] ~ .placeholdera {
+    display: none !important;
+}
+
+[contenteditable=true]:focus ~ .placeholdera {
+    display: block !important;
+}
+
+.placeholder {
+    user-select: none;
+    position: absolute;
+    top: 50%;
+    margin-left: 2px;
+    transform: translateY(-50%);
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.placeholder > span {
+    padding: 3px 6px;
+    background: grey;
+    border-radius: 4px;
+}
+
+.mention_deco > :first-child {
+    user-select: none;
+    pointer-events: none;
+}
+
+.mention_deco > :first-child > * {
+    display: none;
+}
+
+.mention_deco > :first-child > :last-child {
+    display: inline-block;
+    width: 1px;
+}
+
+.mention_deco .mention_placeholder:after {
+    content: 'Mention a person...';
+    color: grey;
+    pointer-events: none;
+}
+
+.heading_1 {
+    font-weight: 600;
+    font-size: 30px;
+    margin-top: 28px;
+    margin-bottom: 4px;
+}
+
+.heading_2 {
+    font-weight: 600;
+    font-size: 24px;
+    margin-top: 18px;
+    margin-bottom: 4px;
+}
+

@@ -8,14 +8,14 @@ export type MarkedText = MarkedNode[];
  * MarkedNode = { string: string; marks: {type: string, data: any}[] }
  */
 export type MarkedNode = { s: string; m?: Mark[] };
-export type Mark = { t: string; d?: any };
+export type Mark<T = any> = { t: string; d?: T };
 
 export interface Node {
     id: string;
     type: string;
-    childrenIds?: string[];
     text?: MarkedText;
-    title?: string;
+    attrs?: Record<string, any>;
+    childrenIds?: string[];
 }
 
 export interface State {
@@ -34,3 +34,17 @@ export interface History {
 }
 
 export type EventHandler<T = any> = (data: T) => void;
+
+export type NodeSchema = {
+    allowText: boolean;
+    allowChildren: boolean;
+    attrs: Record<
+        string,
+        {
+            default?: any;
+            required?: boolean;
+        }
+    >;
+};
+
+export type Schema = Record<string, NodeSchema>;

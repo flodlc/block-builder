@@ -1,8 +1,9 @@
 import { Editor } from '../../editor/model/Editor';
-import { insertMention } from '../mention/insertMention.command';
 import React, { useEffect, useState } from 'react';
-import { TextSelection } from '../../editor/model/Selection';
-import { SUGGESTION_EVENTS, SuggestionPluginState } from './suggestion.plugin';
+import { SuggestionPluginState } from './suggestion.types';
+import { SUGGESTION_EVENTS } from './suggestion.const';
+import { deleteLastChars } from '../commands/deleteLastChars';
+import { getCommandList } from './commandList';
 
 export const SuggestionComponentWrapper = ({ editor }: { editor: Editor }) => {
     const [suggestionState, setSuggestionState] =
@@ -20,36 +21,18 @@ export const SuggestionComponentWrapper = ({ editor }: { editor: Editor }) => {
 };
 
 export const SuggestionComponent = ({
+    close,
     searchText,
     startBoundingRect,
     editor,
-    slashPosition,
 }: {
+    close?: () => void;
     searchText?: string;
     startBoundingRect?: DOMRect;
     editor: Editor;
     slashPosition?: number;
 }) => {
-    const getSearchSelection = () => {
-        if (searchText === undefined || slashPosition === undefined) return;
-        const selection = editor.state.selection as TextSelection;
-        return selection.setRange([
-            slashPosition,
-            slashPosition + 1 + searchText.length,
-        ]);
-    };
-    const commands = [
-        {
-            label: 'Insert Mention',
-            callback: () =>
-                editor.runCommand(insertMention(getSearchSelection())),
-        },
-        {
-            label: 'Insert Mention',
-            callback: () =>
-                editor.runCommand(insertMention(getSearchSelection())),
-        },
-    ];
+    const commands = getCommandList({ editor });
 
     const filteredCommands = !searchText
         ? commands
@@ -74,14 +57,25 @@ export const SuggestionComponent = ({
             }
 
             if (e.key === 'Enter') {
-                e.preventDefault();
-                filteredCommands[index]?.callback();
+                execCommmand(e, index);
             }
         };
         document.addEventListener('keydown', handler, { capture: true });
         return () =>
             document.removeEventListener('keydown', handler, { capture: true });
     }, [searchText, filteredCommands]);
+
+    useEffect(() => setIndex(0), [searchText]);
+
+    const execCommmand = (e: Event, i: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+        editor.runCommand(
+            deleteLastChars({ numberChars: (searchText?.length ?? 0) + 1 })
+        );
+        close?.();
+        filteredCommands[i]?.callback();
+    };
 
     return (
         <>
@@ -91,7 +85,7 @@ export const SuggestionComponent = ({
                         background: 'white',
                         width: '250px',
                         height: '300px',
-                        marginTop: 'calc(6px - 71px)',
+                        marginTop: '6px',
                         backgroundColor: '#3f4447',
                         color: 'white',
                         boxShadow:
@@ -119,9 +113,12 @@ export const SuggestionComponent = ({
                                 background: index === i ? '#53575a' : '',
                                 padding: '15px',
                                 opacity: 0.9,
+                                fontWeight: 600,
+                                fontSize: '14px',
                             }}
                             key={i}
-                            onClick={command.callback}
+                            onMouseEnter={() => setIndex(i)}
+                            onClick={(e) => execCommmand(e.nativeEvent, i)}
                         >
                             {command.label}
                         </div>

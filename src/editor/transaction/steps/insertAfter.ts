@@ -17,6 +17,8 @@ export const insertAfter = ({
             draftState.nodes[node.id] = node;
             const parentNode = draftState.nodes[parent];
 
+            parentNode.childrenIds = parentNode?.childrenIds ?? [];
+
             if (parentNode?.childrenIds) {
                 const index = after
                     ? parentNode.childrenIds.indexOf(after)

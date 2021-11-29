@@ -1,4 +1,12 @@
-import React, { useContext, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+    ReactElement,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { EditorContext } from '../contexts/EditorContext';
 import { TextRenderer } from './TextRenderer';
 import { MarkedText } from '../../model/types';
@@ -6,41 +14,78 @@ import { getElementSelection } from './utils/getElementSelection';
 import { restoreSelection } from './utils/restoreSelection';
 import { keyBinder } from './keyActions';
 import { Range, TextSelection } from '../../model/Selection';
+import { ViewContext } from '../contexts/ViewContext';
+import { Editor } from '../../model/Editor';
+import { Decoration } from '../types';
+import { PlaceholderWrapper } from './Placeholder';
+
+const useDecorations = ({
+    editor,
+    nodeId,
+}: {
+    editor: Editor;
+    nodeId: string;
+}) => {
+    const view = useContext(ViewContext);
+    const [decorations, setDecorations] = useState<Decoration[]>();
+
+    useEffect(() => {
+        const handler = () => setDecorations(view.decorations[nodeId]);
+        editor.on('decorationsChanged', handler);
+        return () => editor.off('decorationsChanged', handler);
+    }, []);
+    return decorations;
+};
 
 export const TextInput = ({
-    onChange = () => undefined,
+    onChange = () => false,
     onKeyDown = () => undefined,
     value = [],
     range,
-    field,
     style = {},
-    id = undefined,
     nodeId,
+    placeholder,
+    keepPlaceholder = false,
+    contentEditable = true,
 }: {
-    onChange: (value: MarkedText, range?: Range) => void;
-    onKeyDown: (e: React.KeyboardEvent) => boolean | undefined;
+    onChange?: (value: MarkedText, range?: Range) => boolean;
+    onKeyDown?: (e: React.KeyboardEvent) => boolean | undefined;
     value?: MarkedText;
     range?: Range;
-    field: string;
     style?: any;
-    id?: string;
     nodeId: string;
+    placeholder?: ReactElement;
+    keepPlaceholder?: boolean;
+    contentEditable?: boolean;
 }) => {
     const editor = useContext(EditorContext);
     const ref = useRef<HTMLDivElement>(null);
-    const [composing, setComposing] = useState(false);
-
+    const [composing] = useState({ state: false });
+    const decorations = useDecorations({ editor, nodeId });
+    const textContent = useMemo(
+        () => value.reduce((prev, cur) => prev + cur.s, ''),
+        [value]
+    );
     useLayoutEffect(() => {
-        if (!ref.current || !range) return;
+        if (!ref.current) return;
         restoreSelection(ref.current, range);
-    }, [range]);
+    }, [range, decorations]);
 
     const onInput = (newValue: MarkedText, newRange?: Range) => {
-        onChange(newValue, newRange);
+        if (onChange(newValue, newRange)) return;
+        const selection = editor.state.selection as TextSelection;
+        editor
+            .createTransaction()
+            .patch({
+                nodeId,
+                patch: { text: newValue },
+            })
+            .focus(newRange && selection?.setRange(newRange))
+            .dispatch();
     };
 
     const handleCompositionEnd = (e: React.FormEvent) => {
-        setComposing(false);
+        composing.state = false;
         if (range) {
             const newTextState = keyBinder({
                 value,
@@ -54,7 +99,11 @@ export const TextInput = ({
     };
 
     const handleCompositionStart = () => {
-        setComposing(true);
+        composing.state = true;
+    };
+
+    const handleBeforeInput = () => {
+        range = getElementSelection(ref.current);
     };
 
     const handleInput = (e: React.FormEvent) => {
@@ -67,7 +116,6 @@ export const TextInput = ({
 
             if (newTextState) {
                 onInput(newTextState.value, newTextState.range);
-                editor.trigger('input');
             }
         }
     };
@@ -77,7 +125,10 @@ export const TextInput = ({
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (!editor.state.selection?.isText()) return;
+        if (!editor.state.selection?.isText()) {
+            e.preventDefault();
+            return;
+        }
         if (!onKeyDown(e) && range) {
             const newTextState = keyBinder({
                 value,
@@ -93,38 +144,51 @@ export const TextInput = ({
     };
 
     const saveDomSelection = () => {
-        if (composing) return;
         const range = getElementSelection(ref.current as HTMLDivElement);
-        if (!range) return;
-        const newTextSelection = new TextSelection(nodeId, field, range);
+        if (!range || composing.state) return;
+        const newTextSelection = new TextSelection(nodeId, range);
         if (newTextSelection.isSame(editor.state.selection)) return;
         editor.createTransaction().focus(newTextSelection).dispatch(false);
     };
 
-    const key = JSON.stringify(value);
+    useLayoutEffect(() => {
+        const selectHandler = () => saveDomSelection();
+        document.addEventListener('selectionchange', selectHandler, {
+            capture: true,
+        });
+        return () =>
+            document.removeEventListener('selectionchange', selectHandler, {
+                capture: true,
+            });
+    }, []);
+
+    const stringText = value && value.reduce((prev, curr) => prev + curr.s, '');
+
+    const key = JSON.stringify([value, decorations]);
     return (
-        <div
-            onCompositionEnd={handleCompositionEnd}
-            onCompositionStart={handleCompositionStart}
-            key={key}
-            contentEditable={true}
-            suppressContentEditableWarning={true}
-            onSelect={saveDomSelection}
-            onKeyDown={handleKeyDown}
-            onKeyUp={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }}
-            ref={ref}
-            onInput={handleInput}
-            style={{ ...style, outline: 'none' }}
-            id={id}
-        >
-            <TextRenderer
-                onChange={handleMarkChange}
-                hashedKey={key}
-                text={value}
-            />
+        <div style={{ position: 'relative', ...style, padding: undefined }}>
+            <div
+                key={key}
+                contentEditable={contentEditable}
+                suppressContentEditableWarning={true}
+                onKeyDown={handleKeyDown}
+                onInput={handleInput}
+                onBeforeInput={handleBeforeInput}
+                onCompositionStart={handleCompositionStart}
+                onCompositionEnd={handleCompositionEnd}
+                ref={ref}
+                style={{ outline: 'none', padding: style.padding }}
+            >
+                <TextRenderer
+                    onChange={handleMarkChange}
+                    hashedKey={key}
+                    text={value}
+                    decorations={decorations}
+                />
+            </div>
+            {!stringText && (range || keepPlaceholder) && (
+                <PlaceholderWrapper>{placeholder}</PlaceholderWrapper>
+            )}
         </div>
     );
 };

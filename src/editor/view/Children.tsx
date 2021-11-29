@@ -70,34 +70,18 @@ export const Child = React.memo(
         }, []);
         if (!node) return <></>;
 
-        const Compo = view.blocks[node.type] ?? Def;
+        const Compo = view.blocks[node.type];
+        const nodeSchema = editor.schema[node.type];
+        if (!Compo) throw `no component matching type ${node.type}`;
+        if (!nodeSchema) throw `no schema matching type ${node.type}`;
+
         return (
-            <div
-                style={{
-                    position: 'relative',
-                }}
-            >
-                <Compo
-                    parentId={parentId}
-                    node={node}
-                    selection={nodeSelection}
-                />
-                <div
-                    style={{
-                        position: 'absolute',
-                        height: '100%',
-                        width: '100%',
-                        top: '0',
-                        transition: 'background 300ms',
-                        pointerEvents: 'none',
-                        background: blockSelected
-                            ? 'rgba(46, 170, 220, 0.2)'
-                            : '',
-                    }}
-                />
-            </div>
+            <Compo
+                parentId={parentId}
+                node={node}
+                selection={nodeSelection}
+                blockSelected={blockSelected}
+            />
         );
     }
 );
-
-const Def = () => <></>;

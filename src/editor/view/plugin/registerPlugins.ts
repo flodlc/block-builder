@@ -1,26 +1,26 @@
 import { Plugin } from './types';
-import { ViewConfig } from '../types';
 import { Editor } from '../../model/Editor';
+import { View } from '../View';
 
 export const registerPlugins = ({
     editor,
     plugins,
-    viewConfig,
+    view,
     dom,
 }: {
     editor: Editor;
     plugins: Plugin[];
-    viewConfig: ViewConfig;
+    view: View;
     dom: HTMLElement;
 }) => {
     return plugins.map((Plugin) => {
-        const registeredPlugin = Plugin({ editor, dom });
-        viewConfig.blocks = {
-            ...viewConfig.blocks,
+        const registeredPlugin = Plugin({ editor, dom, view: view });
+        view.blocks = {
+            ...view.blocks,
             ...registeredPlugin.addBlocks?.(),
         };
-        viewConfig.marks = {
-            ...viewConfig.marks,
+        view.marks = {
+            ...view.marks,
             ...registeredPlugin.addMarks?.(),
         };
         return registeredPlugin;

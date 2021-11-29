@@ -1,9 +1,10 @@
-export const getTextNodes = ({ node }: { node: Node }) => {
+export const getTextNodes = ({ node }: { node: Node }, isRoot = false) => {
     let nodes: Node[] = [];
     if (node.nodeType === 3) {
         nodes = [...nodes, node];
     } else {
         if (
+            !isRoot &&
             node.nodeType === 1 &&
             (node as HTMLElement).matches('[contentEditable="false"]')
         ) {

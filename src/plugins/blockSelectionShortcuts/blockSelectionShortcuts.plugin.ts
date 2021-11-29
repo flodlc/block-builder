@@ -1,6 +1,7 @@
 import { PluginFactory } from '../../editor/view/plugin/types';
 import { onBackspace } from './onBackspace';
 import { onEscape } from './onEscape';
+import { onEnter } from './onEnter';
 
 export const BlockSelectionShortcutsPlugin: PluginFactory =
     () =>
@@ -15,6 +16,7 @@ export const BlockSelectionShortcutsPlugin: PluginFactory =
             const handler = {
                 Backspace: () => onBackspace({ editor }),
                 Escape: () => onEscape({ editor }),
+                Enter: () => onEnter({ editor }),
             }[e.key];
 
             handler?.();
