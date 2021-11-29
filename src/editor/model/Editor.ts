@@ -109,12 +109,12 @@ export class Editor {
         item.transaction.reversedSteps
             .slice()
             .reverse()
-            .forEach((inversedStep) => {
-                if (!inversedStep) return;
+            .forEach((reversedSteps) => {
+                if (!reversedSteps) return;
                 // @ts-ignore
-                const { state: newState } = applyStep[inversedStep.name]({
+                const { state: newState } = applyStep[reversedSteps.name]({
                     state: draft,
-                    ...inversedStep,
+                    ...reversedSteps,
                 });
                 draft = newState;
             });

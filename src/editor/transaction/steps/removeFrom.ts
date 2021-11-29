@@ -25,7 +25,7 @@ export const removeFrom = ({
     });
     return {
         state: newState,
-        inversedStep: {
+        reversedSteps: {
             name: 'insertAfter',
             parent: parentId,
             after: data.beforeId,

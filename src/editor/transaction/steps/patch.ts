@@ -24,6 +24,6 @@ export const patch = ({
             const draftNode = { ...draftState.nodes[nodeId], ...patch };
             draftState.nodes[nodeId] = draftNode;
         }),
-        inversedStep: { name: 'patch', nodeId, patch: reversePatch },
+        reversedSteps: { name: 'patch', nodeId, patch: reversePatch },
     };
 };

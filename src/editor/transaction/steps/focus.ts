@@ -10,7 +10,7 @@ export const focus = ({
 }) => {
     return {
         state: { ...state, selection: selection && selection.clone() },
-        inversedStep: {
+        reversedSteps: {
             name: 'focus',
             ...state.selection,
         },

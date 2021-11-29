@@ -26,7 +26,7 @@ export const insertAfter = ({
                 parentNode.childrenIds.splice(index + 1, 0, node.id);
             }
         }),
-        inversedStep: {
+        reversedSteps: {
             name: 'removeFrom',
             nodeId: node.id,
             parentId: parent,
