@@ -13,20 +13,20 @@ export const applyTransaction = ({
     transaction: Transaction;
 }): { state: State; appliedTransaction: AppliedTransaction } => {
     let draft = state;
-    const inversedSteps = transaction.steps.map((step) => {
+    const reversedSteps = transaction.steps.map((step) => {
         // @ts-ignore
-        const { state: newState, inversedStep } = applyStep[step.name]({
+        const { state: newState, reversedSteps } = applyStep[step.name]({
             state: draft,
             ...step,
         });
         draft = newState;
-        return inversedStep as Step;
+        return reversedSteps as Step;
     });
     return {
         state: draft,
         appliedTransaction: {
             ...transaction,
-            inversedSteps,
+            reversedSteps,
         },
     };
 };

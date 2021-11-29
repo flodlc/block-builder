@@ -19,7 +19,7 @@ export const onBackspace = ({
         return;
     } else if (tryReset({ e, editor })) {
         return;
-    } else if (tryDelete({ e, editor })) {
+    } else if (tryRemove({ e, editor })) {
         return;
     }
 };
@@ -65,7 +65,7 @@ const tryUnwrap = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     return true;
 };
 
-const tryDelete = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
+const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
 

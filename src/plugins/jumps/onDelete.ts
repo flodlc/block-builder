@@ -30,7 +30,7 @@ export const onDelete = ({
 
     if (node.childrenIds?.length && editor.state.rootId !== node.id) {
         const transaction = editor.createTransaction();
-        unwrappChildren({ nodeId: node.id, editor, transaction });
+        unwrapChildren({ nodeId: node.id, editor, transaction });
         transaction.dispatch();
     } else {
         const parentId = editor.runQuery(
@@ -38,7 +38,7 @@ export const onDelete = ({
         );
         if (!parentId) return;
         const transaction = editor.createTransaction();
-        unwrappChildren({ nodeId: nextId, editor, transaction });
+        unwrapChildren({ nodeId: nextId, editor, transaction });
         transaction
             .patch({
                 nodeId: node.id,
@@ -54,7 +54,7 @@ export const onDelete = ({
     e.stopPropagation();
 };
 
-const unwrappChildren = ({
+const unwrapChildren = ({
     editor,
     nodeId,
     transaction,

@@ -14,7 +14,7 @@ const getTargetSelection = (editor: Editor) => {
     ]);
 };
 
-export const onArrrowLeft = (e: KeyboardEvent, editor: Editor) => {
+export const onArrowLeft = (e: KeyboardEvent, editor: Editor) => {
     const selection = editor.state.selection as TextSelection;
     if (selection.range[0] > 0) return;
     e.preventDefault();

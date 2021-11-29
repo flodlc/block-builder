@@ -1,7 +1,7 @@
 import { PluginFactory } from '../../editor/view/plugin/types';
 import { onArrowUp } from './onArrowUp';
 import { onArrowDown } from './onArrowDown';
-import { onArrrowLeft } from './onArrrowLeft';
+import { onArrowLeft } from './onArrowLeft';
 import { onArrowRight } from './onArrowRight';
 
 export const ArrowNavigationPlugin: PluginFactory =
@@ -16,7 +16,7 @@ export const ArrowNavigationPlugin: PluginFactory =
                 onArrowDown(e, editor);
             }
             if (e.key === 'ArrowLeft') {
-                onArrrowLeft(e, editor);
+                onArrowLeft(e, editor);
             }
             if (e.key === 'ArrowRight') {
                 onArrowRight(e, editor);

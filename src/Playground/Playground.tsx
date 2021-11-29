@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Editor } from '../editor/model/Editor';
 import { ReactView } from '../editor/view/ReactView';
-import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
+import { PLAYGROUND_DATA } from './DATA';
 import { BlockSelectionPlugin } from '../plugins/blockSelection/blockSelection.plugin';
 import { SuggestionPlugin } from '../plugins/suggestion/suggestion.plugin';
 import { HistoryShortcutsPlugin } from '../plugins/historyShortcuts/historyShortcuts.plugin';

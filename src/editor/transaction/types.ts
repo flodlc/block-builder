@@ -34,5 +34,5 @@ export interface Transaction {
 
 export interface AppliedTransaction {
     steps: Step[];
-    inversedSteps: Step[];
+    reversedSteps: Step[];
 }

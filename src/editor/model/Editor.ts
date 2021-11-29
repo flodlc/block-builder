@@ -106,7 +106,7 @@ export class Editor {
 
     private reverseTransaction(state: State, item: HistoryItem) {
         let draft = state;
-        item.transaction.inversedSteps
+        item.transaction.reversedSteps
             .slice()
             .reverse()
             .forEach((inversedStep) => {
