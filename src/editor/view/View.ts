@@ -6,12 +6,14 @@ import { getRange } from './TextInput/utils/restoreSelection';
 
 export class View {
     editor: Editor;
+    dom: HTMLElement;
     marks: Record<string, any>;
     blocks: Record<string, React.FC<BlockComponentAttrs>>;
     decorations: Record<string, Decoration[]>;
 
-    constructor(editor: Editor) {
+    constructor(editor: Editor, dom: HTMLElement) {
         this.editor = editor;
+        this.dom = dom;
         this.marks = {};
         this.blocks = {};
         this.decorations = {};
@@ -59,16 +61,18 @@ const getEditable = (nodeId: string) =>
 
 function getDomRectAtPos(nodeId: string, pos: number) {
     const editable = getEditable(nodeId);
-    if (editable.textContent?.length) {
-        const range = getRange(editable, [pos, pos]);
+    const range = getRange(editable, [pos, pos]);
+
+    const clone = range.cloneRange();
+    clone.setEndAfter(editable);
+    const isAtEnd = (clone.cloneContents().textContent?.length ?? 0) <= 1;
+
+    if (editable.textContent?.length && !isAtEnd) {
         return range.getBoundingClientRect();
     } else {
-        editable.textContent = ' ';
-        const range = new Range();
-        range.setStart(editable.firstChild as ChildNode, 0);
-        range.setEnd(editable.firstChild as ChildNode, 0);
-        const rect = range.getBoundingClientRect();
-        editable.textContent = '';
-        return rect;
+        const lastElementLength = editable.lastChild?.textContent?.length ?? 1;
+        range.setStart(editable.lastChild as ChildNode, lastElementLength - 1);
+        range.setEnd(editable.lastChild as ChildNode, lastElementLength - 1);
+        return range.getBoundingClientRect();
     }
 }

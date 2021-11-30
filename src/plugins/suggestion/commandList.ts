@@ -1,6 +1,6 @@
 import { TextSelection } from '../../editor/model/Selection';
-import { wrap } from '../commands/wrap';
 import { Editor } from '../../editor/model/Editor';
+import { turnInCommand } from '../commands/turnIn.command';
 
 export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
@@ -8,17 +8,9 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-
-            editor
-                .createTransaction()
-                .patch({
-                    nodeId,
-                    patch: editor.schema.heading.create({
-                        ...editor.state.nodes[nodeId],
-                        attrs: { level: 1 },
-                    }),
-                })
-                .dispatch();
+            editor.runCommand(
+                turnInCommand({ nodeId, type: 'heading', attrs: { level: 1 } })
+            );
         },
     },
     {
@@ -26,16 +18,9 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor
-                .createTransaction()
-                .patch({
-                    nodeId,
-                    patch: editor.schema.heading.create({
-                        ...editor.state.nodes[nodeId],
-                        attrs: { level: 2 },
-                    }),
-                })
-                .dispatch();
+            editor.runCommand(
+                turnInCommand({ nodeId, type: 'heading', attrs: { level: 2 } })
+            );
         },
     },
     {
@@ -43,15 +28,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor
-                .createTransaction()
-                .patch({
-                    nodeId,
-                    patch: editor.schema.text.create({
-                        ...editor.state.nodes[nodeId],
-                    }),
-                })
-                .dispatch();
+            editor.runCommand(turnInCommand({ nodeId, type: 'text' }));
         },
     },
     {
@@ -59,12 +36,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(
-                wrap({
-                    nodeId,
-                    wrappingNode: editor.schema.quote.create(),
-                })
-            );
+            editor.runCommand(turnInCommand({ nodeId, type: 'quote' }));
         },
     },
     {
@@ -72,12 +44,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(
-                wrap({
-                    nodeId,
-                    wrappingNode: editor.schema.callout.create(),
-                })
-            );
+            editor.runCommand(turnInCommand({ nodeId, type: 'callout' }));
         },
     },
 ];

@@ -24,6 +24,14 @@ export const BIG_DATA = (() => {
     return nodes;
 })();
 
+export const SINGLE_TEXT_DATA = {
+    doc: {
+        id: 'doc',
+        type: 'text',
+        text: [{ s: 'My first note' }],
+    },
+};
+
 export const PLAYGROUND_DATA = {
     doc: {
         id: 'doc',

@@ -3,6 +3,7 @@ import { PluginFactory } from '../../editor/view/plugin/types';
 import { BlockSelection, TextSelection } from '../../editor/model/Selection';
 import { BlockSelectionWrapper } from './BlockSelection';
 import { Editor } from '../../editor/model/Editor';
+import { View } from '../../editor/view/View';
 
 export type DraggingState = {
     start: {
@@ -21,7 +22,7 @@ export enum BLOCK_SELECTION_EVENTS {
 
 export const BlockSelectionPlugin: PluginFactory =
     () =>
-    ({ dom, editor }) => {
+    ({ dom, editor, view }) => {
         let startNodeId: string | undefined;
         let hasSelectedBlocks = false;
         let draggingState: DraggingState | void;
@@ -40,7 +41,7 @@ export const BlockSelectionPlugin: PluginFactory =
 
         const onMouseDown = (e: MouseEvent) => {
             draggingState = editor.trigger(BLOCK_SELECTION_EVENTS.changed, {
-                start: { x: e.pageX, y: e.pageY },
+                start: getMouseEventRectInView(e, view),
             });
             startNodeId = getNodeIdFromPoint(e.pageX, e.pageY);
             if (editor.state.selection?.isBlock()) {
@@ -63,7 +64,6 @@ export const BlockSelectionPlugin: PluginFactory =
 
         const onMouseMove = (e: MouseEvent) => {
             if (!draggingState) return;
-
             const nodeId = getNodeIdFromPoint(e.pageX, e.pageY);
             if (
                 !editor.state.selection?.isBlock() &&
@@ -72,32 +72,29 @@ export const BlockSelectionPlugin: PluginFactory =
             )
                 return;
 
+            e.preventDefault();
+            getSelection()?.removeAllRanges();
+
+            const currentMousePosition = getMouseEventRectInView(e, view);
             draggingState = editor.trigger(BLOCK_SELECTION_EVENTS.changed, {
                 ...draggingState,
-                current: { x: e.pageX, y: e.pageY },
+                current: currentMousePosition,
             });
 
             getSelection()?.removeAllRanges();
-            if (!nodeId) return;
-            if (nodeId === editor.state.rootId) return;
+            const nodeIds = getNodeIdsUnderSelection(
+                view.dom,
+                draggingState.start,
+                currentMousePosition
+            ).filter((nodeId) => nodeId !== editor.state.rootId);
 
-            let selectedIds = getSelectedIds({ editor });
-            if (
-                !selectedIds.length &&
-                startNodeId &&
-                startNodeId !== editor.state.rootId
-            ) {
-                selectedIds = [startNodeId];
-            }
-
-            if (selectedIds.indexOf(nodeId) < 0) {
-                selectedIds = sortSelectedIds([...selectedIds, nodeId], editor);
+            requestAnimationFrame(() => {
                 hasSelectedBlocks = true;
                 editor
                     .createTransaction()
-                    .focus(new BlockSelection(selectedIds))
+                    .focus(new BlockSelection(sortSelectedIds(nodeIds, editor)))
                     .dispatch(false);
-            }
+            });
         };
 
         dom.addEventListener('mousedown', onMouseDown);
@@ -120,17 +117,53 @@ export const BlockSelectionPlugin: PluginFactory =
         };
     };
 
-const getSelectedIds = ({ editor }: { editor: Editor }) => {
-    if (!editor.state.selection?.isBlock()) return [];
-    const selection = editor.state.selection as BlockSelection;
-    return Array.from(selection.nodeIds.values());
-};
-
 const sortSelectedIds = (nodeIds: string[], editor: Editor) => {
     const flatTree = editor.runQuery((resolvedState) => resolvedState.flatTree);
     return nodeIds.slice().sort((a, b) => {
         return flatTree.indexOf(a) > flatTree.indexOf(b) ? 1 : -1;
     });
+};
+
+const getMouseEventRectInView = (e: MouseEvent, view: View) => {
+    const viewDomRect = view.dom.getBoundingClientRect();
+    return { x: e.pageX - viewDomRect.left, y: e.pageY - viewDomRect.top };
+};
+
+const getNodeIdsUnderSelection = (
+    viewDom: HTMLElement,
+    { x: x1, y: y1 }: { x: number; y: number },
+    { x: x2, y: y2 }: { x: number; y: number }
+) => {
+    const rootRect = {
+        top: Math.min(y1, y2),
+        left: Math.min(x1, x2),
+        bottom: Math.max(y1, y2),
+        right: Math.max(x1, x2),
+    } as DOMRect;
+
+    const viewDomRect = viewDom.getBoundingClientRect();
+    const blocks = document.querySelectorAll('[data-uid]');
+    return Array.from(blocks)
+        .filter((block) => {
+            const blockRect = block.getBoundingClientRect();
+            const blockRectInView = {
+                top: blockRect.top - viewDomRect.top,
+                left: blockRect.left - viewDomRect.left,
+                right: blockRect.right - viewDomRect.left,
+                bottom: blockRect.bottom - viewDomRect.top,
+            } as DOMRect;
+            return isOverLapping(rootRect, blockRectInView);
+        })
+        .map((block) => block.getAttribute('data-uid')) as string[];
+};
+
+const isOverLapping = (rect1: DOMRect, rect2: DOMRect) => {
+    return !(
+        rect1.right < rect2.left ||
+        rect1.left > rect2.right ||
+        rect1.bottom < rect2.top ||
+        rect1.top > rect2.bottom
+    );
 };
 
 const getNodeIdFromPoint = (x: number, y: number) => {

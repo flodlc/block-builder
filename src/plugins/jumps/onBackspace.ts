@@ -1,4 +1,4 @@
-import { unwrap } from '../commands/unwrap';
+import { unwrap } from './unwrap';
 import { Editor } from '../../editor/model/Editor';
 import { TextSelection } from '../../editor/model/Selection';
 import { previousEditable } from '../../editor/model/queries/previousEditable';

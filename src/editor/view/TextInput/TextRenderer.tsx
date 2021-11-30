@@ -41,6 +41,7 @@ export const TextRenderer = React.memo(
         hashedKey,
         decorations = [],
     }: {
+        stringText: string;
         text?: MarkedText;
         decorations?: any[];
         hashedKey: string;
@@ -83,6 +84,7 @@ export const TextRenderer = React.memo(
                             </Marks>
                         );
                     })}
+                {'\n'}
             </>
         );
     },

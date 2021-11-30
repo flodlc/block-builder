@@ -24,7 +24,7 @@ export const ReactView = ({
 
     useLayoutEffect(() => {
         if (!ref.current) return;
-        const view = new View(editor);
+        const view = new View(editor, ref.current);
         const registeredPlugins = registerPlugins({
             editor,
             plugins,
@@ -48,7 +48,7 @@ export const ReactView = ({
                     <>
                         <ViewContext.Provider value={view}>
                             <EditorContext.Provider value={editor}>
-                                {rootNode.childrenIds && (
+                                {rootNode && (
                                     <Child
                                         parentId={'undefined'}
                                         nodeId={rootNode.id}
@@ -58,13 +58,13 @@ export const ReactView = ({
                         </ViewContext.Provider>
                     </>
                 )}
+                {registeredPlugins
+                    ?.filter((item) => item.Component)
+                    ?.map(({ Component }, i) => {
+                        Component = Component as React.FC;
+                        return <Component key={i} editor={editor} />;
+                    })}
             </div>
-            {registeredPlugins
-                ?.filter((item) => item.Component)
-                ?.map(({ Component }, i) => {
-                    Component = Component as React.FC;
-                    return <Component key={i} editor={editor} />;
-                })}
         </>
     );
 };

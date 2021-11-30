@@ -1,5 +1,5 @@
-import { unwrap } from '../commands/unwrap';
-import { wrapInPrevious } from '../commands/wrapIn';
+import { unwrap } from './unwrap';
+import { wrapInPrevious } from './wrapIn';
 import { Editor } from '../../editor/model/Editor';
 import { TextSelection } from '../../editor/model/Selection';
 

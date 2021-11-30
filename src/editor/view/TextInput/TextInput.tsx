@@ -103,6 +103,7 @@ export const TextInput = ({
     };
 
     const handleInput = (e: React.FormEvent) => {
+        e.stopPropagation();
         if (range) {
             const newTextState = keyBinder({
                 value,
@@ -168,7 +169,7 @@ export const TextInput = ({
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
                 onKeyDown={handleKeyDown}
-                onInput={handleInput}
+                onInputCapture={handleInput}
                 onBeforeInput={handleBeforeInput}
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={handleCompositionEnd}
@@ -176,6 +177,7 @@ export const TextInput = ({
                 style={{ outline: 'none', padding: style.padding }}
             >
                 <TextRenderer
+                    stringText={stringText}
                     onChange={handleMarkChange}
                     hashedKey={key}
                     text={value}

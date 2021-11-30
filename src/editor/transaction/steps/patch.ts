@@ -10,6 +10,9 @@ export const patch = ({
     nodeId: string;
     patch: any;
 }) => {
+    if (patch.childrenIds && Object.keys(patch).length === 1) {
+        throw 'Cannot patch field childrenIds only. Use insert / delete steps instead.';
+    }
     let reversePatch = {} as any;
     const node = state.nodes[nodeId];
     return {
@@ -21,8 +24,10 @@ export const patch = ({
                     [key]: node[key],
                 };
             }, {});
-            const draftNode = { ...draftState.nodes[nodeId], ...patch };
-            draftState.nodes[nodeId] = draftNode;
+            draftState.nodes[nodeId] = {
+                ...draftState.nodes[nodeId],
+                ...patch,
+            };
         }),
         reversedSteps: { name: 'patch', nodeId, patch: reversePatch },
     };

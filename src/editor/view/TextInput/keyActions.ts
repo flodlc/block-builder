@@ -70,11 +70,23 @@ const config: {
     },
     {
         match: (e) =>
-            e.type === 'input' &&
-            ['insertText'].includes((e as InputEvent).inputType),
+            e.type === 'input' && (e as InputEvent).inputType === 'insertText',
         callback: ({ value, range, e }) => {
             return spliceText(value, {
                 textInput: (e as InputEvent).data ?? '',
+                range,
+            });
+        },
+    },
+    {
+        match: (e) =>
+            e.type === 'input' &&
+            ['insertLineBreak', 'insertParagraph'].includes(
+                (e as InputEvent).inputType
+            ),
+        callback: ({ value, range }) => {
+            return spliceText(value, {
+                textInput: '\n',
                 range,
             });
         },

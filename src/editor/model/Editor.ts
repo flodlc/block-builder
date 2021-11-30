@@ -131,6 +131,7 @@ function getNodeJson(state: State, node: Node) {
         type: string;
         text?: MarkedText;
         children?: JsonNode[];
+        attrs?: any;
     };
 
     const nodeJson: JsonNode = {
@@ -140,6 +141,10 @@ function getNodeJson(state: State, node: Node) {
 
     if (node.text) {
         nodeJson.text = node.text;
+    }
+
+    if (node.attrs) {
+        nodeJson.attrs = node.attrs;
     }
 
     if (node.childrenIds) {

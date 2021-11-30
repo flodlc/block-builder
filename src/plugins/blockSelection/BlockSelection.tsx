@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Editor } from '../../editor/model/Editor';
 import { BLOCK_SELECTION_EVENTS, DraggingState } from './blockSelection.plugin';
 
@@ -27,12 +27,15 @@ export const BlockSelection = ({
     current?: { x: number; y: number };
 }) => {
     if (!start || !current) return <></>;
+    const ref = useRef(null);
+
     return (
         <div
+            ref={ref}
             style={{
                 pointerEvents: 'none',
                 background: 'rgba(46, 170, 220, 0.2)',
-                position: 'fixed',
+                position: 'absolute',
                 top: `${Math.min(start.y, current.y)}px`,
                 left: `${Math.min(start.x, current.x)}px`,
                 height: `${Math.abs(current.y - start.y)}px`,

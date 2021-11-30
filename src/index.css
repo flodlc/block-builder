@@ -13,6 +13,7 @@ code {
 }
 
 .editor {
+    overflow: auto;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -30,7 +31,6 @@ code {
     background-color: #1e2023;
     position: relative;
     flex: 1;
-    overflow: auto;
     color: rgba(255, 255, 255, 0.92);
     padding: 70px calc(50% - 360px) 40px;
     font-size: 16px;
