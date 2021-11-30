@@ -82,7 +82,7 @@ export const MentionComponent = ({
                 });
                 setIndex(newIndex);
             }
-            if (e.key === 'Enter') execCommmand(e, index);
+            if (e.key === 'Enter') execCommand(e, index);
         };
         document.addEventListener('keydown', handler, { capture: true });
         return () =>
@@ -91,7 +91,7 @@ export const MentionComponent = ({
 
     useEffect(() => setIndex(0), [searchText]);
 
-    const execCommmand = (e: Event, i: number) => {
+    const execCommand = (e: Event, i: number) => {
         e.preventDefault();
         e.stopPropagation();
         close?.();
@@ -138,7 +138,7 @@ export const MentionComponent = ({
                             }}
                             key={i}
                             onMouseEnter={() => setIndex(i)}
-                            onClick={(e) => execCommmand(e.nativeEvent, i)}
+                            onClick={(e) => execCommand(e.nativeEvent, i)}
                         >
                             {command.label}
                         </div>
