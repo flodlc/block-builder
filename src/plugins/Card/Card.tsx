@@ -14,7 +14,8 @@ export const Card: React.FC<BlockComponentAttrs> = ({ node, selection }) => {
                     fontWeight: 700,
                     padding: '4px 0',
                     fontSize: '38px',
-                    whiteSpace: 'break-spaces',
+                    whiteSpace: 'pre-wrap',
+                    '-webkit-user-modify': 'read-write',
                     marginBottom: '20px',
                     letterSpacing: '0.006em',
                 }}

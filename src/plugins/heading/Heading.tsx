@@ -22,7 +22,8 @@ export const Heading: React.FC<BlockComponentAttrs> = ({
                 placeholder={<>Heading</>}
                 style={{
                     padding: '4px 0',
-                    whiteSpace: 'break-spaces',
+                    whiteSpace: 'pre-wrap',
+                    '-webkit-user-modify': 'read-write',
                 }}
                 value={node.text}
                 range={textSelection?.range}

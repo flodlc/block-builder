@@ -7,6 +7,15 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+[contenteditable] {
+    -webkit-tap-highlight-color: transparent;
+}
+
+*,
+*:focus {
+    outline: 0;
+}
+
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
         monospace;
@@ -50,15 +59,15 @@ code {
     background: transparent;
 }
 
-[contenteditable=false] ~ .placeholdera {
+[contenteditable='false'] ~ .placeholdera {
     display: none !important;
 }
 
-[contenteditable=true] ~ .placeholdera {
+[contenteditable='true'] ~ .placeholdera {
     display: none !important;
 }
 
-[contenteditable=true]:focus ~ .placeholdera {
+[contenteditable='true']:focus ~ .placeholdera {
     display: block !important;
 }
 
@@ -111,4 +120,3 @@ code {
     margin-top: 18px;
     margin-bottom: 4px;
 }
-

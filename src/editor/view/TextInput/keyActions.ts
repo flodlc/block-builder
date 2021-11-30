@@ -70,6 +70,21 @@ const config: {
     },
     {
         match: (e) =>
+            e.type === 'keydown' &&
+            (e as KeyboardEvent).key === 'Enter' &&
+            (e as KeyboardEvent).shiftKey,
+        callback: ({ value, range, e }) => {
+            /** Avoid css glitch that doesn't goes inline before there is a letter */
+            const softBreak = '\n';
+            e.preventDefault();
+            return spliceText(value, {
+                textInput: softBreak,
+                range: [range[0], range[1]],
+            });
+        },
+    },
+    {
+        match: (e) =>
             e.type === 'input' &&
             ['insertText'].includes((e as InputEvent).inputType),
         callback: ({ value, range, e }) => {
