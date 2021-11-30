@@ -22,7 +22,7 @@ export const JumpsPlugin: PluginFactory =
                     break;
                 case 'Enter':
                     if (!e.shiftKey) {
-                        onDelete({ e, editor });
+                        onEnter({ e, editor });
                     }
                     break;
             }
