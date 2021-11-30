@@ -50,15 +50,15 @@ code {
     background: transparent;
 }
 
-[contenteditable=false] ~ .placeholdera {
+[contenteditable='false'] ~ .placeholdera {
     display: none !important;
 }
 
-[contenteditable=true] ~ .placeholdera {
+[contenteditable='true'] ~ .placeholdera {
     display: none !important;
 }
 
-[contenteditable=true]:focus ~ .placeholdera {
+[contenteditable='true']:focus ~ .placeholdera {
     display: block !important;
 }
 
@@ -112,3 +112,6 @@ code {
     margin-bottom: 4px;
 }
 
+button:hover {
+    opacity: 0.5;
+}

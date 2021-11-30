@@ -18,7 +18,26 @@ import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { SCHEMA } from './SCHEMA';
+import { MenuBallonPlugin } from '../plugins/ballonMenu/ballonMenu.plugin';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
+
+const BallonContent = ({ editor }: { editor: Editor }) => (
+    <button
+        style={{
+            border: 'white',
+            background: 'grey',
+            color: 'white',
+            height: '20px',
+        }}
+        onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            editor.runCommand(toggleBold());
+        }}
+    >
+        Bold
+    </button>
+);
 
 function Playground() {
     const [editor] = useState(
@@ -39,6 +58,9 @@ function Playground() {
         <div className="editor">
             <ReactView
                 plugins={[
+                    MenuBallonPlugin({
+                        BallonContent: <BallonContent editor={editor} />,
+                    }),
                     JumpsPlugin(),
                     MentionPlugin(),
                     BlockSelectionPlugin(),
