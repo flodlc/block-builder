@@ -18,6 +18,7 @@ import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { SCHEMA } from './SCHEMA';
+import { DividerPlugin } from '../plugins/divider/divider.plugin';
 
 function Playground() {
     const [editor] = useState(
@@ -44,6 +45,7 @@ function Playground() {
                     SuggestionPlugin(),
                     HistoryShortcutsPlugin(),
                     CalloutPlugin(),
+                    DividerPlugin(),
                     QuotePlugin(),
                     CardPlugin(),
                     TextPlugin(),

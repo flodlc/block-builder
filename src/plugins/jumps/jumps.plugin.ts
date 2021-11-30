@@ -10,14 +10,22 @@ export const JumpsPlugin: PluginFactory =
         const keydownHandler = (e: KeyboardEvent) => {
             if (!editor.state.selection?.isText()) return;
 
-            const handler = {
-                Backspace: () => onBackspace({ e, editor }),
-                Tab: () => onTab({ e, editor }),
-                Enter: () => onEnter({ e, editor }),
-                Delete: () => onDelete({ e, editor }),
-            }[e.key];
-
-            handler?.();
+            switch (e.key) {
+                case 'Backspace':
+                    onBackspace({ e, editor });
+                    break;
+                case 'Tab':
+                    onTab({ e, editor });
+                    break;
+                case 'Delete':
+                    onDelete({ e, editor });
+                    break;
+                case 'Enter':
+                    if (!e.shiftKey) {
+                        onEnter({ e, editor });
+                    }
+                    break;
+            }
         };
         dom.addEventListener('keydown', keydownHandler);
         return {

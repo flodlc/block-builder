@@ -42,7 +42,9 @@ export const PLAYGROUND_DATA = {
             'sdfsffs',
             'fjsnsjdnf',
             'dsdffze',
+            'diviii',
             'aqdfsd',
+            'spoasdsdf',
             'abc',
             'skdfsdf',
             'kdsfkdf',
@@ -78,7 +80,7 @@ export const PLAYGROUND_DATA = {
         type: 'text',
         text: [
             {
-                s: 'Harum voluptas eum nulla harum necessitatibus. ',
+                s: 'Harum voluptas eum nulla harum necessitatibus.',
             },
         ],
     },
@@ -94,13 +96,22 @@ export const PLAYGROUND_DATA = {
     aqdfsd: {
         id: 'aqdfsd',
         type: 'text',
-        text: [],
+        text: [
+            {
+                s: 'Let’s look at how a single source can proceed through the layers of progressive summarization.',
+            },
+        ],
     },
     abc: {
         id: 'abc',
         type: 'callout',
         attrs: { emoji: '👽' },
         childrenIds: ['bcd'],
+    },
+    spoasdsdf: {
+        id: 'spoasdsdf',
+        type: 'text',
+        text: [],
     },
     skdfsdf: {
         id: 'skdfsdf',
@@ -111,6 +122,10 @@ export const PLAYGROUND_DATA = {
         id: 'bcd',
         type: 'text',
         text: [{ s: 'Child of callout' }],
+    },
+    diviii: {
+        id: 'diviii',
+        type: 'divider',
     },
     dsdffze: {
         id: 'dsdffze',

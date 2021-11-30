@@ -9,7 +9,6 @@ export const onEnter = ({
     e: KeyboardEvent;
     editor: Editor;
 }) => {
-    if (e.shiftKey) return;
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
     const newNode = editor.schema.text.create();

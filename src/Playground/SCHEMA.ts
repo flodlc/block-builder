@@ -14,6 +14,11 @@ export const SCHEMA = {
         allowText: true,
         allowChildren: false,
     },
+    divider: {
+        attrs: {},
+        allowText: false,
+        allowChildren: false,
+    },
     quote: {
         attrs: {},
         allowText: false,

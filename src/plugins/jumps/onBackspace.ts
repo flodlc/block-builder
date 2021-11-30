@@ -1,7 +1,6 @@
 import { unwrap } from './unwrap';
 import { Editor } from '../../editor/model/Editor';
-import { TextSelection } from '../../editor/model/Selection';
-import { previousEditable } from '../../editor/model/queries/previousEditable';
+import { BlockSelection, TextSelection } from '../../editor/model/Selection';
 import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
 
@@ -69,8 +68,12 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
 
-    const target = editor.runQuery(previousEditable(node.id));
-    if (!target) return false;
+    const prevId = editor.runQuery((resolvedState) => {
+        const index = resolvedState.flatTree.indexOf(node.id);
+        return resolvedState.flatTree[index - 1];
+    });
+    const prev = editor.state.nodes[prevId];
+    if (!prev) return false;
 
     const parentId = editor.runQuery(
         (resolvedState) => resolvedState.nodes[node.id].parentId
@@ -89,24 +92,30 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
             .insertAfter({ node: child, parent: parentId, after: node.id });
     });
 
-    transaction
-        .removeFrom({
-            parentId,
-            nodeId: node.id,
-        })
-        .patch({
-            nodeId: target.id,
-            patch: {
-                text: joinMarkedTexts(target.text, node.text),
-            },
-        })
-        .focus(
-            new TextSelection(target.id, [
-                target.text ? getMarkedTextLength(target.text) : 0,
-                target.text ? getMarkedTextLength(target.text) : 0,
-            ])
-        )
-        .dispatch();
+    transaction.removeFrom({
+        parentId,
+        nodeId: node.id,
+    });
+
+    if (editor.schema[prev.type].allowText) {
+        transaction
+            .patch({
+                nodeId: prev.id,
+                patch: {
+                    text: joinMarkedTexts(prev.text, node.text),
+                },
+            })
+            .focus(
+                new TextSelection(prev.id, [
+                    prev.text ? getMarkedTextLength(prev.text) : 0,
+                    prev.text ? getMarkedTextLength(prev.text) : 0,
+                ])
+            );
+    } else {
+        transaction.focus(new BlockSelection([prev.id]));
+    }
+
+    transaction.dispatch();
 
     e.preventDefault();
     e.stopPropagation();

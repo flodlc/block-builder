@@ -40,7 +40,7 @@ const getNextTargetSelection = (editor: Editor) => {
     const previousNodeTextLength = getMarkedTextLength(nextNode.text ?? []);
     let targetPos = previousNodeTextLength;
     let targetDistance = 100000;
-    for (let pos = 0; pos < previousNodeTextLength; pos++) {
+    for (let pos = 0; pos <= previousNodeTextLength; pos++) {
         const rectAtPos = View.getDomRectAtPos(nextNode.id, pos);
         const distanceWithPos = getDistance(selectionRect, rectAtPos);
         if (distanceWithPos < targetDistance) {
