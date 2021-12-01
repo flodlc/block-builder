@@ -11,12 +11,14 @@ import { TextRenderer } from './TextRenderer';
 import { MarkedText } from '../../model/types';
 import { getElementSelection } from './utils/getElementSelection';
 import { restoreSelection } from './utils/restoreSelection';
-import { keyBinder } from './keyActions';
 import { Range, TextSelection } from '../../model/Selection';
 import { ViewContext } from '../contexts/ViewContext';
 import { Editor } from '../../model/Editor';
 import { Decoration } from '../types';
 import { PlaceholderWrapper } from './Placeholder';
+import { getTextNodes } from './utils/getTextNodes';
+import { spliceText } from '../../transaction/MarkedText/spliceText';
+import { keyBinder } from './keyActions';
 
 const useDecorations = ({
     editor,
@@ -36,9 +38,71 @@ const useDecorations = ({
     return decorations;
 };
 
+const getStringText = (el: HTMLElement): string => {
+    return getTextNodes({ node: el }, true).reduce(
+        (c, p) => c + (p.nodeType === 3 ? p.textContent ?? '' : '•'),
+        ''
+    );
+};
+
+const getInputDiff = (
+    prevText: string,
+    newtText: string,
+    prevRange: Range,
+    newRange: Range
+): { textInput: string; inputRange: Range } => {
+    const delta = newtText.length - prevText.length;
+    if (delta < 0 && TextSelection.areSameRange(prevRange, newRange)) {
+        return {
+            inputRange: [prevRange[0], prevRange[1] - delta],
+            textInput: '',
+        };
+    }
+
+    const splittedA = prevText.slice(0, prevRange[0]).split('');
+    const splittedB = newtText.slice(0, newRange[0]).split('');
+
+    const splittedABeforeCursor = splittedA.slice(0, prevRange[0]);
+    let firstDifPos: number | undefined;
+    splittedB.forEach((charB, i) => {
+        const charA = splittedABeforeCursor[i];
+        if (charA !== charB) {
+            firstDifPos = firstDifPos ?? i;
+        }
+    });
+
+    return {
+        inputRange: [firstDifPos ?? newRange[0], prevRange[1]],
+        textInput: newtText.slice(firstDifPos ?? newRange[0], newRange[1]),
+    };
+};
+
+const handleTextChange = ({
+    element,
+    currentValue,
+    range,
+    previousText,
+}: {
+    element: HTMLElement;
+    currentValue: MarkedText;
+    range: Range;
+    previousText: string;
+}) => {
+    const inputDiff = getInputDiff(
+        previousText,
+        getStringText(element),
+        range,
+        getElementSelection(element) as Range
+    );
+    if (!inputDiff) return undefined;
+    return spliceText(currentValue, {
+        textInput: inputDiff.textInput,
+        range: inputDiff.inputRange,
+    });
+};
+
 export const TextInput = ({
     onChange = () => false,
-    onKeyDown = () => undefined,
     value = [],
     range,
     style = {},
@@ -48,7 +112,6 @@ export const TextInput = ({
     contentEditable = true,
 }: {
     onChange?: (value: MarkedText, range?: Range) => boolean;
-    onKeyDown?: (e: React.KeyboardEvent) => boolean | undefined;
     value?: MarkedText;
     range?: Range;
     style?: any;
@@ -59,8 +122,23 @@ export const TextInput = ({
 }) => {
     const editor = useContext(EditorContext);
     const ref = useRef<HTMLDivElement>(null);
-    const [composing] = useState({ state: false });
+    const [text] = useState({ text: '' });
     const decorations = useDecorations({ editor, nodeId });
+
+    const [handlingState] = useState({
+        key: Math.random() + '',
+        render: true,
+        forceRender: false,
+    });
+
+    useEffect(() => {
+        text.text = ref.current ? getStringText(ref.current) : '';
+    }, [value]);
+
+    useEffect(() => {
+        handlingState.render = true;
+        handlingState.forceRender = true;
+    }, [decorations]);
 
     useLayoutEffect(() => {
         if (!ref.current) return;
@@ -80,69 +158,60 @@ export const TextInput = ({
             .dispatch();
     };
 
-    const handleCompositionEnd = (e: React.FormEvent) => {
-        composing.state = false;
-        if (range) {
-            const newTextState = keyBinder({
-                value,
-                e: e.nativeEvent,
-                range,
-            });
-            if (newTextState) {
-                onInput(newTextState.value, newTextState.range);
-            }
-        }
-    };
-
     const handleCompositionStart = () => {
-        composing.state = true;
-    };
-
-    const handleBeforeInput = () => {
-        range = getElementSelection(ref.current);
+        handlingState.render = false;
     };
 
     const handleInput = (e: React.FormEvent) => {
-        e.stopPropagation();
-        if (range) {
-            const newTextState = keyBinder({
-                value,
-                e: e.nativeEvent,
+        if (!range) return;
+        const nativeEvent = e.nativeEvent as InputEvent;
+        if (nativeEvent.data) handlingState.render = false;
+        if (/composition/i.test(nativeEvent.inputType)) return;
+
+        let newTextState: { value: MarkedText; range: Range } | undefined;
+
+        if (
+            ['insertLineBreak', 'insertParagraph'].includes(
+                nativeEvent.inputType
+            )
+        ) {
+            newTextState = spliceText(value, {
+                textInput: '\n',
                 range,
             });
-
-            if (newTextState) {
-                onInput(newTextState.value, newTextState.range);
-            }
         }
+
+        if (!newTextState) {
+            newTextState = handleTextChange({
+                element: ref.current as HTMLElement,
+                currentValue: value,
+                range,
+                previousText: text.text,
+            });
+        }
+        if (!newTextState) return;
+        onInput(newTextState.value, newTextState.range);
+    };
+
+    const handleCompositionEnd = () => {
+        handlingState.render = false;
+        const newTextState = handleTextChange({
+            element: ref.current as HTMLElement,
+            currentValue: value,
+            range: range as Range,
+            previousText: text.text,
+        });
+        if (!newTextState) return;
+        onInput(newTextState.value, newTextState.range);
     };
 
     const handleMarkChange = (markedText: MarkedText) => {
         onInput(markedText, undefined);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (!editor.state.selection?.isText()) {
-            e.preventDefault();
-            return;
-        }
-        if (!onKeyDown(e) && range) {
-            const newTextState = keyBinder({
-                value,
-                e: e.nativeEvent,
-                range,
-            });
-            if (newTextState) {
-                onInput(newTextState.value, newTextState.range);
-            }
-        } else {
-            e.preventDefault();
-        }
-    };
-
     const saveDomSelection = () => {
         const range = getElementSelection(ref.current as HTMLDivElement);
-        if (!range || composing.state) return;
+        if (!range || !handlingState.render) return;
         const newTextSelection = new TextSelection(nodeId, range);
         if (newTextSelection.isSame(editor.state.selection)) return;
         editor.createTransaction().focus(newTextSelection).dispatch(false);
@@ -159,27 +228,29 @@ export const TextInput = ({
             });
     }, []);
 
-    const stringText = value && value.reduce((prev, curr) => prev + curr.s, '');
+    if (handlingState.render || handlingState.forceRender) {
+        handlingState.key = Math.random() + '';
+    }
+    handlingState.render = true;
+    handlingState.forceRender = false;
 
-    const key = JSON.stringify([value, decorations]);
+    const stringText = value && value.reduce((prev, curr) => prev + curr.s, '');
     return (
         <div style={{ position: 'relative', ...style, padding: undefined }}>
             <div
-                key={key}
+                key={handlingState.key}
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
-                onKeyDown={handleKeyDown}
                 onInput={handleInput}
-                onBeforeInput={handleBeforeInput}
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={handleCompositionEnd}
                 ref={ref}
                 style={{ outline: 'none', padding: style.padding }}
             >
                 <TextRenderer
+                    hashedKey={handlingState.key}
                     stringText={stringText}
                     onChange={handleMarkChange}
-                    hashedKey={key}
                     text={value}
                     decorations={decorations}
                 />

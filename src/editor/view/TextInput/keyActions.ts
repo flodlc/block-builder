@@ -70,7 +70,7 @@ const config: {
     },
     {
         match: (e) =>
-            e.type === 'input' && (e as InputEvent).inputType === 'insertText',
+            e.type === 'input' && (e as InputEvent).inputType === 'insertTexta',
         callback: ({ value, range, e }) => {
             return spliceText(value, {
                 textInput: (e as InputEvent).data ?? '',
@@ -92,7 +92,7 @@ const config: {
         },
     },
     {
-        match: (e) => e.type === 'compositionend',
+        match: (e) => e.type === 'compositionenda',
         callback: ({ value, range, e }) => {
             return spliceText(value, {
                 textInput: (e as CompositionEvent).data ?? '',
