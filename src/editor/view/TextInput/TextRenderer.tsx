@@ -62,8 +62,8 @@ export const TextRenderer = React.memo(
             ((decorations ?? []).reduce((prev, curr) => {
                 return markText(prev, { mark: curr.mark, range: curr.range });
             }, text) as MarkedText);
-
         let pos = 0;
+
         return (
             <>
                 {decoratedText &&
