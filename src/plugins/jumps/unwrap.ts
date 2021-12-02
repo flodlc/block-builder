@@ -29,23 +29,21 @@ export const unwrap =
             });
 
         const indexInParent = parent.childrenIds?.indexOf(nodeId) ?? 0;
-        const childrenLength = parent.childrenIds?.length ?? 0;
 
-        if (indexInParent < childrenLength - 1) {
-            for (let i = indexInParent + 1; i < childrenLength; i++) {
-                const nextSiblingId = parent.childrenIds?.[i];
-                if (!nextSiblingId) continue;
+        parent.childrenIds
+            ?.slice(indexInParent + 1)
+            .reverse()
+            .forEach((nextSiblingId) => {
                 tr.removeFrom({
                     nodeId: nextSiblingId,
                     parentId,
                 });
                 tr.insertAfter({
                     parent: nodeId,
-                    after: parent.childrenIds?.[i - 1],
+                    after: node.childrenIds?.[node.childrenIds?.length - 1],
                     node: editor.state.nodes[nextSiblingId],
                 });
-            }
-        }
+            });
 
         if (!editor.schema[parent.type].allowText && indexInParent === 0) {
             tr.removeFrom({

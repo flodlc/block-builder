@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Editor } from '../editor/model/Editor';
 import { ReactView } from '../editor/view/ReactView';
 import { PLAYGROUND_DATA } from './DATA';
@@ -21,13 +21,31 @@ import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
 
 function Playground() {
+    const resetNote = () => {
+        localStorage.clear();
+        window.location.reload();
+    };
+
+    const data = useMemo(() => {
+        const storedDataString = localStorage.getItem('nodes');
+        return storedDataString
+            ? JSON.parse(storedDataString)
+            : PLAYGROUND_DATA;
+    }, []);
+
     const [editor] = useState(
         new Editor({
             rootId: 'doc',
-            nodes: PLAYGROUND_DATA,
+            nodes: data,
             schema: SCHEMA,
         })
     );
+
+    useEffect(() => {
+        editor.on('change', () => {
+            localStorage.setItem('nodes', JSON.stringify(editor.state.nodes));
+        });
+    }, []);
 
     const log = {
         editor: () => console.log(editor),
@@ -61,6 +79,7 @@ function Playground() {
                 <button onClick={log.editor}>Log editor</button>
                 <button onClick={log.state}>Log state</button>
                 <button onClick={log.json}>Log json tree</button>
+                <button onClick={resetNote}>Reset note</button>
                 <button onClick={editor.back}>Undo</button>
                 <button onClick={() => editor.runCommand(toggleBold())}>
                     Bold

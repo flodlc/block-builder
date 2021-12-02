@@ -1,6 +1,6 @@
 import { unwrap } from './unwrap';
 import { Editor } from '../../editor/model/Editor';
-import { BlockSelection, TextSelection } from '../../editor/model/Selection';
+import { TextSelection } from '../../editor/model/Selection';
 import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
 
@@ -82,23 +82,31 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
 
     const transaction = editor.createTransaction();
 
-    (node.childrenIds ?? []).forEach((childId) => {
-        const child = editor.state.nodes[childId];
+    if (
+        editor.schema[prev.type].allowText &&
+        getMarkedTextLength(prev.text ?? [])
+    ) {
+        (node.childrenIds ?? [])
+            .slice()
+            .reverse()
+            .forEach((childId) => {
+                transaction
+                    .removeFrom({
+                        parentId: node.id,
+                        nodeId: childId,
+                    })
+                    .insertAfter({
+                        node: editor.state.nodes[childId],
+                        parent: parentId,
+                        after: node.id,
+                    });
+            });
+
         transaction
             .removeFrom({
-                parentId: node.id,
-                nodeId: childId,
+                parentId,
+                nodeId: node.id,
             })
-            .insertAfter({ node: child, parent: parentId, after: node.id });
-    });
-
-    transaction.removeFrom({
-        parentId,
-        nodeId: node.id,
-    });
-
-    if (editor.schema[prev.type].allowText) {
-        transaction
             .patch({
                 nodeId: prev.id,
                 patch: {
@@ -112,7 +120,12 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
                 ])
             );
     } else {
-        transaction.focus(new BlockSelection([prev.id]));
+        transaction
+            .removeFrom({
+                parentId,
+                nodeId: prev.id,
+            })
+            .focus(selection.clone());
     }
 
     transaction.dispatch();

@@ -28,16 +28,14 @@ export const onDelete = ({
     if (!nextId) return false;
     const next = editor.state.nodes[nextId];
 
+    const transaction = editor.createTransaction();
     if (node.childrenIds?.length && editor.state.rootId !== node.id) {
-        const transaction = editor.createTransaction();
         unwrapChildren({ nodeId: node.id, editor, transaction });
-        transaction.dispatch();
     } else {
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[nextId].parentId
         );
         if (!parentId) return;
-        const transaction = editor.createTransaction();
         unwrapChildren({ nodeId: nextId, editor, transaction });
         transaction
             .patch({
@@ -46,10 +44,9 @@ export const onDelete = ({
                     text: joinMarkedTexts(node.text, next.text),
                 },
             })
-            .removeFrom({ nodeId: nextId, parentId })
-            .focus(selection.clone())
-            .dispatch();
+            .removeFrom({ nodeId: nextId, parentId });
     }
+    transaction.focus(selection.clone()).dispatch();
     e.preventDefault();
     e.stopPropagation();
 };

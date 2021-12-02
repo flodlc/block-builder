@@ -16,7 +16,27 @@ export const onEnter = ({
 
     const tr = editor.createTransaction();
 
-    if (!node.childrenIds?.length) {
+    if (selection.range[0] === 0) {
+        const parentId = editor.runQuery(
+            (resolvedState) => resolvedState.nodes[node.id].parentId
+        );
+        if (!parentId) return;
+        const previousId = editor.runQuery(
+            (resolvedState) => resolvedState.nodes[node.id].previousId
+        );
+
+        tr.insertAfter({
+            parent: parentId,
+            after: previousId,
+            node: editor.schema.text.create(),
+        })
+            .focus(selection.clone())
+            .dispatch();
+        e.preventDefault();
+        e.stopPropagation();
+
+        return;
+    } else if (!node.childrenIds?.length) {
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[node.id].parentId
         );

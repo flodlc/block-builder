@@ -18,7 +18,6 @@ import { Decoration } from '../types';
 import { PlaceholderWrapper } from './Placeholder';
 import { getTextNodes } from './utils/getTextNodes';
 import { spliceText } from '../../transaction/MarkedText/spliceText';
-import { keyBinder } from './keyActions';
 
 const useDecorations = ({
     editor,
