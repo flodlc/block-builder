@@ -11,7 +11,7 @@ export const JumpsPlugin: PluginFactory =
     ({ dom, editor }) => {
         const keydownHandler = (e: KeyboardEvent) => {
             if (!editor.state.selection?.isText()) return;
-            console.log(e);
+
             switch (e.key) {
                 case 'Backspace':
                     onBackspace({ e, editor });
