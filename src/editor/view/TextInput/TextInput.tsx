@@ -43,10 +43,10 @@ export const TextInput = ({
 }) => {
     const editor = useContext(EditorContext);
     const ref = useRef<HTMLDivElement>(null);
+    const composingRef = useRef<boolean>(false);
     const decorations = useNodeDecorations({ editor, nodeId });
     const currentSavedText = useLastValue(value);
     const [render, setRender] = useState(0);
-    const [handlingState] = useState({ composing: false });
 
     const onInput = (newValue: MarkedText, newRange?: Range) => {
         if (onChange(newValue, newRange)) return;
@@ -138,7 +138,7 @@ export const TextInput = ({
         ref,
         value,
         decorations,
-        composing: handlingState.composing,
+        composing: composingRef.current,
     });
 
     if (willUpdate) {
@@ -148,7 +148,7 @@ export const TextInput = ({
     useRestoreSelection({
         ref,
         range,
-        composing: handlingState.composing,
+        composing: composingRef.current,
     });
 
     return (
@@ -165,8 +165,8 @@ export const TextInput = ({
                 }}
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
-                onCompositionStart={() => (handlingState.composing = true)}
-                onCompositionEnd={() => (handlingState.composing = false)}
+                onCompositionStart={() => (composingRef.current = true)}
+                onCompositionEnd={() => (composingRef.current = false)}
                 style={{
                     outline: 'none',
                     padding: style.padding,
