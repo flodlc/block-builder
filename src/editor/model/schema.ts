@@ -5,6 +5,7 @@ export type CompiledSchema = Record<
     string,
     NodeSchema & {
         create: (node?: Partial<Node>) => Node;
+        patch: (node: Partial<Node>) => Node;
     }
 >;
 
@@ -35,6 +36,26 @@ export const compileSchema = ({
                         type,
                         text: node?.text ?? [],
                         childrenIds: [],
+                        attrs,
+                    };
+                },
+                patch: (node) => {
+                    const nodeSchema = schema[type];
+                    const attrs = {} as any;
+
+                    Object.keys(nodeSchema.attrs).forEach((attr) => {
+                        const attrSchema = nodeSchema.attrs[attr];
+                        attrs[attr] = attrSchema.default;
+                        if (node?.attrs?.[attr] !== undefined) {
+                            attrs[attr] = node.attrs?.[attr];
+                        }
+                    });
+
+                    return {
+                        id: node?.id ?? uuidv4(),
+                        type,
+                        text: node?.text ?? [],
+                        childrenIds: node?.childrenIds ?? [],
                         attrs,
                     };
                 },

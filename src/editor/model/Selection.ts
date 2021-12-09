@@ -97,7 +97,7 @@ export class TextSelection extends AbstractSelection {
     }
 
     setRange(range: Range) {
-        return new TextSelection(this.nodeId, [...range]);
+        return new TextSelection(this.nodeId, range && [...range]);
     }
 
     setCollapsedRange(position: number) {

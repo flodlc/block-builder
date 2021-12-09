@@ -1,6 +1,7 @@
 import { Editor } from '../../editor/model/Editor';
 import { insertMark } from '../../editor/transaction/MarkedText/markText';
 import { TextSelection } from '../../editor/model/Selection';
+import { spliceText } from '../../editor/transaction/MarkedText/spliceText';
 
 export const insertMention =
     ({ selection, data }: { selection?: TextSelection; data: any }) =>
@@ -10,9 +11,14 @@ export const insertMention =
         const node = editor.state.nodes[selection.nodeId];
         if (!node.text) return;
 
-        const text = insertMark(node.text, {
+        const textWithMention = insertMark(node.text, {
             mark: { t: 'mention', d: data },
             range: selection.range,
+        });
+
+        const { value, range } = spliceText(textWithMention, {
+            textInput: ' ',
+            range: [selection.range[0] + 1, selection.range[0] + 1],
         });
 
         editor
@@ -20,9 +26,9 @@ export const insertMention =
             .patch({
                 nodeId: node.id,
                 patch: {
-                    text,
+                    text: value,
                 },
             })
-            .focus(selection.setCollapsedRange(selection.range[0] + 1))
-            .dispatch(false);
+            .focus(selection.setRange(range))
+            .dispatch();
     };

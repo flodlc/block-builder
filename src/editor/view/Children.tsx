@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Node } from '../model/types';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { EditorContext } from './contexts/EditorContext';
 import { ViewContext } from './contexts/ViewContext';
 import { AbstractSelection } from '../model/Selection';
@@ -40,34 +39,41 @@ export const Child = React.memo(
     ({ parentId, nodeId }: { parentId: string; nodeId: string }) => {
         const editor = useContext(EditorContext);
         const view = useContext(ViewContext);
-        const [node, setNode] = useState<Node>(editor.state.nodes[nodeId]);
-
+        const node = editor.state.nodes[nodeId];
         const selectionTypes = getSelection({
             nodeId,
             selection: editor.state.selection,
         });
 
-        const [nodeSelection, setNodeSelection] = useState(
-            selectionTypes.insideSelection
-        );
+        const [nodeState, setNodeState] = useState({
+            node,
+            nodeSelection: selectionTypes.insideSelection,
+            blockSelected: selectionTypes.blockSelection,
+        });
 
-        const [blockSelected, setBlockSelected] = useState(
-            selectionTypes.blockSelection
-        );
+        const onChange = useCallback(() => {
+            const selectionTypes = getSelection({
+                nodeId,
+                selection: editor.state.selection,
+            });
+
+            if (
+                nodeState.node !== editor.state.nodes[nodeId] ||
+                nodeState.nodeSelection !== selectionTypes.insideSelection ||
+                nodeState.blockSelected !== selectionTypes.blockSelection
+            ) {
+                setNodeState({
+                    node: editor.state.nodes[nodeId],
+                    nodeSelection: selectionTypes.insideSelection,
+                    blockSelected: selectionTypes.blockSelection,
+                });
+            }
+        }, [nodeState, editor]);
 
         useEffect(() => {
-            const onChange = () => {
-                const selectionTypes = getSelection({
-                    nodeId,
-                    selection: editor.state.selection,
-                });
-                setNode(editor.state.nodes[nodeId]);
-                setNodeSelection(selectionTypes.insideSelection);
-                setBlockSelected(selectionTypes.blockSelection);
-            };
             editor.on('tr', onChange);
             return () => editor.off('tr', onChange);
-        }, []);
+        }, [onChange]);
         if (!node) return <></>;
 
         const Compo = view.blocks[node.type];
@@ -78,9 +84,9 @@ export const Child = React.memo(
         return (
             <Compo
                 parentId={parentId}
-                node={node}
-                selection={nodeSelection}
-                blockSelected={blockSelected}
+                node={nodeState.node}
+                selection={nodeState.nodeSelection}
+                blockSelected={nodeState.blockSelected}
             />
         );
     }

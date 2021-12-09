@@ -56,23 +56,21 @@ export class View {
 
 const getEditable = (nodeId: string) =>
     document.querySelector(
-        `[data-uid="${nodeId}"] [contenteditable="true"]`
+        `[data-uid="${nodeId}"] .editable_content`
     ) as HTMLElement;
 
-function getDomRectAtPos(nodeId: string, pos: number) {
+function getDomRectAtPos(nodeId: string, pos: number, side: 1 | -1 = 1) {
     const editable = getEditable(nodeId);
-    const range = getRange(editable, [pos, pos]);
-
-    const clone = range.cloneRange();
-    clone.setEndAfter(editable);
-    const isAtEnd = (clone.cloneContents().textContent?.length ?? 0) <= 1;
-
-    if (editable.textContent?.length && !isAtEnd) {
-        return range.getBoundingClientRect();
+    const range = getRange(editable, [pos, pos + (side > 0 ? 1 : 0)]);
+    const rangeRects = range.getClientRects();
+    if (editable.textContent?.length && rangeRects.length) {
+        return rangeRects[side > 0 && rangeRects.length > 1 ? 1 : 0];
     } else {
-        const lastElementLength = editable.lastChild?.textContent?.length ?? 1;
-        range.setStart(editable.lastChild as ChildNode, lastElementLength - 1);
-        range.setEnd(editable.lastChild as ChildNode, lastElementLength - 1);
-        return range.getBoundingClientRect();
+        const tempNode = document.createTextNode('a');
+        range.collapse(true);
+        range.insertNode(tempNode);
+        const rect = range.getBoundingClientRect();
+        tempNode.parentElement?.removeChild(tempNode);
+        return rect;
     }
 }

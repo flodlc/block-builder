@@ -32,7 +32,7 @@ const tryReset = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
             .createTransaction()
             .patch({
                 nodeId: node.id,
-                patch: editor.schema.text.create(node),
+                patch: editor.schema.text.patch(node),
             })
             .dispatch();
         e.preventDefault();
@@ -72,6 +72,7 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
         const index = resolvedState.flatTree.indexOf(node.id);
         return resolvedState.flatTree[index - 1];
     });
+
     const prev = editor.state.nodes[prevId];
     if (!prev) return false;
 
@@ -82,10 +83,7 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
 
     const transaction = editor.createTransaction();
 
-    if (
-        editor.schema[prev.type].allowText &&
-        getMarkedTextLength(prev.text ?? [])
-    ) {
+    if (editor.schema[prev.type].allowText) {
         (node.childrenIds ?? [])
             .slice()
             .reverse()
@@ -120,6 +118,10 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
                 ])
             );
     } else {
+        const parentId = editor.runQuery(
+            (resolvedState) => resolvedState.nodes[prevId].parentId
+        );
+        if (!parentId) return false;
         transaction
             .removeFrom({
                 parentId,

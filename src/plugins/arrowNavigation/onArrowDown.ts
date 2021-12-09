@@ -9,12 +9,15 @@ const isLastLine = (editor: Editor) => {
     const currentNode = editor.state.nodes[selection.nodeId];
     const currentCaretCoords = View.getDomRectAtPos(
         currentNode.id,
-        selection.range[0]
+        selection.range[0],
+        -1
     );
     const endRectOfCurrentEditable = View.getDomRectAtPos(
         currentNode.id,
-        selection.getTextLength(editor.state)
+        selection.getTextLength(editor.state),
+        1
     );
+
     return (
         endRectOfCurrentEditable &&
         currentCaretCoords &&
@@ -35,13 +38,14 @@ const getNextTargetSelection = (editor: Editor) => {
     if (!nextNode) return;
     const selectionRect = View.getDomRectAtPos(
         selection.nodeId,
-        selection.range[0]
+        selection.range[0],
+        1
     );
     const previousNodeTextLength = getMarkedTextLength(nextNode.text ?? []);
     let targetPos = previousNodeTextLength;
     let targetDistance = 100000;
     for (let pos = 0; pos <= previousNodeTextLength; pos++) {
-        const rectAtPos = View.getDomRectAtPos(nextNode.id, pos);
+        const rectAtPos = View.getDomRectAtPos(nextNode.id, pos, 1);
         const distanceWithPos = getDistance(selectionRect, rectAtPos);
         if (distanceWithPos < targetDistance) {
             targetDistance = distanceWithPos;

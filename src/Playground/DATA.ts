@@ -11,7 +11,7 @@ export const BIG_DATA = (() => {
         childrenIds: [],
     };
     nodes['doc'] = docNode;
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 2000; i++) {
         const newNode = schema.text.create();
         newNode.text = [
             {
@@ -36,8 +36,11 @@ export const PLAYGROUND_DATA = {
     doc: {
         id: 'doc',
         type: 'card',
-        text: [{ s: 'My first note' }],
+        text: [{ s: 'My note', m: [] }],
         childrenIds: [
+            'c4e3f5b0-53d8-4123-aa94-20f01328477a',
+            'bd80a80b-177c-4df4-a34d-55ed10d3cc5d',
+            '1907f312-3972-4263-8f77-2f58c6eeb188',
             'abcaa',
             'sdfsffs',
             'fjsnsjdnf',
@@ -50,11 +53,7 @@ export const PLAYGROUND_DATA = {
             'kdsfkdf',
         ],
     },
-    abcaa: {
-        id: 'abcaa',
-        type: 'quote',
-        childrenIds: ['bcdaa', 'bcadaa'],
-    },
+    abcaa: { id: 'abcaa', type: 'quote', childrenIds: ['bcdaa', 'bcadaa'] },
     bcdaa: {
         id: 'bcdaa',
         type: 'text',
@@ -63,26 +62,18 @@ export const PLAYGROUND_DATA = {
     bcadaa: {
         id: 'bcadaa',
         type: 'text',
-        text: [{ s: 'Thank you for reading' }],
+        text: [{ s: 'Here is a mention', m: [] }],
     },
     sdfsffs: {
         id: 'sdfsffs',
         type: 'heading',
         attrs: { level: 2 },
-        text: [
-            {
-                s: 'How to take smart notes ?',
-            },
-        ],
+        text: [{ s: 'How to take smart notes ?' }],
     },
     fjsnsjdnf: {
         id: 'fjsnsjdnf',
         type: 'text',
-        text: [
-            {
-                s: 'Harum voluptas eum nulla harum necessitatibus.',
-            },
-        ],
+        text: [{ s: 'Harum voluptas eum nulla harum necessitatibus.' }],
     },
     kdsfkdf: {
         id: 'kdsfkdf',
@@ -108,25 +99,10 @@ export const PLAYGROUND_DATA = {
         attrs: { emoji: '👽' },
         childrenIds: ['bcd'],
     },
-    spoasdsdf: {
-        id: 'spoasdsdf',
-        type: 'text',
-        text: [],
-    },
-    skdfsdf: {
-        id: 'skdfsdf',
-        type: 'text',
-        text: [],
-    },
-    bcd: {
-        id: 'bcd',
-        type: 'text',
-        text: [{ s: 'Child of callout' }],
-    },
-    diviii: {
-        id: 'diviii',
-        type: 'divider',
-    },
+    spoasdsdf: { id: 'spoasdsdf', type: 'text', text: [] },
+    skdfsdf: { id: 'skdfsdf', type: 'text', text: [] },
+    bcd: { id: 'bcd', type: 'text', text: [{ s: 'Child of callout' }] },
+    diviii: { id: 'diviii', type: 'divider' },
     dsdffze: {
         id: 'dsdffze',
         type: 'text',
@@ -135,5 +111,73 @@ export const PLAYGROUND_DATA = {
                 s: 'Expedita cupiditate facilis ut minus neque. Eum ut non ipsa debitis.',
             },
         ],
+    },
+    'c4e3f5b0-53d8-4123-aa94-20f01328477a': {
+        id: 'c4e3f5b0-53d8-4123-aa94-20f01328477a',
+        type: 'text',
+        text: [
+            {
+                s: '•',
+                m: [
+                    {
+                        t: 'mention',
+                        d: {
+                            value: {
+                                type: 'date',
+                                date: '2021-12-06T16:46:35.813Z',
+                            },
+                        },
+                    },
+                ],
+            },
+            { s: ' ', m: [] },
+        ],
+        childrenIds: [],
+        attrs: {},
+    },
+    'bd80a80b-177c-4df4-a34d-55ed10d3cc5d': {
+        id: 'bd80a80b-177c-4df4-a34d-55ed10d3cc5d',
+        type: 'text',
+        text: [
+            {
+                s: '•',
+                m: [
+                    {
+                        t: 'mention',
+                        d: { value: { type: 'person', name: 'Florian' } },
+                    },
+                ],
+            },
+            { s: ' ', m: [] },
+            {
+                s: '•',
+                m: [
+                    {
+                        t: 'mention',
+                        d: { value: { type: 'person', name: 'Mike' } },
+                    },
+                ],
+            },
+            { s: ' ', m: [] },
+            {
+                s: '•',
+                m: [
+                    {
+                        t: 'mention',
+                        d: { value: { type: 'person', name: 'Tyson' } },
+                    },
+                ],
+            },
+            { s: ' ', m: [] },
+        ],
+        childrenIds: [],
+        attrs: {},
+    },
+    '1907f312-3972-4263-8f77-2f58c6eeb188': {
+        id: '1907f312-3972-4263-8f77-2f58c6eeb188',
+        type: 'text',
+        text: [],
+        childrenIds: [],
+        attrs: {},
     },
 };

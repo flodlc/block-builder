@@ -12,7 +12,7 @@ export const spliceText = (
 
     const previousCharNode = updatedText[range[0] - 1];
     // Todo: change the way we identify a previous dynamic node
-    const isPreviousCharText = previousCharNode && previousCharNode.s !== 'm';
+    const isPreviousCharText = previousCharNode && previousCharNode.s !== '•';
     const newSection: MarkedNode = isPreviousCharText
         ? {
               ...updatedText[range[0] - 1],

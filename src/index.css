@@ -5,6 +5,8 @@ body {
         'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    background-color: #232529;
 }
 
 code {
@@ -13,6 +15,7 @@ code {
 }
 
 .editor {
+    scroll-behavior: smooth;
     overflow: auto;
     height: 100vh;
     display: flex;
@@ -20,15 +23,27 @@ code {
 }
 
 .header {
-    position: relative;
-    justify-content: center;
     display: flex;
-    padding: 20px 40px;
-    background-color: #1e2023;
+    background-color: #1d1d1d;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: auto;
+}
+
+.header::-webkit-scrollbar {
+    display: none;
+}
+
+.header_content {
+    position: relative;
+    display: flex;
+    padding: 0px;
 }
 
 .view {
-    background-color: #1e2023;
+    background-color: #232529;
     position: relative;
     flex: 1;
     color: rgba(255, 255, 255, 0.92);
@@ -36,38 +51,34 @@ code {
     font-size: 16px;
     -webkit-font-smoothing: auto;
     line-height: 1.5;
-    letter-spacing: 0.004em;
+    letter-spacing: 0.002em;
 }
 
-.header > button {
-    margin-right: 20px;
-    padding: 7px 10px;
-    border: 1px solid rgb(60, 63, 68);
-    border-radius: 5px;
+.header_content > button {
+    padding: 14px 12px;
+    border: 1px solid rgb(36, 37, 38);
     box-shadow: rgba(0 0 0 0.25) 0 1px 1px;
     color: rgb(215, 216, 219);
     cursor: pointer;
     background: transparent;
 }
 
-[contenteditable=false] ~ .placeholdera {
-    display: none !important;
+@media screen and (max-width: 770px) {
+    .view {
+        font-size: 18px;
+        padding: 20px 15px 140px;
+    }
 }
 
-[contenteditable=true] ~ .placeholdera {
-    display: none !important;
-}
-
-[contenteditable=true]:focus ~ .placeholdera {
-    display: block !important;
+[contenteditable="true"] {
+    white-space: pre-wrap;
 }
 
 .placeholder {
     user-select: none;
     position: absolute;
-    top: 50%;
-    margin-left: 2px;
-    transform: translateY(-50%);
+    top: 0;
+    margin-left: 4px;
     opacity: 0.45;
     pointer-events: none;
 }

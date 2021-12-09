@@ -1,5 +1,5 @@
 import React, { ReactElement, useContext } from 'react';
-import { Mark, MarkedNode, MarkedText } from '../../model/types';
+import { Mark, MarkedText } from '../../model/types';
 import { markText } from '../../transaction/MarkedText/markText';
 import { ViewContext } from '../contexts/ViewContext';
 
@@ -9,10 +9,10 @@ const Marks = ({
     updateMark,
     children,
 }: {
-    marks?: MarkedNode['m'];
+    marks?: Mark[];
     text: string;
     updateMark: (mark: Mark) => void;
-    children: ReactElement[] | string;
+    children: ReactElement[] | ReactElement | string;
 }) => {
     const mark = marks?.[0];
 
@@ -36,34 +36,34 @@ const Marks = ({
 
 export const TextRenderer = React.memo(
     ({
-        text,
+        value,
         onChange,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         hashedKey,
         decorations = [],
     }: {
         stringText: string;
-        text?: MarkedText;
+        value?: MarkedText;
         decorations?: any[];
-        hashedKey: string;
+        hashedKey: number;
         onChange: (text: MarkedText) => void;
     }) => {
         const getUpdateMark =
             ({ from, to }: { from: number; to: number }) =>
             (mark: Mark) => {
-                const updatedMarkedText = markText(text as MarkedText, {
+                const updatedMarkedText = markText(value as MarkedText, {
                     mark,
                     range: [from, to],
                 });
                 onChange(updatedMarkedText);
             };
-
         const decoratedText =
-            text &&
+            value &&
             ((decorations ?? []).reduce((prev, curr) => {
                 return markText(prev, { mark: curr.mark, range: curr.range });
-            }, text) as MarkedText);
-        let pos = 0;
+            }, value) as MarkedText);
 
+        let pos = 0;
         return (
             <>
                 {decoratedText &&
@@ -75,16 +75,15 @@ export const TextRenderer = React.memo(
                         pos += markedNode.s.length;
                         return (
                             <Marks
+                                key={i}
                                 text={markedNode.s}
                                 updateMark={updateMark}
-                                key={i}
                                 marks={markedNode.m}
                             >
                                 {markedNode.s}
                             </Marks>
                         );
                     })}
-                {'\n'}
             </>
         );
     },

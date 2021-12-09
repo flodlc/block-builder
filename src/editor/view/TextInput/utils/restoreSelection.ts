@@ -1,13 +1,10 @@
 import { getTextNodes } from './getTextNodes';
-import {
-    Range as PositionRange,
-    TextSelection,
-} from '../../../model/Selection';
-import { getElementSelection } from './getElementSelection';
+import { Range as PositionRange } from '../../../model/Selection';
 
 export const restoreSelection = (
-    container: HTMLDivElement,
-    textRange?: PositionRange
+    container: HTMLElement,
+    textRange?: PositionRange,
+    force = false
 ) => {
     if (!textRange) {
         const docSelection = window.getSelection() as Selection;
@@ -21,22 +18,32 @@ export const restoreSelection = (
         }
         return;
     }
-    const domRange = getElementSelection(container as HTMLDivElement);
-    if (domRange && TextSelection.areSameRange(textRange, domRange)) {
-        container.focus();
-        return;
-    }
-
-    if (!container.textContent) {
-        container.focus();
-        return;
-    }
-    const range = getRange(container, textRange);
-
     const docSelection = window.getSelection() as Selection;
-    docSelection.removeAllRanges();
-    docSelection.addRange(range);
+    let range: Range;
+    if (!container.textContent) {
+        range = new Range();
+        range.setStart(container, 0);
+        range.collapse();
+    } else {
+        range = getRange(container, textRange);
+    }
+    const currentRange = docSelection.rangeCount && docSelection.getRangeAt(0);
+    if (!force && currentRange && areSameDomRanges(range, currentRange)) {
+        return;
+    }
+
+    if (!range) return;
+    docSelection.collapse(range.startContainer, range.startOffset);
+    if (!range.collapsed) {
+        docSelection.extend(range.endContainer, range.endOffset);
+    }
 };
+
+const areSameDomRanges = (rangeA: Range, rangeB: Range) =>
+    rangeA.startContainer === rangeB.startContainer &&
+    rangeA.startOffset === rangeB.startOffset &&
+    rangeA.endContainer === rangeB.endContainer &&
+    rangeA.endOffset === rangeB.endOffset;
 
 export const getRange = (container: HTMLElement, textRange: PositionRange) => {
     const nodes = getTextNodes({ node: container }, true);

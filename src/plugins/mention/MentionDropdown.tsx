@@ -53,7 +53,7 @@ export const MentionComponent = ({
                 editor.runCommand(
                     insertMention({
                         selection: getSearchSelection(),
-                        data: { name: item.value },
+                        data: { value: item.value() },
                     })
                 ),
         };
@@ -92,6 +92,7 @@ export const MentionComponent = ({
     useEffect(() => setIndex(0), [searchText]);
 
     const execCommand = (e: Event, i: number) => {
+        console.log('exec');
         e.preventDefault();
         e.stopPropagation();
         close?.();
@@ -138,7 +139,9 @@ export const MentionComponent = ({
                             }}
                             key={i}
                             onMouseEnter={() => setIndex(i)}
-                            onClick={(e) => execCommand(e.nativeEvent, i)}
+                            onMouseDownCapture={(e) =>
+                                execCommand(e.nativeEvent, i)
+                            }
                         >
                             {command.label}
                         </div>

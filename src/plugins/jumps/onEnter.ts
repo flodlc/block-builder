@@ -13,9 +13,7 @@ export const onEnter = ({
     const node = editor.state.nodes[selection.nodeId];
     const newNode = editor.schema.text.create();
     newNode.text = cutMarkedText(node.text, [selection?.range[1]]);
-
     const tr = editor.createTransaction();
-
     if (selection.range[0] === 0) {
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[node.id].parentId
@@ -34,7 +32,6 @@ export const onEnter = ({
             .dispatch();
         e.preventDefault();
         e.stopPropagation();
-
         return;
     } else if (!node.childrenIds?.length) {
         const parentId = editor.runQuery(

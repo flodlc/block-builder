@@ -15,8 +15,9 @@ export const MentionPlugin: PluginFactory =
     ({ editor, dom, view }) => {
         let state: MentionPluginState | undefined;
 
-        const keyDownHandler = (e: KeyboardEvent) => {
-            if (state && ['Escape'].includes(e.key)) {
+        const keyDownHandler = (e: Event) => {
+            const char = (e as InputEvent).data ?? '';
+            if (state && ['Escape'].includes(char)) {
                 e.stopPropagation();
                 e.preventDefault();
                 state = editor.trigger(MENTION_EVENTS.changed, undefined);
@@ -33,11 +34,10 @@ export const MentionPlugin: PluginFactory =
                     `${escapeStringRegexp(expression.slice(0, -1))}$`
                 );
                 if (
-                    e.key !== expression.slice(expression.length - 1) ||
+                    char !== expression.slice(expression.length - 1) ||
                     !regex.test(previousText)
                 )
                     return false;
-
                 state = editor.trigger(MENTION_EVENTS.changed, {
                     searchText: '',
                     close: () => {
@@ -46,8 +46,9 @@ export const MentionPlugin: PluginFactory =
                             undefined
                         );
                     },
+                    nodeTextLength: 0,
                     triggeringExpression: expression,
-                    slashPosition: selection.range[0] - (expression.length - 1),
+                    slashPosition: selection.range[0] - expression.length,
                     startBoundingRect: View.getDomRectAtPos(
                         selection.nodeId,
                         selection.range[0]
@@ -66,13 +67,12 @@ export const MentionPlugin: PluginFactory =
             updateDecoration({ suggestionState, editor, view });
 
         const changeHandler = () => {
-            state = editor.trigger(
-                MENTION_EVENTS.changed,
-                onTr({ editor, state })
-            );
+            const newState = onTr({ editor, state });
+            if (!state && !newState) return;
+            state = editor.trigger(MENTION_EVENTS.changed, newState);
         };
 
-        dom.addEventListener('keydown', keyDownHandler);
+        dom.addEventListener('input', keyDownHandler);
         dom.addEventListener('mousedown', mousedownHandler);
         editor.on(MENTION_EVENTS.changed, updateDecorationHandler);
         editor.on('tr', changeHandler);
@@ -84,7 +84,7 @@ export const MentionPlugin: PluginFactory =
             }),
             Component: () => <MentionComponentWrapper editor={editor} />,
             destroy: () => {
-                dom.removeEventListener('keydown', keyDownHandler);
+                dom.removeEventListener('input', keyDownHandler);
                 dom.removeEventListener('mousedown', mousedownHandler);
                 editor.off(MENTION_EVENTS.changed, updateDecorationHandler);
                 editor.off('tr', changeHandler);
@@ -108,6 +108,7 @@ const updateDecoration = ({
         const searchText = suggestionState.searchText as string;
         const triggeringExpression =
             suggestionState.triggeringExpression as string;
+
         view.addDecoration({
             key: 'mention',
             nodeId: selection.nodeId,
@@ -158,7 +159,6 @@ const getSearchText = ({
     const previousSearchText = pluginState.searchText;
     const previousNodeTextLength = pluginState.nodeTextLength;
     pluginState.nodeTextLength = nodeTextLength;
-
     if (
         previousNodeTextLength === undefined ||
         previousSearchText === undefined
@@ -169,7 +169,6 @@ const getSearchText = ({
     const triggerLength = triggeringExpression.length ?? 0;
     const delta = nodeTextLength - previousNodeTextLength;
     const slashPosition = pluginState.slashPosition ?? 0;
-
     const searchStartPosition = slashPosition + triggerLength;
     const searchEndPosition =
         slashPosition + triggerLength + delta + previousSearchText.length;

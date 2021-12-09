@@ -76,14 +76,16 @@ function Playground() {
                 editor={editor}
             />
             <div className="header">
-                <button onClick={log.editor}>Log editor</button>
-                <button onClick={log.state}>Log state</button>
-                <button onClick={log.json}>Log json tree</button>
-                <button onClick={resetNote}>Reset note</button>
-                <button onClick={editor.back}>Undo</button>
-                <button onClick={() => editor.runCommand(toggleBold())}>
-                    Bold
-                </button>
+                <div className="header_content">
+                    <button onClick={log.editor}>Editor</button>
+                    <button onClick={log.state}>State</button>
+                    <button onClick={log.json}>Json</button>
+                    <button onClick={resetNote}>Reset</button>
+                    <button onClick={editor.back}>Undo</button>
+                    <button onClick={() => editor.runCommand(toggleBold())}>
+                        Bold
+                    </button>
+                </div>
             </div>
         </div>
     );

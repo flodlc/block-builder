@@ -11,7 +11,6 @@ export const Text: React.FC<BlockComponentAttrs> = ({
     blockSelected,
 }) => {
     const textSelection = selection as TextSelection;
-
     return (
         <div
             className={

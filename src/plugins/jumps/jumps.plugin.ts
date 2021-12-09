@@ -4,12 +4,14 @@ import { onTab } from './onTab';
 import { onEnter } from './onEnter';
 import { onDelete } from './onDelete';
 
+const isMobile = window.innerWidth < 900;
+
 export const JumpsPlugin: PluginFactory =
     () =>
     ({ dom, editor }) => {
         const keydownHandler = (e: KeyboardEvent) => {
             if (!editor.state.selection?.isText()) return;
-
+            console.log(e);
             switch (e.key) {
                 case 'Backspace':
                     onBackspace({ e, editor });
@@ -21,12 +23,13 @@ export const JumpsPlugin: PluginFactory =
                     onDelete({ e, editor });
                     break;
                 case 'Enter':
-                    if (!e.shiftKey) {
+                    if (!e.shiftKey || isMobile) {
                         onEnter({ e, editor });
                     }
                     break;
             }
         };
+
         dom.addEventListener('keydown', keydownHandler);
         return {
             key: 'jumps',

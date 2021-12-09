@@ -56,12 +56,14 @@ export class Editor {
 
     on = <T>(eventName: EditorEvent, handler: EventHandler<T>) => {
         this.observers[eventName] = this.observers[eventName] ?? [];
-        this.observers[eventName].push(handler);
+        this.observers[eventName] = [...this.observers[eventName], handler];
     };
 
     off = (eventName: EditorEvent, handler: EventHandler) => {
         const index = this.observers[eventName].indexOf(handler);
-        this.observers[eventName].splice(index, 1);
+        const clone = this.observers[eventName].slice();
+        clone.splice(index, 1);
+        this.observers[eventName] = clone;
     };
 
     trigger = <T = any>(eventName: EditorEvent, data?: T) => {
@@ -99,7 +101,6 @@ export class Editor {
                     state: previousState,
                 });
             });
-
             this.trigger('change');
         }
     }

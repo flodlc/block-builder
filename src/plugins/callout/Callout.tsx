@@ -69,7 +69,8 @@ export const Callout: React.FC<BlockComponentAttrs> = ({
         <div
             style={{
                 position: 'relative',
-                background: 'rgb(43 43 50)',
+                // background: 'rgb(43 43 50)',
+                background: 'rgb(57 67 122)',
                 borderRadius: '3px',
                 padding: '13px 20px',
                 margin: '4px 0',

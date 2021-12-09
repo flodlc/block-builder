@@ -25,12 +25,13 @@ export const SuggestionPlugin: PluginFactory =
             }
         };
 
-        const keyDownHandler = (e: KeyboardEvent) => {
-            if (state && ['Escape', 'Enter'].includes(e.key)) {
+        const keyDownHandler = (e: Event) => {
+            const char = (e as InputEvent).data ?? '';
+            if (state && ['Escape', 'Enter'].includes(char)) {
                 e.stopPropagation();
                 e.preventDefault();
                 state = editor.trigger(SUGGESTION_EVENTS.changed, undefined);
-            } else if (e.key === '/') {
+            } else if (char === '/') {
                 const selection = editor.state.selection as TextSelection;
                 if (view.isDecorated(selection)) {
                     return;
@@ -43,8 +44,9 @@ export const SuggestionPlugin: PluginFactory =
                             undefined
                         );
                     },
+                    nodeTextLength: 0,
                     triggeringExpression: '/',
-                    slashPosition: selection.range[0],
+                    slashPosition: selection.range[0] - 1,
                     startBoundingRect: View.getDomRectAtPos(
                         selection.nodeId,
                         selection.range[0]
@@ -55,7 +57,7 @@ export const SuggestionPlugin: PluginFactory =
 
         editor.on('tr', transactionHandler);
         dom.addEventListener('click', clickHandler);
-        dom.addEventListener('keydown', keyDownHandler);
+        dom.addEventListener('input', keyDownHandler);
 
         return {
             key: 'Component',
@@ -79,7 +81,6 @@ const onTr = ({
     if (!editor.state.selection?.isText()) return undefined;
 
     const searchText = getSearchText({ editor, pluginState: state });
-
     if (searchText === undefined || searchText.length > MAX_SEARCH_LENGTH)
         return undefined;
 

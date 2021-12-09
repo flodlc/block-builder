@@ -2,7 +2,7 @@ import React from 'react';
 
 const DefaultPlaceholderContent = () => (
     <>
-        Jot something down or{' '}
+        Type{' '}
         <span
             style={{
                 padding: '3px 6px',
@@ -12,13 +12,19 @@ const DefaultPlaceholderContent = () => (
         >
             /
         </span>{' '}
-        for more options
+        for more commands
     </>
 );
 
-export const PlaceholderWrapper = ({ children }: { children?: any }) => {
+export const PlaceholderWrapper = ({
+    children,
+    style,
+}: {
+    children?: any;
+    style: any;
+}) => {
     return (
-        <div className="placeholder">
+        <div style={style} className="placeholder">
             {children ?? <DefaultPlaceholderContent />}
         </div>
     );

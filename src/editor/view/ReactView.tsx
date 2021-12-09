@@ -40,23 +40,20 @@ export const ReactView = ({
     }, []);
 
     const rootNode = editor.state.nodes[editor.state.rootId];
-
     return (
         <>
             <div className="view" ref={ref}>
                 {view && (
-                    <>
-                        <ViewContext.Provider value={view}>
-                            <EditorContext.Provider value={editor}>
-                                {rootNode && (
-                                    <Child
-                                        parentId={'undefined'}
-                                        nodeId={rootNode.id}
-                                    />
-                                )}
-                            </EditorContext.Provider>
-                        </ViewContext.Provider>
-                    </>
+                    <ViewContext.Provider value={view}>
+                        <EditorContext.Provider value={editor}>
+                            {rootNode && (
+                                <Child
+                                    parentId={'undefined'}
+                                    nodeId={rootNode.id}
+                                />
+                            )}
+                        </EditorContext.Provider>
+                    </ViewContext.Provider>
                 )}
                 {registeredPlugins
                     ?.filter((item) => item.Component)

@@ -11,7 +11,7 @@ export const insertMark = (
     { mark, range }: { mark: Mark; range: Range }
 ) => {
     const splittedNodes = splitMarkedText(text);
-    const markedNode: MarkedNode = { s: 'm', m: [mark] };
+    const markedNode: MarkedNode = { s: '•', m: [mark] };
     const markedNodes: MarkedText = splittedNodes.slice();
     markedNodes.splice(range[0], range[1] - range[0], markedNode);
     return minifyMarkedText(markedNodes);

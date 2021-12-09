@@ -1,30 +1,34 @@
 export const DATA = [
     {
+        label: 'Today',
+        value: () => ({ type: 'date', date: new Date() }),
+    },
+    {
         label: 'Florian',
-        value: 'Florian',
+        value: () => ({ type: 'person', name: 'Florian' }),
     },
     {
         label: 'Clara',
-        value: 'Clara',
+        value: () => ({ type: 'person', name: 'Clara' }),
     },
     {
         label: 'Etienne',
-        value: 'Etienne',
+        value: () => ({ type: 'person', name: 'Etienne' }),
     },
     {
         label: 'Suzanne',
-        value: 'Suzanne',
+        value: () => ({ type: 'person', name: 'Suzanne' }),
     },
     {
         label: 'John',
-        value: 'John',
+        value: () => ({ type: 'person', name: 'John' }),
     },
     {
         label: 'Mike',
-        value: 'Mike',
+        value: () => ({ type: 'person', name: 'Mike' }),
     },
     {
         label: 'Tyson',
-        value: 'Tyson',
+        value: () => ({ type: 'person', name: 'Tyson' }),
     },
 ];

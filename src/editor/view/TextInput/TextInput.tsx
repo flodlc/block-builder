@@ -1,7 +1,6 @@
 import React, {
     ReactElement,
     useContext,
-    useEffect,
     useLayoutEffect,
     useRef,
     useState,
@@ -10,95 +9,18 @@ import { EditorContext } from '../contexts/EditorContext';
 import { TextRenderer } from './TextRenderer';
 import { MarkedText } from '../../model/types';
 import { getElementSelection } from './utils/getElementSelection';
-import { restoreSelection } from './utils/restoreSelection';
 import { Range, TextSelection } from '../../model/Selection';
-import { ViewContext } from '../contexts/ViewContext';
-import { Editor } from '../../model/Editor';
-import { Decoration } from '../types';
 import { PlaceholderWrapper } from './Placeholder';
-import { getTextNodes } from './utils/getTextNodes';
-import { spliceText } from '../../transaction/MarkedText/spliceText';
-
-const useDecorations = ({
-    editor,
-    nodeId,
-}: {
-    editor: Editor;
-    nodeId: string;
-}) => {
-    const view = useContext(ViewContext);
-    const [decorations, setDecorations] = useState<Decoration[]>();
-
-    useEffect(() => {
-        const handler = () => setDecorations(view.decorations[nodeId]);
-        editor.on('decorationsChanged', handler);
-        return () => editor.off('decorationsChanged', handler);
-    }, []);
-    return decorations;
-};
-
-const getStringText = (el: HTMLElement): string => {
-    return getTextNodes({ node: el }, true).reduce(
-        (c, p) => c + (p.nodeType === 3 ? p.textContent ?? '' : '•'),
-        ''
-    );
-};
-
-const getInputDiff = (
-    prevText: string,
-    newtText: string,
-    prevRange: Range,
-    newRange: Range
-): { textInput: string; inputRange: Range } => {
-    const delta = newtText.length - prevText.length;
-    if (delta < 0 && TextSelection.areSameRange(prevRange, newRange)) {
-        return {
-            inputRange: [prevRange[0], prevRange[1] - delta],
-            textInput: '',
-        };
-    }
-
-    const splittedA = prevText.slice(0, prevRange[0]).split('');
-    const splittedB = newtText.slice(0, newRange[0]).split('');
-
-    const splittedABeforeCursor = splittedA.slice(0, prevRange[0]);
-    let firstDifPos: number | undefined;
-    splittedB.forEach((charB, i) => {
-        const charA = splittedABeforeCursor[i];
-        if (charA !== charB) {
-            firstDifPos = firstDifPos ?? i;
-        }
-    });
-
-    return {
-        inputRange: [firstDifPos ?? newRange[0], prevRange[1]],
-        textInput: newtText.slice(firstDifPos ?? newRange[0], newRange[1]),
-    };
-};
-
-const handleTextChange = ({
-    element,
-    currentValue,
-    range,
-    previousText,
-}: {
-    element: HTMLElement;
-    currentValue: MarkedText;
-    range: Range;
-    previousText: string;
-}) => {
-    const inputDiff = getInputDiff(
-        previousText,
-        getStringText(element),
-        range,
-        getElementSelection(element) as Range
-    );
-    if (!inputDiff) return undefined;
-    return spliceText(currentValue, {
-        textInput: inputDiff.textInput,
-        range: inputDiff.inputRange,
-    });
-};
+import { useNodeDecorations } from './hooks/useNodeDecorations';
+import { useLastValue } from './hooks/useLastValue';
+import { useTrailingElements } from './hooks/useTrailingElements';
+import { useHandler } from './actions/useHander';
+import {
+    clearTrackedDomNodes,
+    useTrackDomNodes,
+} from './hooks/useTrackDomNodes';
+import { useRestoreSelection } from './hooks/useRestoreSelection';
+import { useRenderingKey } from './hooks/useRenderingKey';
 
 export const TextInput = ({
     onChange = () => false,
@@ -121,97 +43,79 @@ export const TextInput = ({
 }) => {
     const editor = useContext(EditorContext);
     const ref = useRef<HTMLDivElement>(null);
-    const [text] = useState({ text: '' });
-    const decorations = useDecorations({ editor, nodeId });
-
-    const [handlingState] = useState({
-        key: Math.random() + '',
-        render: true,
-        forceRender: false,
-    });
-
-    useEffect(() => {
-        text.text = ref.current ? getStringText(ref.current) : '';
-    }, [value]);
-
-    useEffect(() => {
-        handlingState.render = true;
-        handlingState.forceRender = true;
-    }, [decorations]);
-
-    useLayoutEffect(() => {
-        if (!ref.current) return;
-        restoreSelection(ref.current, range);
-    }, [range, decorations]);
+    const decorations = useNodeDecorations({ editor, nodeId });
+    const currentSavedText = useLastValue(value);
+    const [render, setRender] = useState(0);
+    const [handlingState] = useState({ composing: false });
 
     const onInput = (newValue: MarkedText, newRange?: Range) => {
         if (onChange(newValue, newRange)) return;
         const selection = editor.state.selection as TextSelection;
-        editor
-            .createTransaction()
-            .patch({
-                nodeId,
-                patch: { text: newValue },
-            })
-            .focus(newRange && selection?.setRange(newRange))
-            .dispatch();
-    };
-
-    const handleCompositionStart = () => {
-        handlingState.render = false;
-    };
-
-    const handleInput = (e: React.FormEvent) => {
-        if (!range) return;
-        const nativeEvent = e.nativeEvent as InputEvent;
-        if (nativeEvent.data) handlingState.render = false;
-        if (/composition/i.test(nativeEvent.inputType)) return;
-
-        let newTextState: { value: MarkedText; range: Range } | undefined;
-
-        if (
-            ['insertLineBreak', 'insertParagraph'].includes(
-                nativeEvent.inputType
-            )
-        ) {
-            newTextState = spliceText(value, {
-                textInput: '\n',
-                range,
-            });
-        }
-
-        if (!newTextState) {
-            newTextState = handleTextChange({
-                element: ref.current as HTMLElement,
-                currentValue: value,
-                range,
-                previousText: text.text,
-            });
-        }
-        if (!newTextState) return;
-        onInput(newTextState.value, newTextState.range);
-    };
-
-    const handleCompositionEnd = () => {
-        handlingState.render = false;
-        const newTextState = handleTextChange({
-            element: ref.current as HTMLElement,
-            currentValue: value,
-            range: range as Range,
-            previousText: text.text,
+        const tr = editor.createTransaction();
+        tr.patch({
+            nodeId,
+            patch: { text: newValue },
         });
-        if (!newTextState) return;
-        onInput(newTextState.value, newTextState.range);
+        newRange = newRange ?? getElementSelection(ref.current);
+        if (newRange) {
+            tr.focus(selection?.setRange(newRange as Range));
+        }
+        tr.dispatch();
     };
 
-    const handleMarkChange = (markedText: MarkedText) => {
-        onInput(markedText, undefined);
+    const handler = useHandler();
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (!range) return;
+        const handledStatus = handler({
+            e: e.nativeEvent,
+            element: ref.current as HTMLElement,
+            value,
+            range,
+            previousText: currentSavedText,
+        });
+        if (!handledStatus?.value) return;
+        onInput(handledStatus.value, handledStatus.range);
     };
+
+    const handleInput = async (e: InputEvent | Event) => {
+        if (!range) return;
+        const handledStatus = handler({
+            e,
+            element: ref.current as HTMLElement,
+            value,
+            range,
+            previousText: currentSavedText,
+        });
+        if (!handledStatus?.value) {
+            if (e.type === 'input') setRender(render + 1);
+            return;
+        }
+        onInput(handledStatus.value, handledStatus.range);
+    };
+
+    useLayoutEffect(() => {
+        ref.current?.addEventListener('beforeinput', handleInput);
+        return () =>
+            ref.current?.removeEventListener('beforeinput', handleInput);
+    }, [ref.current, handleInput]);
+
+    useLayoutEffect(() => {
+        ref.current?.addEventListener('input', handleInput, {
+            capture: true,
+        });
+        return () =>
+            ref.current?.removeEventListener('input', handleInput, {
+                capture: true,
+            });
+    }, [ref.current, handleInput]);
+
+    const handleMarkChange = (markedText: MarkedText) =>
+        onInput(markedText, undefined);
 
     const saveDomSelection = () => {
-        const range = getElementSelection(ref.current as HTMLDivElement);
-        if (!range || !handlingState.render) return;
-        const newTextSelection = new TextSelection(nodeId, range);
+        const currentRange = getElementSelection(ref.current as HTMLElement);
+        if (!currentRange) return;
+        const newTextSelection = new TextSelection(nodeId, currentRange);
         if (newTextSelection.isSame(editor.state.selection)) return;
         editor.createTransaction().focus(newTextSelection).dispatch(false);
     };
@@ -225,37 +129,66 @@ export const TextInput = ({
             document.removeEventListener('selectionchange', selectHandler, {
                 capture: true,
             });
-    }, []);
+    }, [saveDomSelection]);
 
-    if (handlingState.render || handlingState.forceRender) {
-        handlingState.key = Math.random() + '';
+    useTrailingElements(ref, value);
+    const trackedDomNodes = useTrackDomNodes(ref);
+
+    const { key, willUpdate } = useRenderingKey({
+        ref,
+        value,
+        decorations,
+        composing: handlingState.composing,
+    });
+
+    if (willUpdate) {
+        clearTrackedDomNodes(trackedDomNodes.trackedNodes, ref.current);
     }
-    handlingState.render = true;
-    handlingState.forceRender = false;
 
-    const stringText = value && value.reduce((prev, curr) => prev + curr.s, '');
+    useRestoreSelection({
+        ref,
+        range,
+        composing: handlingState.composing,
+    });
+
     return (
         <div style={{ position: 'relative', ...style, padding: undefined }}>
             <div
-                key={handlingState.key}
+                ref={ref}
+                className="editable_content"
+                onKeyDown={handleKeyDown}
+                onKeyDownCapture={(e: React.KeyboardEvent) => {
+                    if (e.nativeEvent.isComposing) {
+                        // bug in chrome when composing: keydown is fired twice on enter.
+                        e.stopPropagation();
+                    }
+                }}
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
-                onInput={handleInput}
-                onCompositionStart={handleCompositionStart}
-                onCompositionEnd={handleCompositionEnd}
-                ref={ref}
-                style={{ outline: 'none', padding: style.padding }}
+                onCompositionStart={() => (handlingState.composing = true)}
+                onCompositionEnd={() => (handlingState.composing = false)}
+                style={{
+                    outline: 'none',
+                    padding: style.padding,
+                    WebkitUserSelect: 'text',
+                    WebkitUserModify: 'read-write-plaintext-only',
+                }}
             >
                 <TextRenderer
-                    hashedKey={handlingState.key}
-                    stringText={stringText}
+                    key={key}
+                    hashedKey={key}
+                    stringText={currentSavedText}
                     onChange={handleMarkChange}
-                    text={value}
+                    value={value}
                     decorations={decorations}
                 />
             </div>
-            {!stringText && (range || keepPlaceholder) && (
-                <PlaceholderWrapper>{placeholder}</PlaceholderWrapper>
+            {!currentSavedText && (range || keepPlaceholder) && (
+                <PlaceholderWrapper
+                    style={{ outline: 'none', padding: style.padding }}
+                >
+                    {placeholder}
+                </PlaceholderWrapper>
             )}
         </div>
     );

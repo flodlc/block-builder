@@ -22,5 +22,7 @@ export const minifyMarkedText = (text: MarkedText): MarkedText => {
         }
     });
 
-    return [...minified, { s: tempString, m: tempMarks }];
+    return !tempString
+        ? minified
+        : [...minified, { s: tempString, m: tempMarks }];
 };
