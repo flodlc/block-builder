@@ -1,8 +1,10 @@
+import { Coords } from '../../editor/view/types';
+
 export type MentionPluginState = {
     close: () => void;
     searchText: string;
     nodeTextLength?: number;
     triggeringExpression: string;
-    startBoundingRect: DOMRect;
+    startBoundingRect: Coords;
     slashPosition: number;
 };

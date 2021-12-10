@@ -7,13 +7,15 @@ export const minifyMarkedText = (text: MarkedText): MarkedText => {
     text.forEach((markedNode) => {
         const character = markedNode.s as string;
         const charMarks = markedNode.m ?? [];
+
         const hasSameMarkup =
             JSON.stringify(charMarks) === JSON.stringify(tempMarks);
+        const canMerge = hasSameMarkup && character !== '•';
 
         if (!tempString.length) {
             tempString += character;
             tempMarks = [...charMarks];
-        } else if (!hasSameMarkup) {
+        } else if (!canMerge) {
             minified = [...minified, { s: tempString, m: tempMarks }];
             tempString = character;
             tempMarks = [...charMarks];

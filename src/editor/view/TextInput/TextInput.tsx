@@ -132,8 +132,8 @@ export const TextInput = ({
     }, [saveDomSelection]);
 
     useTrailingElements(ref, value);
-    const trackedDomNodes = useTrackDomNodes(ref);
 
+    const trackedDomNodes = useTrackDomNodes(ref);
     const { key, willUpdate } = useRenderingKey({
         ref,
         value,

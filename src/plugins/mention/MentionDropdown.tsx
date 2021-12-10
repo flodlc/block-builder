@@ -5,6 +5,7 @@ import { DATA } from './DATA';
 import { insertMention } from './insertMention.command';
 import { MENTION_EVENTS } from './mention.const';
 import { MentionPluginState } from './mention.types';
+import { Coords } from '../../editor/view/types';
 
 export const MentionComponentWrapper = ({ editor }: { editor: Editor }) => {
     const [mentionState, setMentionState] =
@@ -31,7 +32,7 @@ export const MentionComponent = ({
 }: {
     searchText?: string;
     triggeringExpression?: string;
-    startBoundingRect?: DOMRect;
+    startBoundingRect?: Coords;
     editor: Editor;
     slashPosition?: number;
     close?: () => void;

@@ -5,7 +5,6 @@ import { TextSelection } from '../../editor/model/Selection';
 import { Editor } from '../../editor/model/Editor';
 import { SuggestionPluginState } from './suggestion.types';
 import { MAX_SEARCH_LENGTH, SUGGESTION_EVENTS } from './suggestion.const';
-import { View } from '../../editor/view/View';
 
 export const SuggestionPlugin: PluginFactory =
     () =>
@@ -47,7 +46,7 @@ export const SuggestionPlugin: PluginFactory =
                     nodeTextLength: 0,
                     triggeringExpression: '/',
                     slashPosition: selection.range[0] - 1,
-                    startBoundingRect: View.getDomRectAtPos(
+                    startBoundingRect: view.getCoordsAtPos(
                         selection.nodeId,
                         selection.range[0]
                     ),

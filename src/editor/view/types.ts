@@ -24,3 +24,12 @@ export type BlockComponentAttrs = {
     selection: AbstractSelection;
     blockSelected: boolean;
 };
+
+export type Coords = {
+    left: number;
+    top: number;
+    height: number;
+    width: number;
+    bottom: number;
+    right: number;
+};

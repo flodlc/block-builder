@@ -15,7 +15,7 @@ export const spliceText = (
     const isPreviousCharText = previousCharNode && previousCharNode.s !== '•';
     const newSection: MarkedNode = isPreviousCharText
         ? {
-              ...updatedText[range[0] - 1],
+              ...previousCharNode,
               s: textInput,
           }
         : {

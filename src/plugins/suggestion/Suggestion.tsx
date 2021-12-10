@@ -4,6 +4,7 @@ import { SuggestionPluginState } from './suggestion.types';
 import { SUGGESTION_EVENTS } from './suggestion.const';
 import { deleteLastChars } from '../commands/deleteLastChars';
 import { getCommandList } from './commandList';
+import { Coords } from '../../editor/view/types';
 
 export const SuggestionComponentWrapper = ({ editor }: { editor: Editor }) => {
     const [suggestionState, setSuggestionState] =
@@ -28,7 +29,7 @@ export const SuggestionComponent = ({
 }: {
     close?: () => void;
     searchText?: string;
-    startBoundingRect?: DOMRect;
+    startBoundingRect?: Coords;
     editor: Editor;
     slashPosition?: number;
 }) => {

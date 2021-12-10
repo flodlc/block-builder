@@ -3,19 +3,18 @@ import { TextSelection } from '../../editor/model/Selection';
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
 import { View } from '../../editor/view/View';
 import { nextEditable } from '../../editor/model/queries/nextEditable';
+import { Coords } from '../../editor/view/types';
 
-const isLastLine = (editor: Editor) => {
+const isLastLine = (editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;
     const currentNode = editor.state.nodes[selection.nodeId];
-    const currentCaretCoords = View.getDomRectAtPos(
+    const currentCaretCoords = view.getCoordsAtPos(
         currentNode.id,
-        selection.range[0],
-        -1
+        selection.range[0]
     );
-    const endRectOfCurrentEditable = View.getDomRectAtPos(
+    const endRectOfCurrentEditable = view.getCoordsAtPos(
         currentNode.id,
-        selection.getTextLength(editor.state),
-        1
+        selection.getTextLength(editor.state)
     );
 
     return (
@@ -25,27 +24,26 @@ const isLastLine = (editor: Editor) => {
     );
 };
 
-const getDistance = (selectionRect: DOMRect, charRect: DOMRect) => {
+const getDistance = (selectionRect: Coords, charRect: Coords) => {
     return Math.sqrt(
         Math.pow(charRect.left - selectionRect.left, 2) +
             Math.pow(charRect.bottom - selectionRect.top, 2)
     );
 };
 
-const getNextTargetSelection = (editor: Editor) => {
+const getNextTargetSelection = (editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;
     const nextNode = editor.runQuery(nextEditable(selection.nodeId));
     if (!nextNode) return;
-    const selectionRect = View.getDomRectAtPos(
+    const selectionRect = view.getCoordsAtPos(
         selection.nodeId,
-        selection.range[0],
-        1
+        selection.range[0]
     );
     const previousNodeTextLength = getMarkedTextLength(nextNode.text ?? []);
     let targetPos = previousNodeTextLength;
     let targetDistance = 100000;
     for (let pos = 0; pos <= previousNodeTextLength; pos++) {
-        const rectAtPos = View.getDomRectAtPos(nextNode.id, pos, 1);
+        const rectAtPos = view.getCoordsAtPos(nextNode.id, pos);
         const distanceWithPos = getDistance(selectionRect, rectAtPos);
         if (distanceWithPos < targetDistance) {
             targetDistance = distanceWithPos;
@@ -57,12 +55,12 @@ const getNextTargetSelection = (editor: Editor) => {
     return new TextSelection(nextNode.id, [targetPos, targetPos]);
 };
 
-export function onArrowDown(e: KeyboardEvent, editor: Editor) {
-    if (!isLastLine(editor)) return;
+export function onArrowDown(e: KeyboardEvent, editor: Editor, view: View) {
+    if (!isLastLine(editor, view)) return;
     e.preventDefault();
     e.stopPropagation();
 
-    const targetSelection = getNextTargetSelection(editor);
+    const targetSelection = getNextTargetSelection(editor, view);
     if (!targetSelection) return;
     editor.createTransaction().focus(targetSelection).dispatch(false);
 }

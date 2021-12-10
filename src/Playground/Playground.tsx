@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Editor } from '../editor/model/Editor';
 import { ReactView } from '../editor/view/ReactView';
-import { PLAYGROUND_DATA } from './DATA';
+import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
 import { BlockSelectionPlugin } from '../plugins/blockSelection/blockSelection.plugin';
 import { SuggestionPlugin } from '../plugins/suggestion/suggestion.plugin';
 import { HistoryShortcutsPlugin } from '../plugins/historyShortcuts/historyShortcuts.plugin';
@@ -19,10 +19,12 @@ import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
+import { Node } from '../editor/model/types';
 
 function Playground() {
-    const resetNote = () => {
+    const resetNote = (dataSet: Record<string, Node>) => () => {
         localStorage.clear();
+        localStorage.setItem('nodes', JSON.stringify(dataSet));
         window.location.reload();
     };
 
@@ -80,7 +82,8 @@ function Playground() {
                     <button onClick={log.editor}>Editor</button>
                     <button onClick={log.state}>State</button>
                     <button onClick={log.json}>Json</button>
-                    <button onClick={resetNote}>Reset</button>
+                    <button onClick={resetNote(PLAYGROUND_DATA)}>Reset</button>
+                    <button onClick={resetNote(BIG_DATA)}>Reset 2</button>
                     <button onClick={editor.back}>Undo</button>
                     <button onClick={() => editor.runCommand(toggleBold())}>
                         Bold

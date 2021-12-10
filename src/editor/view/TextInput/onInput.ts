@@ -38,7 +38,7 @@ export const getInputDiff = (prevText: string, newtText: string) => {
 
 const getStringText = (el: HTMLElement | null): string => {
     if (!el) return '';
-    return getTextNodes({ node: el, withIgnored: true }, true).reduce(
+    return getTextNodes({ node: el, withIgnored: false }, true).reduce(
         (c, p) => c + (p.nodeType === 3 ? p.textContent ?? '' : '•'),
         ''
     );

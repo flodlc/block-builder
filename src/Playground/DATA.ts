@@ -8,10 +8,11 @@ export const BIG_DATA = (() => {
     const docNode: any = {
         id: 'doc',
         type: 'card',
+        text: [{ s: 'My big note', m: [] }],
         childrenIds: [],
     };
     nodes['doc'] = docNode;
-    for (let i = 0; i < 2000; i++) {
+    for (let i = 0; i < 1000; i++) {
         const newNode = schema.text.create();
         newNode.text = [
             {

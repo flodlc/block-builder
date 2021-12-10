@@ -49,7 +49,7 @@ export const MentionPlugin: PluginFactory =
                     nodeTextLength: 0,
                     triggeringExpression: expression,
                     slashPosition: selection.range[0] - expression.length,
-                    startBoundingRect: View.getDomRectAtPos(
+                    startBoundingRect: view.getCoordsAtPos(
                         selection.nodeId,
                         selection.range[0]
                     ),
