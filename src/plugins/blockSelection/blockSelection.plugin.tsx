@@ -43,7 +43,7 @@ export const BlockSelectionPlugin: PluginFactory =
             draggingState = editor.trigger(BLOCK_SELECTION_EVENTS.changed, {
                 start: getMouseEventRectInView(e, view),
             });
-            startNodeId = getNodeIdFromPoint(e.pageX, e.pageY);
+            startNodeId = getNodeIdFromPoint(e.clientX, e.clientY);
             if (editor.state.selection?.isBlock()) {
                 editor.createTransaction().focus().dispatch(false);
             }
@@ -64,7 +64,7 @@ export const BlockSelectionPlugin: PluginFactory =
 
         const onMouseMove = (e: MouseEvent) => {
             if (!draggingState) return;
-            const nodeId = getNodeIdFromPoint(e.pageX, e.pageY);
+            const nodeId = getNodeIdFromPoint(e.clientX, e.clientY);
             if (
                 !editor.state.selection?.isBlock() &&
                 startNodeId &&
@@ -126,7 +126,7 @@ const sortSelectedIds = (nodeIds: string[], editor: Editor) => {
 
 const getMouseEventRectInView = (e: MouseEvent, view: View) => {
     const viewDomRect = view.dom.getBoundingClientRect();
-    return { x: e.pageX - viewDomRect.left, y: e.pageY - viewDomRect.top };
+    return { x: e.clientX - viewDomRect.left, y: e.clientY - viewDomRect.top };
 };
 
 const getNodeIdsUnderSelection = (
