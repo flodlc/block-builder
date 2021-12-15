@@ -1,9 +1,9 @@
-import { Editor } from '../../editor/model/Editor';
-import { TextSelection } from '../../editor/model/Selection';
-import { previousEditable } from '../../editor/model/queries/previousEditable';
-import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
-import { View } from '../../editor/view/View';
-import { Coords } from '../../editor/view/types';
+import { Editor } from '../../../model/Editor';
+import { TextSelection } from '../../../model/Selection';
+import { previousEditable } from '../../../model/queries/previousEditable';
+import { getMarkedTextLength } from '../../../transaction/MarkedText/getMarkedTextLength';
+import { View } from '../../View';
+import { Coords } from '../../types';
 
 const isFirstLine = (editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;

@@ -104,10 +104,10 @@ export class TextSelection extends AbstractSelection {
         return new TextSelection(this.nodeId, [position, position]);
     }
 
-    static areSameRange(rangeA: Range, rangeB: Range) {
+    static areSameRange(rangeA?: Range, rangeB?: Range) {
         return (
-            (rangeA[0] === rangeB[0] && rangeA[1] === rangeB[1]) ||
-            (rangeA[0] === rangeB[1] && rangeA[1] === rangeB[0])
+            (rangeA?.[0] === rangeB?.[0] && rangeA?.[1] === rangeB?.[1]) ||
+            (rangeA?.[0] === rangeB?.[1] && rangeA?.[1] === rangeB?.[0])
         );
     }
 }

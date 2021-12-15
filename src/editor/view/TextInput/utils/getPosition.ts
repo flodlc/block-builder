@@ -21,7 +21,8 @@ export const getPosition = ({
             if (child.isSameNode(node)) {
                 return offset + position;
             } else {
-                position += child?.textContent?.length ?? 0;
+                position +=
+                    child?.textContent?.replace(/\uFEFF/g, '')?.length ?? 0;
             }
         } else {
             if ((child as HTMLElement).matches('[contenteditable="false"]')) {

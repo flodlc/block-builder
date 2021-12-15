@@ -7,7 +7,10 @@ export const parseDom = ({ element }: { element: HTMLElement }): MarkedText => {
     const nodes = getTextNodes({ node: element });
     const parsed = nodes.map((node) => {
         if (node.nodeType === 3) {
-            return { s: node.textContent ?? '', m: getAllMarks(node) };
+            return {
+                s: node.textContent?.replace(/\uFEFF/g, '') ?? '',
+                m: getAllMarks(node),
+            };
         } else {
             const type = (node as HTMLElement).getAttribute('data-type');
             if (!type) throw 'Missing data-type attribute';

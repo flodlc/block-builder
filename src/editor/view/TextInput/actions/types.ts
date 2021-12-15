@@ -6,7 +6,6 @@ export type EventName = 'keydown' | 'beforeinput' | 'input';
 
 export type ActionStatus = {
     textState: { value: MarkedText; range?: Range } | undefined | void;
-    waitInput?: boolean;
 };
 
 export type ActionHandler = Record<

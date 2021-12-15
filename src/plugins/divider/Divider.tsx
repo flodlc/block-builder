@@ -19,6 +19,7 @@ export const Divider: React.FC<BlockComponentAttrs> = ({
 
     return (
         <div
+            contentEditable={false}
             onClick={select}
             style={{
                 position: 'relative',

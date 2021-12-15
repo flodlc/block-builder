@@ -23,7 +23,7 @@ const Marks = ({
     const view = useContext(ViewContext);
     const MarkComponent = view.marks[mark.t];
 
-    return mark && MarkComponent ? (
+    return MarkComponent ? (
         <MarkComponent text={text} updateMark={updateMark} mark={mark}>
             <Marks text={text} updateMark={updateMark} marks={marks.slice(1)}>
                 {children}

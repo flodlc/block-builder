@@ -3,8 +3,7 @@ import { Range as PositionRange } from '../../../model/Selection';
 
 export const restoreSelection = (
     container: HTMLElement,
-    textRange?: PositionRange,
-    force = false
+    textRange?: PositionRange
 ) => {
     if (!textRange) {
         const docSelection = window.getSelection() as Selection;
@@ -27,16 +26,25 @@ export const restoreSelection = (
     } else {
         range = getRange(container, textRange);
     }
-    const currentRange = docSelection.rangeCount && docSelection.getRangeAt(0);
-    if (!force && currentRange && areSameDomRanges(range, currentRange)) {
-        return;
-    }
 
+    if (isCurrentRange(range)) return;
     if (!range) return;
-    docSelection.collapse(range.startContainer, range.startOffset);
-    if (!range.collapsed) {
-        docSelection.extend(range.endContainer, range.endOffset);
+    if (range.collapsed) {
+        docSelection.collapse(range.startContainer, range.startOffset);
+    } else {
+        docSelection.setBaseAndExtent(
+            range.startContainer,
+            range.startOffset,
+            range.endContainer,
+            range.endOffset
+        );
     }
+};
+
+const isCurrentRange = (range: Range) => {
+    const docSelection = window.getSelection() as Selection;
+    const currentRange = docSelection.rangeCount && docSelection.getRangeAt(0);
+    return !!currentRange && areSameDomRanges(range, currentRange);
 };
 
 const areSameDomRanges = (rangeA: Range, rangeB: Range) =>
@@ -59,15 +67,21 @@ export const getRange = (container: HTMLElement, textRange: PositionRange) => {
     for (const node of nodes) {
         const isTextNode = node.nodeType === 3;
         const isLastNode = index === nodes.length - 1;
-        const nodeLength = isTextNode ? node?.textContent?.length ?? 1 : 1;
+        const nodeLength = isTextNode
+            ? node?.textContent?.replace(/\uFEFF/g, '')?.length ?? 1
+            : 1;
 
         if (!fromReady && pos + nodeLength >= textRange[0]) {
             fromReady = setStart({
                 range,
                 node,
                 isTextNode,
-                offset: textRange[0] - pos,
+                offset: getAdjustedOffset(
+                    node.textContent ?? '',
+                    textRange[0] - pos
+                ),
                 isLastNode,
+                container,
             });
         }
 
@@ -76,8 +90,12 @@ export const getRange = (container: HTMLElement, textRange: PositionRange) => {
                 range,
                 node,
                 isTextNode,
-                offset: textRange[1] - pos,
+                offset: getAdjustedOffset(
+                    node.textContent ?? '',
+                    textRange[1] - pos
+                ),
                 isLastNode,
+                container,
             });
         }
 
@@ -88,33 +106,59 @@ export const getRange = (container: HTMLElement, textRange: PositionRange) => {
     return range;
 };
 
+function getAdjustedOffset(text: string, pos: number) {
+    let realPos = pos;
+    const split = text.split('');
+    for (let i = 0; i <= split.length; i++) {
+        const char = split[i] ?? '';
+        if (/\uFEFF/.test(char)) {
+            realPos++;
+        }
+        if (i === realPos) {
+            return i;
+        }
+    }
+    return 0;
+}
+
 function setStart({
     range,
     node,
     offset,
     isLastNode,
     isTextNode,
-}: {
+    container,
+}: //
+{
     range: Range;
     node: Node;
     offset: number;
     isLastNode: boolean;
     isTextNode: boolean;
+    container: HTMLElement;
 }) {
     if (isTextNode) {
         range.setStart(node, offset);
         return true;
     } else {
         if (offset <= 0) {
-            range.setStartBefore(node);
+            const index = getNodeIndexInContainer(container, node);
+            range.setStart(container, index);
             return true;
         } else if (isLastNode) {
-            range.setStartAfter(node);
+            const index = getNodeIndexInContainer(container, node);
+            range.setStart(container, index + 1);
             return true;
         }
     }
     return false;
 }
+
+const getNodeIndexInContainer = (container: HTMLElement, node: Node) => {
+    return Array.from(container.childNodes).findIndex(
+        (childNode) => childNode === node || childNode.contains(node)
+    );
+};
 
 function setEnd({
     range,
@@ -122,22 +166,26 @@ function setEnd({
     offset,
     isLastNode,
     isTextNode,
+    container,
 }: {
     range: Range;
     node: Node;
     offset: number;
     isTextNode: boolean;
     isLastNode: boolean;
+    container: HTMLElement;
 }) {
     if (isTextNode) {
         range.setEnd(node, offset);
         return true;
     } else {
         if (offset <= 0) {
-            range.setEndBefore(node);
+            const index = getNodeIndexInContainer(container, node);
+            range.setEnd(container, index);
             return true;
         } else if (isLastNode) {
-            range.setEndAfter(node);
+            const index = getNodeIndexInContainer(container, node);
+            range.setEnd(container, index + 1);
             return true;
         }
     }

@@ -1,6 +1,6 @@
-import { Editor } from '../../editor/model/Editor';
-import { TextSelection } from '../../editor/model/Selection';
-import { nextEditable } from '../../editor/model/queries/nextEditable';
+import { Editor } from '../../../model/Editor';
+import { TextSelection } from '../../../model/Selection';
+import { nextEditable } from '../../../model/queries/nextEditable';
 
 const getTargetSelection = (editor: Editor) => {
     const selection = editor.state.selection as TextSelection;
@@ -12,7 +12,16 @@ const getTargetSelection = (editor: Editor) => {
 export const onArrowRight = (e: KeyboardEvent, editor: Editor) => {
     const selection = editor.state.selection as TextSelection;
     const previousNodeTextLength = selection.getTextLength(editor.state);
-    if (selection.range[0] < previousNodeTextLength) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (selection.range[0] < previousNodeTextLength) {
+        editor
+            .createTransaction()
+            .focus(selection.setCollapsedRange(selection.range[0] + 1))
+            .dispatch(false);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
     e.preventDefault();
     e.stopPropagation();
     const targetSelection = getTargetSelection(editor);

@@ -1,4 +1,4 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
+import { PluginFactory } from '../../plugin/types';
 import { onArrowUp } from './onArrowUp';
 import { onArrowDown } from './onArrowDown';
 import { onArrowLeft } from './onArrowLeft';

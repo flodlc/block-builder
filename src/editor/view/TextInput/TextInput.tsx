@@ -56,6 +56,7 @@ export const TextInput = ({
             nodeId,
             patch: { text: newValue },
         });
+        console.log('save', newRange);
         newRange = newRange ?? getElementSelection(ref.current);
         if (newRange) {
             tr.focus(selection?.setRange(newRange as Range));
@@ -64,10 +65,10 @@ export const TextInput = ({
     };
 
     const handler = useHandler();
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleNativeKeyDown = (e: KeyboardEvent) => {
         if (!range) return;
         const handledStatus = handler({
-            e: e.nativeEvent,
+            e,
             element: ref.current as HTMLElement,
             value,
             range,
@@ -76,6 +77,9 @@ export const TextInput = ({
         if (!handledStatus?.value) return;
         onInput(handledStatus.value, handledStatus.range);
     };
+
+    const handleKeyDown = (e: React.KeyboardEvent) =>
+        handleNativeKeyDown(e.nativeEvent);
 
     const handleInput = async (e: InputEvent | Event) => {
         if (!range) return;
@@ -100,38 +104,14 @@ export const TextInput = ({
     }, [ref.current, handleInput]);
 
     useLayoutEffect(() => {
-        ref.current?.addEventListener('input', handleInput, {
-            capture: true,
-        });
-        return () =>
-            ref.current?.removeEventListener('input', handleInput, {
-                capture: true,
-            });
+        ref.current?.addEventListener('input', handleInput);
+        return () => ref.current?.removeEventListener('input', handleInput);
     }, [ref.current, handleInput]);
 
     const handleMarkChange = (markedText: MarkedText) =>
         onInput(markedText, undefined);
 
-    const saveDomSelection = () => {
-        const currentRange = getElementSelection(ref.current as HTMLElement);
-        if (!currentRange) return;
-        const newTextSelection = new TextSelection(nodeId, currentRange);
-        if (newTextSelection.isSame(editor.state.selection)) return;
-        editor.createTransaction().focus(newTextSelection).dispatch(false);
-    };
-
-    useLayoutEffect(() => {
-        const selectHandler = () => saveDomSelection();
-        document.addEventListener('selectionchange', selectHandler, {
-            capture: true,
-        });
-        return () =>
-            document.removeEventListener('selectionchange', selectHandler, {
-                capture: true,
-            });
-    }, [saveDomSelection]);
-
-    useTrailingElements(ref, value);
+    useTrailingElements(ref);
 
     const trackedDomNodes = useTrackDomNodes(ref);
     const { key, willUpdate } = useRenderingKey({
@@ -148,7 +128,13 @@ export const TextInput = ({
     useRestoreSelection({
         ref,
         range,
+        key,
         composing: composingRef.current,
+        updateRange: (newRange: Range) => {
+            const newTextSelection = new TextSelection(nodeId, newRange);
+            if (newTextSelection.isSame(editor.state.selection)) return;
+            editor.createTransaction().focus(newTextSelection).dispatch(false);
+        },
     });
 
     return (
@@ -170,8 +156,6 @@ export const TextInput = ({
                 style={{
                     outline: 'none',
                     padding: style.padding,
-                    WebkitUserSelect: 'text',
-                    WebkitUserModify: 'read-write-plaintext-only',
                 }}
             >
                 <TextRenderer

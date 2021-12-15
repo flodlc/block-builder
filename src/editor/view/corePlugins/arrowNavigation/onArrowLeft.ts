@@ -1,7 +1,8 @@
-import { Editor } from '../../editor/model/Editor';
-import { TextSelection } from '../../editor/model/Selection';
-import { previousEditable } from '../../editor/model/queries/previousEditable';
-import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
+import { Editor } from '../../../model/Editor';
+import { TextSelection } from '../../../model/Selection';
+import { previousEditable } from '../../../model/queries/previousEditable';
+import { getMarkedTextLength } from '../../../transaction/MarkedText/getMarkedTextLength';
+import { range } from 'lodash';
 
 const getTargetSelection = (editor: Editor) => {
     const selection = editor.state.selection as TextSelection;
@@ -16,7 +17,16 @@ const getTargetSelection = (editor: Editor) => {
 
 export const onArrowLeft = (e: KeyboardEvent, editor: Editor) => {
     const selection = editor.state.selection as TextSelection;
-    if (selection.range[0] > 0) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (selection.range[0] > 0) {
+        editor
+            .createTransaction()
+            .focus(selection.setCollapsedRange(selection.range[0] - 1))
+            .dispatch(false);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
     e.preventDefault();
     e.stopPropagation();
     const targetSelection = getTargetSelection(editor);

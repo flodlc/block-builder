@@ -4,13 +4,13 @@ import { ReactView } from '../editor/view/ReactView';
 import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
 import { BlockSelectionPlugin } from '../plugins/blockSelection/blockSelection.plugin';
 import { SuggestionPlugin } from '../plugins/suggestion/suggestion.plugin';
-import { HistoryShortcutsPlugin } from '../plugins/historyShortcuts/historyShortcuts.plugin';
+import { HistoryShortcutsPlugin } from '../editor/view/corePlugins/historyShortcuts/historyShortcuts.plugin';
 import { CalloutPlugin } from '../plugins/callout/callout.plugin';
 import { TextPlugin } from '../plugins/text/text.plugin';
 import { BoldPlugin } from '../plugins/bold/bold.plugin';
 import { toggleBold } from '../plugins/bold/toggleBold.command';
 import { BlockSelectionShortcutsPlugin } from '../plugins/blockSelectionShortcuts/blockSelectionShortcuts.plugin';
-import { ArrowNavigationPlugin } from '../plugins/arrowNavigation/arrowNavigation.plugin';
+import { ArrowNavigationPlugin } from '../editor/view/corePlugins/arrowNavigation/arrowNavigation.plugin';
 import { CopyPastePlugin } from '../plugins/copyPaste/copyPaste.plugin';
 import { MentionPlugin } from '../plugins/mention/mention.plugin';
 import { JumpsPlugin } from '../plugins/jumps/jumps.plugin';
@@ -20,6 +20,7 @@ import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
 import { Node } from '../editor/model/types';
+import { TextEventPlugin } from '../plugins/textEvent/textEvent.plugin';
 
 function Playground() {
     const resetNote = (dataSet: Record<string, Node>) => () => {
@@ -59,6 +60,7 @@ function Playground() {
         <div className="editor">
             <ReactView
                 plugins={[
+                    // TextEventPlugin(),
                     JumpsPlugin(),
                     MentionPlugin(),
                     BlockSelectionPlugin(),

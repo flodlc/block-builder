@@ -44,7 +44,7 @@ code {
     position: relative;
     flex: 1;
     color: rgba(255, 255, 255, 0.92);
-    padding: 70px calc(50% - 360px) 40px;
+    padding: 70px calc(50% - 360px) 60px;
     font-size: 16px;
     -webkit-font-smoothing: auto;
     line-height: 1.5;

@@ -1,4 +1,4 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
+import { PluginFactory } from '../../plugin/types';
 
 export const HistoryShortcutsPlugin: PluginFactory =
     () =>

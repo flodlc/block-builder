@@ -42,7 +42,7 @@ export const ReactView = ({
     const rootNode = editor.state.nodes[editor.state.rootId];
     return (
         <>
-            <div className="view" ref={ref}>
+            <div className="view" ref={ref} style={{ outline: 'none' }}>
                 {view && (
                     <ViewContext.Provider value={view}>
                         <EditorContext.Provider value={editor}>

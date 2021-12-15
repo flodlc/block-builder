@@ -12,16 +12,13 @@ export const spliceText = (
 
     const previousCharNode = updatedText[range[0] - 1];
     // Todo: change the way we identify a previous dynamic node
-    const isPreviousCharText = previousCharNode && previousCharNode.s !== '•';
-    const newSection: MarkedNode = isPreviousCharText
-        ? {
-              ...previousCharNode,
-              s: textInput,
-          }
-        : {
-              s: textInput,
-              m: [],
-          };
+    const previousMarks = previousCharNode?.m?.filter((mark) => {
+        return mark.t !== 'mention';
+    });
+    const newSection: MarkedNode = {
+        s: textInput,
+        m: previousMarks,
+    };
     range = [Math.max(range[0], 0), range[1]];
     updatedText.splice(range[0], range[1] - range[0], newSection);
     return {

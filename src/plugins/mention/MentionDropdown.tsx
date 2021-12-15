@@ -93,7 +93,6 @@ export const MentionComponent = ({
     useEffect(() => setIndex(0), [searchText]);
 
     const execCommand = (e: Event, i: number) => {
-        console.log('exec');
         e.preventDefault();
         e.stopPropagation();
         close?.();
