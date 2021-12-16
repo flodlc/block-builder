@@ -1,4 +1,4 @@
-import { handleTextChange } from '../onInput';
+import { handleTextChange } from './handleTextChange';
 import { ActionHandler } from './types';
 import { spliceText } from '../../../transaction/MarkedText/spliceText';
 

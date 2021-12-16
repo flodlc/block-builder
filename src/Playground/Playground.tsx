@@ -13,7 +13,7 @@ import { BlockSelectionShortcutsPlugin } from '../plugins/blockSelectionShortcut
 import { ArrowNavigationPlugin } from '../editor/view/corePlugins/arrowNavigation/arrowNavigation.plugin';
 import { CopyPastePlugin } from '../plugins/copyPaste/copyPaste.plugin';
 import { MentionPlugin } from '../plugins/mention/mention.plugin';
-import { JumpsPlugin } from '../plugins/jumps/jumps.plugin';
+import { BlockBehaviorsPlugin } from '../plugins/blockBehaviors/blockBehaviors.plugin';
 import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
@@ -59,8 +59,7 @@ function Playground() {
         <div className="editor">
             <ReactView
                 plugins={[
-                    // TextEventPlugin(),
-                    JumpsPlugin(),
+                    BlockBehaviorsPlugin(),
                     MentionPlugin(),
                     BlockSelectionPlugin(),
                     SuggestionPlugin(),

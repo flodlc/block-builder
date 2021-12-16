@@ -12,9 +12,16 @@ export const NodeView = ({
     const buffersRef = useBuffers(ref);
     return (
         <span
-            onClick={() => {
+            onClick={(e: React.MouseEvent) => {
                 if (!buffersRef.current?.nextBuffer) return;
-                getSelection()?.collapse(buffersRef.current?.nextBuffer, 1);
+                const elementRect = (
+                    ref.current as HTMLElement
+                ).getBoundingClientRect();
+                if (e.clientX > elementRect.left + elementRect.width / 2) {
+                    getSelection()?.collapse(buffersRef.current?.nextBuffer, 1);
+                } else {
+                    getSelection()?.collapse(buffersRef.current?.prevBuffer, 0);
+                }
             }}
             ref={ref}
             data-attrs={JSON.stringify(mark.d)}

@@ -6,7 +6,7 @@ import { onDelete } from './onDelete';
 
 const isMobile = window.innerWidth < 900;
 
-export const JumpsPlugin: PluginFactory =
+export const BlockBehaviorsPlugin: PluginFactory =
     () =>
     ({ dom, editor }) => {
         const keydownHandler = (e: KeyboardEvent) => {

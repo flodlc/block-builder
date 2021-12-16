@@ -2,7 +2,7 @@ import { MarkedText } from '../../../model/types';
 import { Range } from '../../../model/Selection';
 import { getElementSelection } from '../utils/getElementSelection';
 import { ActionHandler, ActionName, ActionStatus } from './types';
-import { handleTextChange } from '../onInput';
+import { handleTextChange } from './handleTextChange';
 import { backspaceActions } from './backspace';
 import { enterActions } from './enter';
 import { deleteActions } from './delete';

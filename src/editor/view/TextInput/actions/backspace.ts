@@ -1,7 +1,7 @@
 import { getElementSelection } from '../utils/getElementSelection';
 import { spliceText } from '../../../transaction/MarkedText/spliceText';
-import { handleTextChange } from '../onInput';
-import { isPreviousNodeView } from './utils/isPreviousNodeView';
+import { handleTextChange } from './handleTextChange';
+import { isPreviousNodeView } from '../utils/isPreviousNodeView';
 import { ActionHandler } from './types';
 
 export const backspaceActions: ActionHandler = {
