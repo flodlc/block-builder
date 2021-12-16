@@ -2,35 +2,53 @@ import React, { ReactElement, useContext } from 'react';
 import { Mark, MarkedText } from '../../model/types';
 import { markText } from '../../transaction/MarkedText/markText';
 import { ViewContext } from '../contexts/ViewContext';
+import { CompiledSchema } from '../../model/schema';
+import { NodeView } from './NodeView';
 
 const Marks = ({
     marks,
     text,
     updateMark,
     children,
+    schema,
 }: {
     marks?: Mark[];
     text: string;
     updateMark: (mark: Mark) => void;
     children: ReactElement[] | ReactElement | string;
+    schema: CompiledSchema;
 }) => {
     const mark = marks?.[0];
-
-    if (!mark) {
-        return <>{children}</>;
-    }
+    if (!mark) return <>{children}</>;
 
     const view = useContext(ViewContext);
     const MarkComponent = view.marks[mark.t];
+    if (!MarkComponent) return <>{children}</>;
 
-    return MarkComponent ? (
+    const isNodeView = !schema[mark.t].allowText;
+    if (isNodeView) {
+        return (
+            <NodeView mark={mark}>
+                <MarkComponent
+                    text={text}
+                    updateMark={updateMark}
+                    mark={mark}
+                />
+            </NodeView>
+        );
+    }
+
+    return (
         <MarkComponent text={text} updateMark={updateMark} mark={mark}>
-            <Marks text={text} updateMark={updateMark} marks={marks.slice(1)}>
+            <Marks
+                text={text}
+                updateMark={updateMark}
+                marks={marks.slice(1)}
+                schema={schema}
+            >
                 {children}
             </Marks>
         </MarkComponent>
-    ) : (
-        <>{children}</>
     );
 };
 
@@ -38,6 +56,7 @@ export const TextRenderer = React.memo(
     ({
         value,
         onChange,
+        schema,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         hashedKey,
         decorations = [],
@@ -47,6 +66,7 @@ export const TextRenderer = React.memo(
         decorations?: any[];
         hashedKey: number;
         onChange: (text: MarkedText) => void;
+        schema: CompiledSchema;
     }) => {
         const getUpdateMark =
             ({ from, to }: { from: number; to: number }) =>
@@ -64,6 +84,7 @@ export const TextRenderer = React.memo(
             }, value) as MarkedText);
 
         let pos = 0;
+
         return (
             <>
                 {decoratedText &&
@@ -79,6 +100,7 @@ export const TextRenderer = React.memo(
                                 text={markedNode.s}
                                 updateMark={updateMark}
                                 marks={markedNode.m}
+                                schema={schema}
                             >
                                 {markedNode.s}
                             </Marks>

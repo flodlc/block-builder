@@ -1,4 +1,4 @@
-import { RefObject, useLayoutEffect, useState } from 'react';
+import { RefObject, useLayoutEffect, useRef } from 'react';
 
 type TrackedNodes = Map<Node, TrackedNode>;
 type TrackedNode = { node: Node; isReact: boolean; isInDom: boolean };
@@ -18,34 +18,29 @@ export const clearTrackedDomNodes = (
 };
 
 export const useTrackDomNodes = (ref: RefObject<HTMLDivElement>) => {
-    const [reactRender] = useState({
-        observer: undefined as MutationObserver | undefined,
-    });
-
+    const observer = useRef<MutationObserver>();
     useLayoutEffect(() => {
-        reactRender.observer?.takeRecords();
+        observer.current?.takeRecords();
     });
 
-    const [temp] = useState({
-        trackedNodes: new Map() as TrackedNodes,
-    });
+    const trackedNodes = useRef(new Map() as TrackedNodes);
 
     useLayoutEffect(() => {
         if (!ref.current) return;
-        reactRender.observer = new MutationObserver((entries) => {
-            temp.trackedNodes = getTrackedNodes(temp.trackedNodes, entries);
+        observer.current = new MutationObserver((entries) => {
+            trackedNodes.current = getTrackedNodes(
+                trackedNodes.current,
+                entries
+            );
         });
-        reactRender.observer.observe(ref.current, {
-            childList: true,
-            subtree: true,
-        });
-        return () => reactRender.observer?.disconnect();
+        observer.current.observe(ref.current, { childList: true });
+        return () => observer.current?.disconnect();
     }, []);
 
-    const entries = reactRender.observer?.takeRecords();
-    temp.trackedNodes = getTrackedNodes(temp.trackedNodes, entries);
+    const entries = observer.current?.takeRecords();
+    trackedNodes.current = getTrackedNodes(trackedNodes.current, entries);
 
-    return temp;
+    return trackedNodes;
 };
 
 const getTrackedNodes = (

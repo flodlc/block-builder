@@ -6,9 +6,9 @@ export const cutMarkedText = (
     text: MarkedText | undefined,
     range: [number | undefined, number] | [number | undefined]
 ) => {
-    const splittedNodes = splitMarkedText(text ?? []).slice(
+    const splitNodes = splitMarkedText(text ?? []).slice(
         range[0] ?? 0,
         range[1] ?? undefined
     );
-    return minifyMarkedText(splittedNodes);
+    return minifyMarkedText(splitNodes);
 };

@@ -43,7 +43,8 @@ export const SuggestionPlugin: PluginFactory =
                             undefined
                         );
                     },
-                    nodeTextLength: 0,
+                    nodeTextLength: selection.getCurrentText(editor.state)
+                        .length,
                     triggeringExpression: '/',
                     slashPosition: selection.range[0] - 1,
                     startBoundingRect: view.getCoordsAtPos(

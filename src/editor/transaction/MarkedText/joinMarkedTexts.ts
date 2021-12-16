@@ -6,8 +6,8 @@ export const joinMarkedTexts = (
     text1: MarkedText | undefined,
     text2: MarkedText | undefined
 ) => {
-    const splittedNodes = splitMarkedText(text1 ?? []).concat(
+    const splitNodes = splitMarkedText(text1 ?? []).concat(
         splitMarkedText(text2 ?? [])
     );
-    return minifyMarkedText(splittedNodes);
+    return minifyMarkedText(splitNodes);
 };

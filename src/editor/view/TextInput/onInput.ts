@@ -3,21 +3,26 @@ import { Range } from '../../model/Selection';
 import { spliceText } from '../../transaction/MarkedText/spliceText';
 import { diffText } from './hooks/diff-text';
 import { getTextNodes } from './utils/getTextNodes';
+import { Editor } from '../../model/Editor';
 
 export const handleTextChange = ({
     element,
+    editor,
     currentValue,
     // range,
     previousText,
 }: {
     element: HTMLElement;
+    editor: Editor;
     currentValue: MarkedText;
     range: Range;
     previousText: string;
 }) => {
     const inputDiff = getInputDiff(previousText, getStringText(element));
     if (!inputDiff) return undefined;
-    const spp = spliceText(currentValue, {
+    const spp = spliceText({
+        text: currentValue,
+        editor,
         textInput: inputDiff.textInput,
         range: inputDiff.inputRange,
     });

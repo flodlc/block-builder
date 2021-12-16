@@ -31,8 +31,9 @@ export const MentionPlugin: PluginFactory =
             const previousText = selection.getTextBefore(editor.state);
             EXPRESSIONS.some((expression) => {
                 const regex = new RegExp(
-                    `${escapeStringRegexp(expression.slice(0, -1))}$`
+                    `${escapeStringRegexp(expression.slice())}$`
                 );
+
                 if (
                     char !== expression.slice(expression.length - 1) ||
                     !regex.test(previousText)
@@ -46,7 +47,8 @@ export const MentionPlugin: PluginFactory =
                             undefined
                         );
                     },
-                    nodeTextLength: 0,
+                    nodeTextLength: selection.getCurrentText(editor.state)
+                        .length,
                     triggeringExpression: expression,
                     slashPosition: selection.range[0] - expression.length,
                     startBoundingRect: view.getCoordsAtPos(
@@ -137,6 +139,7 @@ export const onTr = ({
         editor,
         pluginState: state,
     });
+
     if (searchText === undefined) return undefined;
 
     return {
@@ -159,12 +162,12 @@ const getSearchText = ({
     const previousSearchText = pluginState.searchText;
     const previousNodeTextLength = pluginState.nodeTextLength;
     pluginState.nodeTextLength = nodeTextLength;
+
     if (
         previousNodeTextLength === undefined ||
         previousSearchText === undefined
     )
         return '';
-
     const triggeringExpression = pluginState.triggeringExpression as string;
     const triggerLength = triggeringExpression.length ?? 0;
     const delta = nodeTextLength - previousNodeTextLength;
@@ -172,7 +175,6 @@ const getSearchText = ({
     const searchStartPosition = slashPosition + triggerLength;
     const searchEndPosition =
         slashPosition + triggerLength + delta + previousSearchText.length;
-
     if (
         selection.range[0] < searchStartPosition ||
         selection.range[1] > searchEndPosition

@@ -10,9 +10,9 @@ export const insertMark = (
     text: MarkedText,
     { mark, range }: { mark: Mark; range: Range }
 ) => {
-    const splittedNodes = splitMarkedText(text);
+    const splitNodes = splitMarkedText(text);
     const markedNode: MarkedNode = { s: '•', m: [mark] };
-    const markedNodes: MarkedText = splittedNodes.slice();
+    const markedNodes: MarkedText = splitNodes.slice();
     markedNodes.splice(range[0], range[1] - range[0], markedNode);
     return minifyMarkedText(markedNodes);
 };
@@ -21,8 +21,8 @@ export const markText = (
     text: MarkedText,
     { mark, range }: { mark: Mark; range: Range }
 ) => {
-    const splittedNodes = splitMarkedText(text);
-    const markedNodesUpdated: MarkedText = splittedNodes
+    const splitNodes = splitMarkedText(text);
+    const markedNodesUpdated: MarkedText = splitNodes
         .slice(range[0], range[1])
         .map((charNode) => {
             const updatedMarks = (charNode.m ?? []).slice();
@@ -37,7 +37,7 @@ export const markText = (
                 m: updatedMarks,
             };
         });
-    const markedNodes: MarkedText = splittedNodes.slice();
+    const markedNodes: MarkedText = splitNodes.slice();
     markedNodes.splice(range[0], range[1] - range[0], ...markedNodesUpdated);
     return minifyMarkedText(markedNodes);
 };
@@ -46,8 +46,8 @@ export const unmarkText = (
     text: MarkedText,
     { mark, range }: { mark: Mark; range: Range }
 ) => {
-    const splittedNodes = splitMarkedText(text);
-    const markedNodes: MarkedText = splittedNodes.map((charNode, i) => {
+    const splitNodes = splitMarkedText(text);
+    const markedNodes: MarkedText = splitNodes.map((charNode, i) => {
         if (range[0] <= i && i < range[1]) {
             const marks = (charNode.m ?? []).slice();
             const index = marks.findIndex((item) => item.t === mark.t);

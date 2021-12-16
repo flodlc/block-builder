@@ -35,16 +35,11 @@ export const SCHEMA = {
         allowChildren: true,
     },
     card: {
-        attrs: {
-            emoji: {
-                required: true,
-                default: '😺',
-            },
-        },
+        attrs: {},
         allowText: true,
         allowChildren: true,
     },
-    bold: {
+    b: {
         attrs: {},
         allowText: true,
         allowChildren: true,
@@ -53,5 +48,10 @@ export const SCHEMA = {
         attrs: {},
         allowText: false,
         allowChildren: false,
+    },
+    mentionDecoration: {
+        attrs: {},
+        allowText: true,
+        allowChildren: true,
     },
 };

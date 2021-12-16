@@ -2,19 +2,26 @@ import { MarkedNode, MarkedText } from '../../model/types';
 import { splitMarkedText } from './splitMarkedText';
 import { minifyMarkedText } from './minifyMarkedText';
 import { Range } from '../../model/Selection';
+import { Editor } from '../../model/Editor';
 
-export const spliceText = (
-    text: MarkedText,
-    { textInput, range }: { textInput: string; range: Range }
-) => {
-    const splittedNodes = splitMarkedText(text);
-    const updatedText: MarkedText = splittedNodes.slice();
+export const spliceText = ({
+    text,
+    textInput,
+    range,
+    editor,
+}: {
+    text: MarkedText;
+    textInput: string;
+    range: Range;
+    editor: Editor;
+}) => {
+    const splitNodes = splitMarkedText(text);
+    const updatedText: MarkedText = splitNodes.slice();
 
     const previousCharNode = updatedText[range[0] - 1];
-    // Todo: change the way we identify a previous dynamic node
-    const previousMarks = previousCharNode?.m?.filter((mark) => {
-        return mark.t !== 'mention';
-    });
+    const previousMarks = previousCharNode?.m?.filter(
+        (mark) => editor.schema[mark.t].allowText
+    );
     const newSection: MarkedNode = {
         s: textInput,
         m: previousMarks,

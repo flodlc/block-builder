@@ -1,7 +1,7 @@
 import { Mark } from '../../model/types';
 import React, { RefObject, useLayoutEffect, useRef } from 'react';
 
-export const InlineNode = ({
+export const NodeView = ({
     mark,
     children,
 }: {
@@ -21,8 +21,8 @@ export const InlineNode = ({
             data-type={mark.t}
             style={{
                 color: '#ffffff99',
-                userSelect: 'text',
-                WebkitUserSelect: 'text',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
             }}
             contentEditable={false}
         >
@@ -51,18 +51,19 @@ const useBuffers = (ref: RefObject<HTMLElement>) => {
             characterData: true,
             subtree: true,
         });
+
         return () => {
             observer.disconnect();
-            nextBuffer.parentElement?.removeChild(prevBuffer);
             nextBuffer.parentElement?.removeChild(nextBuffer);
+            prevBuffer.parentElement?.removeChild(prevBuffer);
         };
     }, []);
     return buffers;
 };
 
-function setBuffers(element: HTMLElement, buffer: Text, prevBuffer: Text) {
-    if (element?.nextSibling !== buffer) {
-        element?.parentElement?.insertBefore(buffer, element?.nextSibling);
+function setBuffers(element: HTMLElement, nextBuffer: Text, prevBuffer: Text) {
+    if (element?.nextSibling !== nextBuffer) {
+        element?.parentElement?.insertBefore(nextBuffer, element?.nextSibling);
     }
     if (element?.previousSibling !== prevBuffer) {
         element?.parentElement?.insertBefore(prevBuffer, element);
@@ -74,11 +75,11 @@ function setBuffers(element: HTMLElement, buffer: Text, prevBuffer: Text) {
             prevBuffer.insertData(0, '\uFEFF');
         }
     }
-    if (buffer?.textContent) {
-        const index = buffer.textContent.indexOf('\uFEFF');
+    if (nextBuffer?.textContent) {
+        const index = nextBuffer.textContent.indexOf('\uFEFF');
         if (index > 0) {
-            buffer.deleteData(index, 1);
-            buffer.insertData(0, '\uFEFF');
+            nextBuffer.deleteData(index, 1);
+            nextBuffer.insertData(0, '\uFEFF');
         }
     }
 }

@@ -3,7 +3,7 @@ import { Callout } from './Callout';
 
 export const CalloutPlugin: PluginFactory = () => () => {
     return {
-        key: 'mention',
+        key: 'callout',
         addBlocks: () => ({
             callout: Callout,
         }),

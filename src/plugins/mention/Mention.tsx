@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Mark } from '../../editor/model/types';
-import { InlineNode } from '../../editor/view/TextInput/InlineNode';
 
 function getValue(value: { type: string; date?: string; name?: string }) {
     if (!value) return undefined;
@@ -26,12 +25,10 @@ function getPrefix(value: { type: string }) {
 export const Mention = ({ mark }: { mark: Mark }) => {
     const displayed = useMemo(() => getValue(mark.d?.value), [mark.d?.value]);
     return (
-        <InlineNode mark={mark}>
-            <span style={{}}>
-                <span style={{ opacity: 0.6 }}>{getPrefix(mark.d?.value)}</span>
-                {mark.d?.name}
-                {displayed}
-            </span>
-        </InlineNode>
+        <span style={{}}>
+            <span style={{ opacity: 0.6 }}>{getPrefix(mark.d?.value)}</span>
+            {mark.d?.name}
+            {displayed}
+        </span>
     );
 };

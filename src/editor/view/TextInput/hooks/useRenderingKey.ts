@@ -1,4 +1,4 @@
-import { RefObject, useState } from 'react';
+import { RefObject, useRef, useState } from 'react';
 import { isDomUpToDate, parseDom } from '../utils/parseDom';
 import { Decoration } from '../../types';
 import { MarkedText } from '../../../model/types';
@@ -14,7 +14,7 @@ export const useRenderingKey = ({
     decorations: Decoration[] | undefined;
     composing: boolean;
 }) => {
-    const [state] = useState({ key: Math.random() });
+    const key = useRef(Math.random());
 
     const changedProps = useChangedProps({
         value,
@@ -27,11 +27,11 @@ export const useRenderingKey = ({
             !composing &&
             (!isDomUpToDate(value, parsed) || changedProps.decorationsLength)
         ) {
-            state.key = Math.random();
-            return { key: state.key, willUpdate: true };
+            key.current = Math.random();
+            return { key: key.current, willUpdate: true };
         }
     }
-    return { key: state.key, willUpdate: false };
+    return { key: key.current, willUpdate: false };
 };
 
 function useChangedProps<T extends Record<string, any> = any>(props: T) {

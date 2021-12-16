@@ -9,7 +9,9 @@ export const deleteLastChars =
         const selection = editor.state.selection as TextSelection;
         const nodeId = selection.nodeId;
         const node = editor.state.nodes[nodeId];
-        const splicedText = spliceText(node.text as MarkedText, {
+        const splicedText = spliceText({
+            text: node.text as MarkedText,
+            editor,
             textInput: '',
             range: [selection.range[0] - numberChars, selection.range[1]],
         });

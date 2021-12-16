@@ -1,9 +1,18 @@
 import { handleTextChange } from '../onInput';
 import { ActionHandler } from './types';
+import { spliceText } from '../../../transaction/MarkedText/spliceText';
 
 export const deleteActions: ActionHandler = {
-    keydown: () => {
-        return { textState: undefined };
+    keydown: ({ e, editor, range, value }) => {
+        e.preventDefault();
+        const newTextState = spliceText({
+            text: value,
+            editor,
+            textInput: '',
+            range: [range[1], range[1] > range[0] ? range[1] : range[0] + 1],
+        });
+
+        return { textState: newTextState };
     },
     beforeinput: () => {
         return { textState: undefined };

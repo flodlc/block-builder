@@ -20,7 +20,6 @@ import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
 import { Node } from '../editor/model/types';
-import { TextEventPlugin } from '../plugins/textEvent/textEvent.plugin';
 
 function Playground() {
     const resetNote = (dataSet: Record<string, Node>) => () => {

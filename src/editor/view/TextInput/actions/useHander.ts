@@ -6,10 +6,12 @@ import { handleTextChange } from '../onInput';
 import { backspaceActions } from './backspace';
 import { enterActions } from './enter';
 import { deleteActions } from './delete';
+import { Editor } from '../../../model/Editor';
 
 export const useHandler = () => {
     return (props: {
         e: Event;
+        editor: Editor;
         element: HTMLElement;
         value: MarkedText;
         range: Range;
@@ -37,6 +39,7 @@ const ACTIONS: Record<ActionName, ActionHandler> = {
 
 export const onKeydown = (props: {
     e: Event;
+    editor: Editor;
     element: HTMLElement;
     value: MarkedText;
     range: Range;
@@ -46,6 +49,8 @@ export const onKeydown = (props: {
     props.range = getElementSelection(props.element) ?? props.range;
     if (event.key === 'Backspace') {
         return ACTIONS.backspace.keydown(props);
+    } else if (event.key === 'Delete') {
+        return ACTIONS.delete.keydown(props);
     } else if (event.key === 'Enter') {
         return ACTIONS.Enter.keydown(props);
     } else {
@@ -57,6 +62,7 @@ export const onKeydown = (props: {
 
 const onBeforeInput = (props: {
     e: Event;
+    editor: Editor;
     element: HTMLElement;
     value: MarkedText;
     range: Range;
@@ -70,6 +76,10 @@ const onBeforeInput = (props: {
     ) {
         return ACTIONS.backspace.beforeinput(props);
     } else if (
+        ['deleteContentForward', 'deleteWordForward'].includes(event.inputType)
+    ) {
+        return ACTIONS.delete.beforeinput(props);
+    } else if (
         ['insertLineBreak', 'insertParagraph'].includes(event.inputType)
     ) {
         return ACTIONS.Enter.beforeinput(props);
@@ -82,6 +92,7 @@ const onBeforeInput = (props: {
 
 const onInput = (props: {
     e: Event;
+    editor: Editor;
     element: HTMLElement;
     value: MarkedText;
     range: Range;

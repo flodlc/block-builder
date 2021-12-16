@@ -119,7 +119,9 @@ export const SuggestionComponent = ({
                             }}
                             key={i}
                             onMouseEnter={() => setIndex(i)}
-                            onClick={(e) => execCommmand(e.nativeEvent, i)}
+                            onMouseDownCapture={(e) =>
+                                execCommmand(e.nativeEvent, i)
+                            }
                         >
                             {command.label}
                         </div>

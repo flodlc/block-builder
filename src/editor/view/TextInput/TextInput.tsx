@@ -56,7 +56,7 @@ export const TextInput = ({
             nodeId,
             patch: { text: newValue },
         });
-        console.log('save', newRange);
+
         newRange = newRange ?? getElementSelection(ref.current);
         if (newRange) {
             tr.focus(selection?.setRange(newRange as Range));
@@ -69,6 +69,7 @@ export const TextInput = ({
         if (!range) return;
         const handledStatus = handler({
             e,
+            editor,
             element: ref.current as HTMLElement,
             value,
             range,
@@ -85,6 +86,7 @@ export const TextInput = ({
         if (!range) return;
         const handledStatus = handler({
             e,
+            editor,
             element: ref.current as HTMLElement,
             value,
             range,
@@ -122,7 +124,7 @@ export const TextInput = ({
     });
 
     if (willUpdate) {
-        clearTrackedDomNodes(trackedDomNodes.trackedNodes, ref.current);
+        clearTrackedDomNodes(trackedDomNodes.current, ref.current);
     }
 
     useRestoreSelection({
@@ -165,6 +167,7 @@ export const TextInput = ({
                     onChange={handleMarkChange}
                     value={value}
                     decorations={decorations}
+                    schema={editor.schema}
                 />
             </div>
             {!currentSavedText && (range || keepPlaceholder) && (

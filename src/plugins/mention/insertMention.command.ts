@@ -16,7 +16,9 @@ export const insertMention =
             range: selection.range,
         });
 
-        const { value, range } = spliceText(textWithMention, {
+        const { value, range } = spliceText({
+            text: textWithMention,
+            editor,
             textInput: ' ',
             range: [selection.range[0] + 1, selection.range[0] + 1],
         });

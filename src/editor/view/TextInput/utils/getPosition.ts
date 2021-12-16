@@ -9,6 +9,9 @@ export const getPosition = ({
     node: Node;
     offset: number;
 }) => {
+    // safari sometimes give wrong selection offset.
+    offset =
+        node.nodeType === 1 ? Math.min(node.childNodes.length, offset) : offset;
     const range = new Range();
     range.setStart(container, 0);
     range.setEnd(node, offset);

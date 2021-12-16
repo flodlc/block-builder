@@ -3,7 +3,7 @@ import { Text } from './Text';
 
 export const TextPlugin: PluginFactory = () => () => {
     return {
-        key: 'mention',
+        key: 'text',
         addBlocks: () => ({
             text: Text,
         }),

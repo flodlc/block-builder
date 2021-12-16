@@ -121,7 +121,6 @@ export class Editor {
             });
         this.state = { ...draft, selection: item.state.selection };
         delete this.resolvedState;
-        console.log('reversed', this.state);
         this.trigger('tr');
         this.trigger('change');
     }

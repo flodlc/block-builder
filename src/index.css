@@ -49,6 +49,7 @@ code {
     -webkit-font-smoothing: auto;
     line-height: 1.5;
     letter-spacing: 0.002em;
+    min-height: 100vh;
 }
 
 .header_content > button {
