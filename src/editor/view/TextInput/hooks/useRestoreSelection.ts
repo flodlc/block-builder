@@ -1,4 +1,4 @@
-import { RefObject, useLayoutEffect } from 'react';
+import { RefObject, useLayoutEffect, useRef } from 'react';
 import { restoreSelection } from '../utils/restoreSelection';
 import { Range, TextSelection } from '../../../model/Selection';
 import { getElementSelection } from '../utils/getElementSelection';
@@ -16,7 +16,9 @@ export const useRestoreSelection = ({
     composing: boolean;
     updateRange: (range: Range) => void;
 }) => {
+    const timeout = useRef<NodeJS.Timeout>();
     const saveDomSelection = () => {
+        if (timeout.current) return;
         const currentRange = getElementSelection(ref.current as HTMLElement);
         if (!currentRange) return;
         updateRange(currentRange);
@@ -30,11 +32,20 @@ export const useRestoreSelection = ({
             document.removeEventListener('selectionchange', selectHandler);
     }, [saveDomSelection]);
 
-    useLayoutEffect(() => {
-        if (!ref.current || composing || !range) return;
+    const restoreSelectionIfNeeded = () => {
         const currentRange = getElementSelection(ref.current as HTMLElement);
-        TextSelection.areSameRange(currentRange, range);
         if (TextSelection.areSameRange(currentRange, range)) return;
         restoreSelection(ref.current as HTMLDivElement, range);
+    };
+
+    useLayoutEffect(() => {
+        if (!ref.current || composing || !range) return;
+        restoreSelectionIfNeeded();
+        if (timeout.current) clearTimeout(timeout.current);
+        // timeout is needed because on android Gboard and swiftkey change the selection after deleting an element.
+        timeout.current = setTimeout(() => {
+            restoreSelectionIfNeeded();
+            timeout.current = undefined;
+        }, 0);
     }, [key, range]);
 };
