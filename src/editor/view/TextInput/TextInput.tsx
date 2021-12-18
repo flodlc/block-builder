@@ -21,6 +21,10 @@ import {
 } from './hooks/useTrackDomNodes';
 import { useRestoreSelection } from './hooks/useRestoreSelection';
 import { useRenderingKey } from './hooks/useRenderingKey';
+import {
+    restoreReactScreenshot,
+    useReactScreenshot,
+} from './hooks/useReactScreenshot';
 
 export const TextInput = ({
     onChange = () => false,
@@ -44,7 +48,7 @@ export const TextInput = ({
     const editor = useContext(EditorContext);
     const ref = useRef<HTMLDivElement>(null);
     const composingRef = useRef<boolean>(false);
-    const decorations = useNodeDecorations({ editor, nodeId });
+    const decorations = useNodeDecorations({ nodeId });
     const currentSavedText = useLastValue(value);
     const [render, setRender] = useState(0);
 
@@ -116,15 +120,23 @@ export const TextInput = ({
     useTrailingElements(ref);
 
     const trackedDomNodes = useTrackDomNodes(ref);
+
     const { key, willUpdate } = useRenderingKey({
         ref,
         value,
         decorations,
         composing: composingRef.current,
+        domChanged: !!trackedDomNodes.current?.size,
     });
 
+    const reactScreenShot = useReactScreenshot(ref, willUpdate);
+
     if (willUpdate) {
-        clearTrackedDomNodes(trackedDomNodes.current, ref.current);
+        clearTrackedDomNodes(trackedDomNodes.current);
+        restoreReactScreenshot(
+            ref.current as HTMLElement,
+            reactScreenShot.current as Node[]
+        );
     }
 
     useRestoreSelection({
@@ -154,14 +166,17 @@ export const TextInput = ({
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
                 onCompositionStart={() => (composingRef.current = true)}
-                onCompositionEnd={() => (composingRef.current = false)}
+                onCompositionEnd={() => {
+                    composingRef.current = false;
+                    setRender(render + 1);
+                }}
                 style={{
                     outline: 'none',
                     padding: style.padding,
                 }}
             >
                 <TextRenderer
-                    key={key}
+                    // key={key}
                     hashedKey={key}
                     stringText={currentSavedText}
                     onChange={handleMarkChange}

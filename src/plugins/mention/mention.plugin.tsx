@@ -39,6 +39,7 @@ export const MentionPlugin: PluginFactory =
                     !regex.test(previousText)
                 )
                     return false;
+
                 state = editor.trigger(MENTION_EVENTS.changed, {
                     searchText: '',
                     close: () => {

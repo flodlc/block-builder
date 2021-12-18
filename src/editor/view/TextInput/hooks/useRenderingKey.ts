@@ -1,5 +1,4 @@
 import { RefObject, useRef, useState } from 'react';
-import { isDomUpToDate, parseDom } from '../utils/parseDom';
 import { Decoration } from '../../types';
 import { MarkedText } from '../../../model/types';
 
@@ -8,24 +7,24 @@ export const useRenderingKey = ({
     value,
     decorations,
     composing,
+    domChanged,
 }: {
     ref: RefObject<HTMLDivElement>;
     value: MarkedText;
     decorations: Decoration[] | undefined;
     composing: boolean;
+    domChanged: boolean;
 }) => {
     const key = useRef(Math.random());
 
     const changedProps = useChangedProps({
         value,
-        decorationsLength: decorations?.length,
+        decorations: decorations,
     });
-
     if (ref.current) {
-        const parsed = parseDom({ element: ref.current });
         if (
             !composing &&
-            (!isDomUpToDate(value, parsed) || changedProps.decorationsLength)
+            (domChanged || changedProps.value || changedProps.decorations)
         ) {
             key.current = Math.random();
             return { key: key.current, willUpdate: true };

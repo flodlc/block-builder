@@ -25,7 +25,7 @@ function getPrefix(value: { type: string }) {
 export const Mention = ({ mark }: { mark: Mark }) => {
     const displayed = useMemo(() => getValue(mark.d?.value), [mark.d?.value]);
     return (
-        <span style={{}}>
+        <span style={{ color: '#ffffff99' }}>
             <span style={{ opacity: 0.6 }}>{getPrefix(mark.d?.value)}</span>
             {mark.d?.name}
             {displayed}

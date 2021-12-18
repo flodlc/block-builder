@@ -21,12 +21,13 @@ export const getTextNodes = (
         ) {
             nodes = [...nodes, node];
         } else {
-            Array.from(node.childNodes).forEach((child) => {
+            for (let i = 0; i < node.childNodes.length; i++) {
+                const child = node.childNodes[i];
                 nodes = [
                     ...nodes,
                     ...getTextNodes({ node: child, withIgnored }),
                 ];
-            });
+            }
         }
     }
     return nodes;

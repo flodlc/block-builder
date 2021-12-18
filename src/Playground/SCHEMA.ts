@@ -44,6 +44,11 @@ export const SCHEMA = {
         allowText: true,
         allowChildren: true,
     },
+    i: {
+        attrs: {},
+        allowText: true,
+        allowChildren: true,
+    },
     mention: {
         attrs: {},
         allowText: false,

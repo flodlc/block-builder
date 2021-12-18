@@ -4,37 +4,34 @@ import {
     unmarkText,
 } from '../../editor/transaction/MarkedText/markText';
 import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
-import { MarkedText } from '../../editor/model/types';
-import { TextSelection, Range } from '../../editor/model/Selection';
+import { TextSelection } from '../../editor/model/Selection';
 import { Editor } from '../../editor/model/Editor';
 
-const getBoldStatus = (text: MarkedText, range: Range) => {
-    const textFragment = cutMarkedText(text, range);
-    return hasMark(textFragment, { t: 'b' });
-};
-
-export const toggleBold =
-    (status?: boolean, selection?: TextSelection) => (editor: Editor) => {
-        if (!selection) {
-            if (editor.state?.selection?.isText()) {
-                selection = editor.state.selection as TextSelection;
-            } else {
-                return;
-            }
-        }
+export const italicApi = (editor: Editor) => ({
+    isItalic: () => {
+        if (!editor.state.selection) return false;
+        const selection = editor.state.selection as TextSelection;
+        if (!selection.isText()) return false;
+        const node = editor.state.nodes[selection.nodeId];
+        if (!node.text) return false;
+        const textFragment = cutMarkedText(node.text, selection.range);
+        return hasMark(textFragment, { t: 'i' });
+    },
+    toggleItalic: () => {
+        const selection = editor.state.selection as TextSelection;
+        if (!selection.isText()) return false;
+        const boldStatus = italicApi(editor).isItalic();
 
         const node = editor.state.nodes[selection.nodeId];
         if (!node.text) return;
 
-        const boldStatus = getBoldStatus(node.text, selection.range);
-
         const newMarkedText = boldStatus
             ? unmarkText(node.text, {
-                  mark: { t: 'b' },
+                  mark: { t: 'i' },
                   range: selection.range,
               })
             : markText(node.text, {
-                  mark: { t: 'b' },
+                  mark: { t: 'i' },
                   range: selection.range,
               });
 
@@ -48,4 +45,5 @@ export const toggleBold =
             })
             .focus(selection.clone())
             .dispatch();
-    };
+    },
+});

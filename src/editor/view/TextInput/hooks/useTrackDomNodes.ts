@@ -3,14 +3,9 @@ import { RefObject, useLayoutEffect, useRef } from 'react';
 type TrackedNodes = Map<Node, TrackedNode>;
 type TrackedNode = { node: Node; isReact: boolean; isInDom: boolean };
 
-export const clearTrackedDomNodes = (
-    trackedDomNodes: TrackedNodes,
-    element: HTMLElement | null
-) => {
+export const clearTrackedDomNodes = (trackedDomNodes: TrackedNodes) => {
     Array.from(trackedDomNodes.values()).forEach((trackedNode) => {
-        if (trackedNode.isReact && !trackedNode.isInDom) {
-            element?.append(trackedNode.node);
-        } else if (!trackedNode.isReact && trackedNode.isInDom) {
+        if (!trackedNode.isReact && trackedNode.isInDom) {
             trackedNode.node.parentElement?.removeChild(trackedNode.node);
         }
     });
@@ -27,13 +22,19 @@ export const useTrackDomNodes = (ref: RefObject<HTMLDivElement>) => {
 
     useLayoutEffect(() => {
         if (!ref.current) return;
-        observer.current = new MutationObserver((entries) => {
-            trackedNodes.current = getTrackedNodes(
-                trackedNodes.current,
-                entries
-            );
+        observer.current =
+            observer.current ??
+            new MutationObserver((entries) => {
+                trackedNodes.current = getTrackedNodes(
+                    trackedNodes.current,
+                    entries
+                );
+            });
+        observer.current.observe(ref.current, {
+            childList: true,
+            attributes: false,
+            characterData: false,
         });
-        observer.current.observe(ref.current, { childList: true });
         return () => observer.current?.disconnect();
     }, []);
 
@@ -52,10 +53,7 @@ const getTrackedNodes = (
         entry.addedNodes.forEach((node) => {
             const trackedNode = trackedNodesClone.get(node);
             if (trackedNode) {
-                trackedNodesClone.set(node, {
-                    ...trackedNode,
-                    isInDom: true,
-                });
+                trackedNode.isInDom = true;
             } else {
                 trackedNodesClone.set(node, {
                     node,
@@ -74,10 +72,7 @@ const getTrackedNodes = (
                     isInDom: false,
                 });
             } else {
-                trackedNodesClone.set(node, {
-                    ...trackedNode,
-                    isInDom: false,
-                });
+                trackedNode.isInDom = false;
             }
         });
     });

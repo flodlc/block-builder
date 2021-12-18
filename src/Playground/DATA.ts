@@ -149,6 +149,17 @@ export const PLAYGROUND_DATA = {
                     },
                 ],
             },
+            ...new Array(0).fill(0).flatMap((item) => [
+                {
+                    s: '•',
+                    m: [
+                        {
+                            t: 'mention',
+                            d: { value: { type: 'person', name: 'Mike' } },
+                        },
+                    ],
+                },
+            ]),
             { s: ' ', m: [] },
             {
                 s: '•',

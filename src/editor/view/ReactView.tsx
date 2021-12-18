@@ -10,9 +10,11 @@ import { View } from './View';
 export const ReactView = ({
     editor,
     plugins = [],
+    slot,
 }: {
     editor: Editor;
     plugins?: Plugin[];
+    slot: React.ReactElement;
 }) => {
     const [view, setView] = useState<View | undefined>(undefined);
 
@@ -41,7 +43,7 @@ export const ReactView = ({
 
     const rootNode = editor.state.nodes[editor.state.rootId];
     return (
-        <>
+        <div style={{ position: 'relative' }}>
             <div className="view" ref={ref} style={{ outline: 'none' }}>
                 {view && (
                     <ViewContext.Provider value={view}>
@@ -55,13 +57,14 @@ export const ReactView = ({
                         </EditorContext.Provider>
                     </ViewContext.Provider>
                 )}
-                {registeredPlugins
-                    ?.filter((item) => item.Component)
-                    ?.map(({ Component }, i) => {
-                        Component = Component as React.FC;
-                        return <Component key={i} editor={editor} />;
-                    })}
             </div>
-        </>
+            {registeredPlugins
+                ?.filter((item) => item.Component)
+                ?.map(({ Component }, i) => {
+                    Component = Component as React.FC;
+                    return <Component key={i} editor={editor} />;
+                })}
+            {slot}
+        </div>
     );
 };

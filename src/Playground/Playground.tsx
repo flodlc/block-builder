@@ -8,7 +8,7 @@ import { HistoryShortcutsPlugin } from '../editor/view/corePlugins/historyShortc
 import { CalloutPlugin } from '../plugins/callout/callout.plugin';
 import { TextPlugin } from '../plugins/text/text.plugin';
 import { BoldPlugin } from '../plugins/bold/bold.plugin';
-import { toggleBold } from '../plugins/bold/toggleBold.command';
+import { boldApi } from '../plugins/bold/bold.api';
 import { BlockSelectionShortcutsPlugin } from '../plugins/blockSelectionShortcuts/blockSelectionShortcuts.plugin';
 import { ArrowNavigationPlugin } from '../editor/view/corePlugins/arrowNavigation/arrowNavigation.plugin';
 import { CopyPastePlugin } from '../plugins/copyPaste/copyPaste.plugin';
@@ -20,6 +20,11 @@ import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
 import { Node } from '../editor/model/types';
+import { ItalicPlugin } from '../plugins/italic/italic.plugin';
+import { italicApi } from '../plugins/italic/italic.api';
+import { balloonPlugin } from '../plugins/balloon/balloon.plugin';
+import { Balloon } from './Balloon';
+import { createEditorApi } from './editorApi';
 
 function Playground() {
     const resetNote = (dataSet: Record<string, Node>) => () => {
@@ -55,9 +60,17 @@ function Playground() {
         json: () => console.log(JSON.parse(JSON.stringify(editor.getJson()))),
     };
 
+    const editorApi = createEditorApi(editor);
+    console.log(editorApi);
+
     return (
         <div className="editor">
             <ReactView
+                slot={
+                    <>
+                        <Balloon editorApi={editorApi} editor={editor} />
+                    </>
+                }
                 plugins={[
                     BlockBehaviorsPlugin(),
                     MentionPlugin(),
@@ -71,9 +84,11 @@ function Playground() {
                     TextPlugin(),
                     HeadingPlugin(),
                     BoldPlugin(),
+                    ItalicPlugin(),
                     BlockSelectionShortcutsPlugin(),
                     ArrowNavigationPlugin(),
                     CopyPastePlugin(),
+                    balloonPlugin(),
                 ]}
                 editor={editor}
             />
@@ -85,9 +100,8 @@ function Playground() {
                     <button onClick={resetNote(PLAYGROUND_DATA)}>Reset</button>
                     <button onClick={resetNote(BIG_DATA)}>Reset 2</button>
                     <button onClick={editor.back}>Undo</button>
-                    <button onClick={() => editor.runCommand(toggleBold())}>
-                        Bold
-                    </button>
+                    <button onClick={() => editorApi.toggleBold()}>B</button>
+                    <button onClick={() => editorApi.toggleItalic()}>I</button>
                 </div>
             </div>
         </div>

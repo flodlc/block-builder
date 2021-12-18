@@ -33,6 +33,7 @@ export const useRestoreSelection = ({
     }, [saveDomSelection]);
 
     const restoreSelectionIfNeeded = () => {
+        if (!ref.current) return;
         const currentRange = getElementSelection(ref.current as HTMLElement);
         if (TextSelection.areSameRange(currentRange, range)) return;
         restoreSelection(ref.current as HTMLDivElement, range);
@@ -42,6 +43,7 @@ export const useRestoreSelection = ({
         if (!ref.current || composing || !range) return;
         restoreSelectionIfNeeded();
         if (timeout.current) clearTimeout(timeout.current);
+        if (range[0] !== range[1]) return;
         // timeout is needed because on android Gboard and swiftkey change the selection after deleting an element.
         timeout.current = setTimeout(() => {
             restoreSelectionIfNeeded();

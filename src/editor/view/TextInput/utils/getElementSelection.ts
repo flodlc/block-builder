@@ -19,13 +19,15 @@ export const getElementSelection = (
         container,
     });
 
-    const anchorPosition = selection.anchorNode
-        ? getPosition({
-              node: selection.anchorNode,
-              offset: selection.anchorOffset,
-              container,
-          })
-        : undefined;
+    let anchorPosition = focusPosition;
+
+    if (!selection.isCollapsed && selection.anchorNode) {
+        anchorPosition = getPosition({
+            node: selection.anchorNode,
+            offset: selection.anchorOffset,
+            container,
+        });
+    }
 
     return [
         Math.min(anchorPosition ?? 0, focusPosition),

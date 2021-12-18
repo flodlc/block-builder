@@ -4,6 +4,7 @@ import { minifyMarkedText } from './minifyMarkedText';
 import { Range } from '../../model/Selection';
 
 export const hasMark = (text: MarkedText, mark: Mark) =>
+    !!text.length &&
     !text.some((textNode) => !textNode?.m?.some((item) => item.t === mark.t));
 
 export const insertMark = (

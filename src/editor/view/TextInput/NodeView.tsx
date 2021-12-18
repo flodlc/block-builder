@@ -24,10 +24,9 @@ export const NodeView = ({
                 }
             }}
             ref={ref}
-            data-attrs={JSON.stringify(mark.d)}
-            data-type={mark.t}
+            // data-attrs={JSON.stringify(mark.d)}
+            // data-type={mark.t}
             style={{
-                color: '#ffffff99',
                 userSelect: 'none',
                 WebkitUserSelect: 'none',
             }}
@@ -39,7 +38,7 @@ export const NodeView = ({
 };
 
 const useBuffers = (ref: RefObject<HTMLElement>) => {
-    const buffers = useRef<{ prevBuffer: Node; nextBuffer: Node }>();
+    const buffers = useRef<{ prevBuffer: Text; nextBuffer: Text }>();
     useLayoutEffect(() => {
         const prevBuffer = document.createTextNode('\uFEFF');
         const nextBuffer = document.createTextNode('\uFEFF');
@@ -47,23 +46,23 @@ const useBuffers = (ref: RefObject<HTMLElement>) => {
         if (!ref.current) return;
 
         setBuffers(ref.current as HTMLElement, nextBuffer, prevBuffer);
-        const observer = new MutationObserver(() => {
+        const handler = () => {
             setBuffers(ref.current as HTMLElement, nextBuffer, prevBuffer);
-            observer.takeRecords();
-        });
-
+        };
         const root = ref.current.closest('.editable_content');
-        observer.observe(root as HTMLElement, {
-            childList: true,
-            characterData: true,
-            subtree: true,
-        });
+        root?.addEventListener('input', handler);
 
         return () => {
-            observer.disconnect();
-            nextBuffer.parentElement?.removeChild(nextBuffer);
-            prevBuffer.parentElement?.removeChild(prevBuffer);
+            root?.removeEventListener('input', handler);
+            removeBuffers(buffers);
         };
+    }, []);
+    useLayoutEffect(() => {
+        resetBuffers(buffers);
+        // return () => removeBuffers(buffers);
+    });
+    useLayoutEffect(() => {
+        return () => removeBuffers(buffers);
     }, []);
     return buffers;
 };
@@ -71,22 +70,48 @@ const useBuffers = (ref: RefObject<HTMLElement>) => {
 function setBuffers(element: HTMLElement, nextBuffer: Text, prevBuffer: Text) {
     if (element?.nextSibling !== nextBuffer) {
         element?.parentElement?.insertBefore(nextBuffer, element?.nextSibling);
-    }
-    if (element?.previousSibling !== prevBuffer) {
-        element?.parentElement?.insertBefore(prevBuffer, element);
-    }
-    if (prevBuffer?.textContent) {
-        const index = prevBuffer.textContent.indexOf('\uFEFF');
-        if (index > 0) {
-            prevBuffer.deleteData(index, 1);
-            prevBuffer.insertData(0, '\uFEFF');
-        }
-    }
-    if (nextBuffer?.textContent) {
+    } else if (nextBuffer?.textContent) {
         const index = nextBuffer.textContent.indexOf('\uFEFF');
         if (index > 0) {
             nextBuffer.deleteData(index, 1);
             nextBuffer.insertData(0, '\uFEFF');
         }
     }
+    if (element?.previousSibling !== prevBuffer) {
+        element?.parentElement?.insertBefore(prevBuffer, element);
+    } else if (prevBuffer?.textContent) {
+        const index = prevBuffer.textContent.indexOf('\uFEFF');
+        if (index > 0) {
+            prevBuffer.deleteData(index, 1);
+            prevBuffer.insertData(0, '\uFEFF');
+        }
+    }
+}
+
+function resetBuffers(
+    buffers: React.MutableRefObject<
+        { nextBuffer: Text; prevBuffer: Text } | undefined
+    >
+) {
+    const nextBuffer = buffers.current?.nextBuffer;
+    if (nextBuffer?.textContent !== '\uFEFF') {
+        nextBuffer?.replaceData(0, nextBuffer?.length ?? 0, '\uFEFF');
+    }
+    const prevBuffer = buffers.current?.prevBuffer;
+    if (prevBuffer?.textContent !== '\uFEFF') {
+        prevBuffer?.replaceData(0, prevBuffer?.length ?? 0, '\uFEFF');
+    }
+}
+
+function removeBuffers(
+    buffers: React.MutableRefObject<
+        { nextBuffer: Text; prevBuffer: Text } | undefined
+    >
+) {
+    buffers.current?.nextBuffer.parentElement?.removeChild(
+        buffers.current?.nextBuffer
+    );
+    buffers.current?.prevBuffer.parentElement?.removeChild(
+        buffers.current?.prevBuffer
+    );
 }

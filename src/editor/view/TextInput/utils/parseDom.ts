@@ -44,10 +44,8 @@ const getAllMarks = (domNode: Node) => {
     return marks;
 };
 
-export const isDomUpToDate = (
-    modelValue: MarkedText,
-    parsedValue: MarkedText
-) => {
+export const isDomUpToDate = (modelValue: MarkedText, element: HTMLElement) => {
+    const parsedValue = parseDom({ element });
     if (modelValue.length !== parsedValue.length) return false;
     for (let i = 0; i < modelValue.length; i++) {
         const modelNode = modelValue[i];

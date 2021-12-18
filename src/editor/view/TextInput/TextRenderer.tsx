@@ -84,7 +84,6 @@ export const TextRenderer = React.memo(
             }, value) as MarkedText);
 
         let pos = 0;
-
         return (
             <>
                 {decoratedText &&
@@ -96,6 +95,7 @@ export const TextRenderer = React.memo(
                         pos += markedNode.s.length;
                         return (
                             <Marks
+                                // key={JSON.stringify({ m: markedNode.m, i })}
                                 key={i}
                                 text={markedNode.s}
                                 updateMark={updateMark}
