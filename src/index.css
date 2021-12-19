@@ -39,6 +39,20 @@ code {
     padding: 0px;
 }
 
+hr.text_point {
+    height: 1em;
+    line-height: 1em;
+    font-size: 1em;
+    vertical-align: middle;
+    color: white;
+    overflow: visible;
+    display: inline;
+    width: 0;
+    border:none;
+    margin: 0;
+    padding: 0;
+}
+
 .view {
     background-color: #232529;
     position: relative;

@@ -17,7 +17,7 @@ export const getTextNodes = (
         if (
             !isRoot &&
             node.nodeType === 1 &&
-            (node as HTMLElement).matches('[contentEditable="false"]')
+            (node as HTMLElement).matches('[data-nodeview="true"]')
         ) {
             nodes = [...nodes, node];
         } else {

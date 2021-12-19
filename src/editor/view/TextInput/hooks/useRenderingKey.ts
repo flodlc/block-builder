@@ -17,10 +17,14 @@ export const useRenderingKey = ({
 }) => {
     const key = useRef(Math.random());
 
-    const changedProps = useChangedProps({
-        value,
-        decorations: decorations,
-    });
+    const changedProps = useChangedProps(
+        {
+            value,
+            decorations: decorations,
+        },
+        composing
+    );
+
     if (ref.current) {
         if (
             !composing &&
@@ -33,7 +37,10 @@ export const useRenderingKey = ({
     return { key: key.current, willUpdate: false };
 };
 
-function useChangedProps<T extends Record<string, any> = any>(props: T) {
+function useChangedProps<T extends Record<string, any> = any>(
+    props: T,
+    ignore = false
+) {
     const [state] = useState<{ lastProps: T }>({ lastProps: {} as T });
     const changedProps = Object.entries(props)
         .filter((entry) => entry[1] !== state.lastProps[entry[0]])
@@ -47,6 +54,7 @@ function useChangedProps<T extends Record<string, any> = any>(props: T) {
             }),
             {} as any
         );
+    if (ignore) return {};
     state.lastProps = { ...props };
     return changedProps;
 }

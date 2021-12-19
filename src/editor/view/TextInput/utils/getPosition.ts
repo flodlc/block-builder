@@ -28,7 +28,7 @@ export const getPosition = ({
                     child?.textContent?.replace(/\uFEFF/g, '')?.length ?? 0;
             }
         } else {
-            if ((child as HTMLElement).matches('[contenteditable="false"]')) {
+            if ((child as HTMLElement).matches('[data-nodeview="true"]')) {
                 position += 1;
             }
         }

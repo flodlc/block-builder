@@ -81,7 +81,6 @@ export const getRange = (container: HTMLElement, textRange: PositionRange) => {
                     textRange[0] - pos
                 ),
                 isLastNode,
-                container,
             });
         }
 
@@ -95,7 +94,6 @@ export const getRange = (container: HTMLElement, textRange: PositionRange) => {
                     textRange[1] - pos
                 ),
                 isLastNode,
-                container,
             });
         }
 
@@ -127,32 +125,52 @@ function setStart({
     offset,
     isLastNode,
     isTextNode,
-    container,
-}: //
-{
+}: {
     range: Range;
     node: Node;
     offset: number;
     isLastNode: boolean;
     isTextNode: boolean;
-    container: HTMLElement;
 }) {
     if (isTextNode) {
-        range.setStart(node, offset);
+        const isValidNode = isValidContainer(node.parentElement as HTMLElement);
+        if (isValidNode) {
+            range.setStart(node, offset);
+        } else {
+            const { validContainer, validNode } = findValidContainer(node);
+            const niex = getNodeIndexInContainer(validContainer, validNode);
+            range.setStart(validContainer, niex + 1);
+        }
         return true;
     } else {
         if (offset <= 0) {
-            const index = getNodeIndexInContainer(container, node);
-            range.setStart(container, index);
+            range.setStartBefore(node);
             return true;
         } else if (isLastNode) {
-            const index = getNodeIndexInContainer(container, node);
-            range.setStart(container, index + 1);
+            range.setStartAfter(node);
             return true;
         }
     }
     return false;
 }
+
+const isValidContainer = (element: HTMLElement) => {
+    return Boolean(element.getAttribute('data-noselect') !== 'true');
+};
+
+const findValidContainer = (
+    node: Node
+): { validContainer: HTMLElement; validNode: Node } => {
+    let currentNode = node as Node;
+    let currentParent = node.parentElement as HTMLElement;
+    while (true) {
+        const isValid = isValidContainer(currentParent);
+        if (isValid)
+            return { validContainer: currentParent, validNode: currentNode };
+        currentNode = currentNode.parentElement as HTMLElement;
+        currentParent = currentNode.parentElement as HTMLElement;
+    }
+};
 
 const getNodeIndexInContainer = (container: HTMLElement, node: Node) => {
     return Array.from(container.childNodes).findIndex(
@@ -166,26 +184,29 @@ function setEnd({
     offset,
     isLastNode,
     isTextNode,
-    container,
 }: {
     range: Range;
     node: Node;
     offset: number;
     isTextNode: boolean;
     isLastNode: boolean;
-    container: HTMLElement;
 }) {
     if (isTextNode) {
-        range.setEnd(node, offset);
+        const isValidNode = isValidContainer(node.parentElement as HTMLElement);
+        if (isValidNode) {
+            range.setEnd(node, offset);
+        } else {
+            const { validContainer, validNode } = findValidContainer(node);
+            const niex = getNodeIndexInContainer(validContainer, validNode);
+            range.setEnd(validContainer, niex + 1);
+        }
         return true;
     } else {
         if (offset <= 0) {
-            const index = getNodeIndexInContainer(container, node);
-            range.setEnd(container, index);
+            range.setEndBefore(node);
             return true;
         } else if (isLastNode) {
-            const index = getNodeIndexInContainer(container, node);
-            range.setEnd(container, index + 1);
+            range.setEndAfter(node);
             return true;
         }
     }

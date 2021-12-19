@@ -30,6 +30,7 @@ export const NodeView = ({
                 userSelect: 'none',
                 WebkitUserSelect: 'none',
             }}
+            data-nodeview={true}
             contentEditable={false}
         >
             {children}

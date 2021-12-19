@@ -168,7 +168,9 @@ export const TextInput = ({
                 onCompositionStart={() => (composingRef.current = true)}
                 onCompositionEnd={() => {
                     composingRef.current = false;
-                    setRender(render + 1);
+                    setTimeout(() => {
+                        setRender(render + 1);
+                    });
                 }}
                 style={{
                     outline: 'none',
