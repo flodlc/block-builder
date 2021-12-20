@@ -1,15 +1,20 @@
 import { Mark, MarkedText } from '../../model/types';
 
 export const minifyMarkedText = (text: MarkedText): MarkedText => {
+    // console.trace();
     const minified: MarkedText = [];
     let tempMarks: Mark[] = [];
     let tempString = '' as string;
-    text.forEach((markedNode) => {
+    text.forEach((markedNode, i) => {
         const character = markedNode.s as string;
         const charMarks = markedNode.m ?? [];
 
+        const prev = text[i - 1];
+
         const canMerge =
-            character !== '•' && areSameMarkup(charMarks, tempMarks);
+            character !== '•' &&
+            prev?.s !== '•' &&
+            areSameMarkup(charMarks, tempMarks);
 
         if (!tempString.length) {
             tempString += character;

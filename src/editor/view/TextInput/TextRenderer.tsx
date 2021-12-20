@@ -1,4 +1,4 @@
-import React, { ReactElement, useContext } from 'react';
+import React, { ReactElement, useContext, useLayoutEffect } from 'react';
 import { Mark, MarkedText } from '../../model/types';
 import { markText } from '../../transaction/MarkedText/markText';
 import { ViewContext } from '../contexts/ViewContext';
@@ -60,6 +60,8 @@ export const TextRenderer = React.memo(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         hashedKey,
         decorations = [],
+        willRender = () => undefined,
+        didRender = () => undefined,
     }: {
         stringText: string;
         value?: MarkedText;
@@ -67,7 +69,14 @@ export const TextRenderer = React.memo(
         hashedKey: number;
         onChange: (text: MarkedText) => void;
         schema: CompiledSchema;
+        willRender: () => void;
+        didRender: () => void;
     }) => {
+        willRender();
+        useLayoutEffect(() => {
+            didRender();
+        });
+
         const getUpdateMark =
             ({ from, to }: { from: number; to: number }) =>
             (mark: Mark) => {
@@ -77,6 +86,7 @@ export const TextRenderer = React.memo(
                 });
                 onChange(updatedMarkedText);
             };
+
         const decoratedText =
             value &&
             ((decorations ?? []).reduce((prev, curr) => {
@@ -84,6 +94,7 @@ export const TextRenderer = React.memo(
             }, value) as MarkedText);
 
         let pos = 0;
+
         return (
             <>
                 {decoratedText &&
@@ -93,6 +104,7 @@ export const TextRenderer = React.memo(
                             to: pos + markedNode.s.length,
                         });
                         pos += markedNode.s.length;
+
                         return (
                             <Marks
                                 key={i}

@@ -16,16 +16,12 @@ import { useLastValue } from './hooks/useLastValue';
 import { useTrailingElements } from './hooks/useTrailingElements';
 import { useHandler } from './actions/useHander';
 import {
-    clearTrackedDomNodes,
-    useTrackDomNodes,
+    resetChangesTracking,
+    restoreDom,
+    useTrackDomChanges,
 } from './hooks/useTrackDomNodes';
 import { useRestoreSelection } from './hooks/useRestoreSelection';
 import { useRenderingKey } from './hooks/useRenderingKey';
-import {
-    DomScreenShot,
-    restoreReactScreenshot,
-    useReactScreenshot,
-} from './hooks/useReactScreenshot';
 
 export const TextInput = ({
     onChange = () => false,
@@ -118,29 +114,19 @@ export const TextInput = ({
     const handleMarkChange = (markedText: MarkedText) =>
         onInput(markedText, undefined);
 
+    const changesTracker = useTrackDomChanges(ref);
     useTrailingElements(ref);
 
-    const trackedDomNodes = useTrackDomNodes(ref);
-
-    const { key, willUpdate } = useRenderingKey({
+    const { key } = useRenderingKey({
         ref,
         value,
         decorations,
         composing: composingRef.current,
-        domChanged: !!trackedDomNodes.current?.size,
+        domChanged: !!changesTracker.current.domChanges.length,
     });
 
-    const reactScreenShot = useReactScreenshot(ref, willUpdate);
-
-    if (willUpdate) {
-        clearTrackedDomNodes(trackedDomNodes.current);
-        restoreReactScreenshot(
-            ref.current as HTMLElement,
-            reactScreenShot.current as DomScreenShot
-        );
-    }
-
     useRestoreSelection({
+        editor,
         ref,
         range,
         key,
@@ -166,21 +152,16 @@ export const TextInput = ({
                 }}
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
-                onCompositionStart={() => {
-                    composingRef.current = true;
-                }}
+                onCompositionStart={() => (composingRef.current = true)}
                 onCompositionEnd={() => {
                     composingRef.current = false;
-                    setTimeout(() => {
-                        setRender(render + 1);
-                    });
+                    setTimeout(() => setRender(render + 1));
                 }}
-                style={{
-                    outline: 'none',
-                    padding: style.padding,
-                }}
+                style={{ outline: 'none', padding: style.padding }}
             >
                 <TextRenderer
+                    didRender={() => resetChangesTracking(changesTracker)}
+                    willRender={() => restoreDom(changesTracker)}
                     hashedKey={key}
                     stringText={currentSavedText}
                     onChange={handleMarkChange}

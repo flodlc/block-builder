@@ -1,80 +1,98 @@
-import { RefObject, useLayoutEffect, useRef } from 'react';
+import { MutableRefObject, RefObject, useLayoutEffect, useRef } from 'react';
 
-type TrackedNodes = Map<Node, TrackedNode>;
-type TrackedNode = { node: Node; isReact: boolean; isInDom: boolean };
+type DomChanges = { func: () => void; log: any }[];
+type ChangesTracker = { observer: MutationObserver; domChanges: DomChanges };
 
-export const clearTrackedDomNodes = (trackedDomNodes: TrackedNodes) => {
-    Array.from(trackedDomNodes.values()).forEach((trackedNode) => {
-        if (!trackedNode.isReact && trackedNode.isInDom) {
-            trackedNode.node.parentElement?.removeChild(trackedNode.node);
-        }
-    });
-    trackedDomNodes.clear();
-};
-
-export const useTrackDomNodes = (ref: RefObject<HTMLDivElement>) => {
-    const observer = useRef<MutationObserver>();
-    useLayoutEffect(() => {
-        observer.current?.takeRecords();
+export const useTrackDomChanges = (ref: RefObject<HTMLDivElement>) => {
+    const changesTracker = useRef<ChangesTracker>({
+        observer: undefined as unknown as MutationObserver,
+        domChanges: [],
     });
 
-    const trackedNodes = useRef(new Map() as TrackedNodes);
-
     useLayoutEffect(() => {
-        if (!ref.current) return;
-        observer.current =
-            observer.current ??
+        changesTracker.current.observer =
+            changesTracker.current.observer ??
             new MutationObserver((entries) => {
-                trackedNodes.current = getTrackedNodes(
-                    trackedNodes.current,
-                    entries
+                changesTracker.current.domChanges.push(
+                    ...getReversedMutations(entries)
                 );
             });
-        observer.current.observe(ref.current, {
-            childList: true,
-            attributes: false,
-            characterData: false,
-        });
-        return () => observer.current?.disconnect();
-    }, []);
 
-    const entries = observer.current?.takeRecords();
-    trackedNodes.current = getTrackedNodes(trackedNodes.current, entries);
-
-    return trackedNodes;
+        if (ref.current) {
+            changesTracker.current.observer.observe(
+                ref.current as HTMLElement,
+                {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    characterData: true,
+                    characterDataOldValue: true,
+                }
+            );
+        }
+        return () => {
+            changesTracker.current.observer?.disconnect();
+        };
+    }, [ref.current]);
+    changesTracker.current.domChanges.push(
+        ...getReversedMutations(
+            changesTracker.current.observer?.takeRecords() ?? []
+        )
+    );
+    return changesTracker;
 };
 
-const getTrackedNodes = (
-    trackedNodes: TrackedNodes,
-    entries: MutationRecord[] = []
-) => {
-    const trackedNodesClone = new Map(trackedNodes);
+const getReversedMutations = (entries: MutationRecord[]) => {
+    const domChanges = [] as { func: () => void; log: any }[];
     entries.forEach((entry) => {
-        entry.addedNodes.forEach((node) => {
-            const trackedNode = trackedNodesClone.get(node);
-            if (trackedNode) {
-                trackedNode.isInDom = true;
-            } else {
-                trackedNodesClone.set(node, {
-                    node,
-                    isReact: false,
-                    isInDom: true,
-                });
-            }
-        });
+        if (entry.type === 'characterData') {
+            domChanges.push({
+                func: () =>
+                    (entry.target as Text).replaceData(
+                        0,
+                        entry.target.textContent?.length ?? 0,
+                        entry.oldValue ?? ''
+                    ),
+                log: { type: 'replace text', value: entry.oldValue },
+            });
+        }
 
-        entry.removedNodes.forEach((node) => {
-            const trackedNode = trackedNodesClone.get(node);
-            if (!trackedNode) {
-                trackedNodesClone.set(node, {
-                    node,
-                    isReact: true,
-                    isInDom: false,
+        if (entry.type === 'childList') {
+            if (entry.addedNodes.length) {
+                entry.addedNodes.forEach((addedNode) => {
+                    domChanges.push({
+                        func: () => entry.target?.removeChild(addedNode),
+                        log: { type: 'remove', addedNode },
+                    });
                 });
-            } else {
-                trackedNode.isInDom = false;
             }
-        });
+            if (entry.removedNodes.length) {
+                entry.removedNodes.forEach((removedNode) => {
+                    domChanges.push({
+                        func: () =>
+                            entry.target?.insertBefore(
+                                removedNode,
+                                entry.nextSibling
+                            ),
+                        log: { type: 'insert', removedNode },
+                    });
+                });
+            }
+        }
     });
-    return trackedNodesClone;
+    return domChanges;
+};
+
+export const resetChangesTracking = (
+    changesTracker: MutableRefObject<ChangesTracker>
+) => {
+    changesTracker.current.domChanges = [];
+    changesTracker.current.observer?.takeRecords();
+};
+
+export const restoreDom = (
+    changesTracker: MutableRefObject<ChangesTracker>
+) => {
+    changesTracker.current.domChanges.reverse().forEach((item) => item.func());
+    changesTracker.current.domChanges = [];
 };
