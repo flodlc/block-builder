@@ -2,7 +2,6 @@ import { Mark } from '../../model/types';
 import React, { RefObject, useLayoutEffect, useRef } from 'react';
 
 export const NodeView = ({
-    mark,
     children,
 }: {
     mark: Mark;

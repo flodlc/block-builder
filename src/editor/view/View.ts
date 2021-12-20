@@ -25,7 +25,6 @@ export class View {
             ...this.decorations,
             [decoration.nodeId]: [...nodeDecorations, decoration],
         };
-        // this.editor.trigger('decorationsChanged');
     }
 
     clearDecorations(key?: string) {
@@ -40,7 +39,6 @@ export class View {
                 : undefined;
         });
         this.decorations = newDecorationsRecord;
-        // this.editor.trigger('decorationsChanged');
     }
 
     isDecorated(selection: TextSelection) {

@@ -41,7 +41,6 @@ export const MentionDecoration = ({
                 contentEditable={false}
                 style={{
                     height: '1px',
-                    opacity: 0.4,
                     display: 'inline-block',
                     width: '1px',
                     overflow: 'hidden',

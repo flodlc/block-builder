@@ -1,13 +1,23 @@
 import { RefObject, useLayoutEffect, useRef } from 'react';
 
+export type DomScreenShot = { node: Node; text?: string }[];
+
 export const useReactScreenshot = (
     ref: RefObject<HTMLDivElement>,
     willUpdate: boolean
 ) => {
-    const screenshot = useRef<Node[]>();
+    const screenshot = useRef<DomScreenShot>();
     useLayoutEffect(() => {
         if (willUpdate || !screenshot.current) {
-            screenshot.current = Array.from(ref.current?.childNodes ?? []);
+            screenshot.current = Array.from(ref.current?.childNodes ?? []).map(
+                (node) => ({
+                    node,
+                    text:
+                        node.nodeType === 3
+                            ? node.textContent ?? undefined
+                            : undefined,
+                })
+            );
         }
     });
 
@@ -21,13 +31,30 @@ export const useReactScreenshot = (
 
 export const restoreReactScreenshot = (
     element: HTMLElement,
-    screenshot: Node[]
+    screenshot: DomScreenShot
 ) => {
     for (let i = screenshot.length - 1; i >= 0; i--) {
-        const node = screenshot[i] ?? null;
-        const nextNode = screenshot[i + 1] ?? null;
-        if (node.nextSibling !== nextNode) {
-            element?.insertBefore(node, nextNode);
+        const nodeScreenShot = screenshot[i];
+        const nextNodeScreenShot = screenshot[i + 1];
+        if (
+            nodeScreenShot.node.nextSibling !== nextNodeScreenShot?.node ??
+            null
+        ) {
+            element?.insertBefore(
+                nodeScreenShot.node,
+                nextNodeScreenShot?.node ?? null
+            );
+        }
+        if (
+            nodeScreenShot.node.nodeType === 3 &&
+            nodeScreenShot.node.textContent !== nodeScreenShot.text
+        ) {
+            const textNode = nodeScreenShot.node as Text;
+            textNode.replaceData(
+                0,
+                textNode.length,
+                nodeScreenShot.text as string
+            );
         }
     }
 };

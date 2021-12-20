@@ -8,7 +8,6 @@ import { HistoryShortcutsPlugin } from '../editor/view/corePlugins/historyShortc
 import { CalloutPlugin } from '../plugins/callout/callout.plugin';
 import { TextPlugin } from '../plugins/text/text.plugin';
 import { BoldPlugin } from '../plugins/bold/bold.plugin';
-import { boldApi } from '../plugins/bold/bold.api';
 import { BlockSelectionShortcutsPlugin } from '../plugins/blockSelectionShortcuts/blockSelectionShortcuts.plugin';
 import { ArrowNavigationPlugin } from '../editor/view/corePlugins/arrowNavigation/arrowNavigation.plugin';
 import { CopyPastePlugin } from '../plugins/copyPaste/copyPaste.plugin';
@@ -21,7 +20,6 @@ import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
 import { Node } from '../editor/model/types';
 import { ItalicPlugin } from '../plugins/italic/italic.plugin';
-import { italicApi } from '../plugins/italic/italic.api';
 import { balloonPlugin } from '../plugins/balloon/balloon.plugin';
 import { Balloon } from './Balloon';
 import { createEditorApi } from './editorApi';
@@ -61,7 +59,6 @@ function Playground() {
     };
 
     const editorApi = createEditorApi(editor);
-    console.log(editorApi);
 
     return (
         <div className="editor">

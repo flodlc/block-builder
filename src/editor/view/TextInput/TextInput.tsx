@@ -22,6 +22,7 @@ import {
 import { useRestoreSelection } from './hooks/useRestoreSelection';
 import { useRenderingKey } from './hooks/useRenderingKey';
 import {
+    DomScreenShot,
     restoreReactScreenshot,
     useReactScreenshot,
 } from './hooks/useReactScreenshot';
@@ -135,7 +136,7 @@ export const TextInput = ({
         clearTrackedDomNodes(trackedDomNodes.current);
         restoreReactScreenshot(
             ref.current as HTMLElement,
-            reactScreenShot.current as Node[]
+            reactScreenShot.current as DomScreenShot
         );
     }
 
@@ -165,7 +166,9 @@ export const TextInput = ({
                 }}
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
-                onCompositionStart={() => (composingRef.current = true)}
+                onCompositionStart={() => {
+                    composingRef.current = true;
+                }}
                 onCompositionEnd={() => {
                     composingRef.current = false;
                     setTimeout(() => {
@@ -178,7 +181,6 @@ export const TextInput = ({
                 }}
             >
                 <TextRenderer
-                    // key={key}
                     hashedKey={key}
                     stringText={currentSavedText}
                     onChange={handleMarkChange}
