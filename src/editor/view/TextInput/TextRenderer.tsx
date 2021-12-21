@@ -94,7 +94,6 @@ export const TextRenderer = React.memo(
             }, value) as MarkedText);
 
         let pos = 0;
-
         return (
             <>
                 {decoratedText &&

@@ -45,7 +45,7 @@ export const TextInput = ({
     const editor = useContext(EditorContext);
     const ref = useRef<HTMLDivElement>(null);
     const composingRef = useRef<boolean>(false);
-    const decorations = useNodeDecorations({ nodeId });
+    const decorations = useNodeDecorations({ nodeId, editor });
     const currentSavedText = useLastValue(value);
     const [render, setRender] = useState(0);
 

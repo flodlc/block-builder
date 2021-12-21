@@ -149,7 +149,7 @@ export const PLAYGROUND_DATA = {
                     },
                 ],
             },
-            ...new Array(600).fill(0).flatMap(() => [
+            ...new Array(0).fill(0).flatMap(() => [
                 {
                     s: 'bold ',
                     m: [

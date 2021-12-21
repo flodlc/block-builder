@@ -57,6 +57,7 @@ export const MentionPlugin: PluginFactory =
                         selection.range[0]
                     ),
                 });
+                editor.trigger('decorationsChanged');
                 return true;
             });
         };

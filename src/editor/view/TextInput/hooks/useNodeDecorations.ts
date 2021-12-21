@@ -1,13 +1,24 @@
 import { useContext, useEffect, useState } from 'react';
 import { ViewContext } from '../../contexts/ViewContext';
 import { Decoration } from '../../types';
+import { Editor } from '../../../model/Editor';
 
-export const useNodeDecorations = ({ nodeId }: { nodeId: string }) => {
+export const useNodeDecorations = ({
+    nodeId,
+    editor,
+}: {
+    nodeId: string;
+    editor: Editor;
+}) => {
     const view = useContext(ViewContext);
-    const [decorations, setDecorations] = useState<Decoration[]>();
+    const [_, setDecorations] = useState<Decoration[]>();
 
     useEffect(() => {
-        setDecorations(view.decorations[nodeId]);
-    });
-    return decorations;
+        const handler = () => setDecorations(view.decorations[nodeId]);
+        editor.on('decorationsChanged', handler);
+        return () => {
+            editor.off('decorationsChanged', handler);
+        };
+    }, []);
+    return view.decorations[nodeId];
 };
