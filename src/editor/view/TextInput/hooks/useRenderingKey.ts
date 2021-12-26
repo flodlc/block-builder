@@ -1,16 +1,19 @@
 import { RefObject, useRef, useState } from 'react';
 import { Decoration } from '../../types';
 import { MarkedText } from '../../../model/types';
+import { getInputDiff } from '../utils/getInputDiff';
 
 export const useRenderingKey = ({
     ref,
     value,
+    currentSavedText,
     decorations,
     composing,
     domChanged,
 }: {
     ref: RefObject<HTMLDivElement>;
     value: MarkedText;
+    currentSavedText: string;
     decorations: Decoration[] | undefined;
     composing: boolean;
     domChanged: boolean;
@@ -25,15 +28,22 @@ export const useRenderingKey = ({
         composing
     );
 
-    if (ref.current) {
-        if (
-            !composing &&
-            (domChanged || changedProps.value || changedProps.decorations)
-        ) {
-            key.current = Math.random();
-            return { key: key.current, willUpdate: true };
-        }
+    if (!ref.current) return { key: key.current, willUpdate: false };
+
+    const needsRender = getInputDiff(
+        currentSavedText,
+        ref.current as HTMLElement
+    );
+
+    if (
+        needsRender ||
+        (!composing &&
+            (domChanged || changedProps.value || changedProps.decorations))
+    ) {
+        key.current = Math.random();
+        return { key: key.current, willUpdate: true };
     }
+
     return { key: key.current, willUpdate: false };
 };
 

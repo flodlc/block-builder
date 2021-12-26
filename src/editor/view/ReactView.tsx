@@ -6,6 +6,7 @@ import { ViewContext } from './contexts/ViewContext';
 import { Plugin, RegisteredPlugin } from './plugin/types';
 import { registerPlugins } from './plugin/registerPlugins';
 import { View } from './View';
+import { useEventManager } from './useEventManager';
 
 export const ReactView = ({
     editor,
@@ -24,9 +25,11 @@ export const ReactView = ({
         RegisteredPlugin[] | undefined
     >(undefined);
 
+    const eventManager = useEventManager();
+
     useLayoutEffect(() => {
         if (!ref.current) return;
-        const view = new View(editor, ref.current);
+        const view = new View(editor, ref.current, eventManager);
         const registeredPlugins = registerPlugins({
             editor,
             plugins,

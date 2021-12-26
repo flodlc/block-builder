@@ -11,6 +11,7 @@ export const useNodeDecorations = ({
     editor: Editor;
 }) => {
     const view = useContext(ViewContext);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, setDecorations] = useState<Decoration[]>();
 
     useEffect(() => {

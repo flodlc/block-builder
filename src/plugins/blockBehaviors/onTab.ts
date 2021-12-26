@@ -1,15 +1,16 @@
-import { unwrap } from './unwrap';
 import { wrapInPrevious } from './wrapIn';
 import { Editor } from '../../editor/model/Editor';
 import { TextSelection } from '../../editor/model/Selection';
+import { unwrap } from './unwrap';
 
-export const onTab = ({ e, editor }: { e: KeyboardEvent; editor: Editor }) => {
+export const onTab = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.shiftKey) {
-        editor.runCommand(unwrap({ nodeId: selection.nodeId }));
-    } else {
-        editor.runCommand(wrapInPrevious({ nodeId: selection.nodeId }));
-    }
+    editor.runCommand(wrapInPrevious({ nodeId: selection.nodeId }));
+    return true;
+};
+
+export const onBackTab = ({ editor }: { editor: Editor }) => {
+    const selection = editor.state.selection as TextSelection;
+    editor.runCommand(unwrap({ nodeId: selection.nodeId }));
+    return true;
 };

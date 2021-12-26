@@ -2,13 +2,7 @@ import { Editor } from '../../editor/model/Editor';
 import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
 import { TextSelection } from '../../editor/model/Selection';
 
-export const onEnter = ({
-    e,
-    editor,
-}: {
-    e: KeyboardEvent;
-    editor: Editor;
-}) => {
+export const onEnter = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
     const newNode = editor.schema.text.create();
@@ -18,7 +12,7 @@ export const onEnter = ({
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[node.id].parentId
         );
-        if (!parentId) return;
+        if (!parentId) return false;
         const previousId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[node.id].previousId
         );
@@ -30,14 +24,12 @@ export const onEnter = ({
         })
             .focus(selection.clone())
             .dispatch();
-        e.preventDefault();
-        e.stopPropagation();
-        return;
+        return true;
     } else if (!node.childrenIds?.length) {
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[node.id].parentId
         );
-        if (!parentId) return;
+        if (!parentId) return false;
 
         tr.insertAfter({
             node: newNode,
@@ -60,6 +52,5 @@ export const onEnter = ({
         .focus(new TextSelection(newNode.id, [0, 0]))
         .dispatch();
 
-    e.preventDefault();
-    e.stopPropagation();
+    return true;
 };

@@ -4,26 +4,22 @@ import { TextSelection } from '../../editor/model/Selection';
 import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
 
-export const onBackspace = ({
-    editor,
-    e,
-}: {
-    editor: Editor;
-    e: KeyboardEvent;
-}) => {
+export const onBackspace = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
-    if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0) return;
+    if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0)
+        return false;
 
-    if (tryUnwrap({ e, editor })) {
-        return;
-    } else if (tryReset({ e, editor })) {
-        return;
-    } else if (tryRemove({ e, editor })) {
-        return;
+    if (tryReset({ editor })) {
+        return true;
+    } else if (tryUnwrap({ editor })) {
+        return true;
+    } else if (tryRemove({ editor })) {
+        return true;
     }
+    return false;
 };
 
-const tryReset = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
+const tryReset = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
 
@@ -35,14 +31,12 @@ const tryReset = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
                 patch: editor.schema.text.patch(node),
             })
             .dispatch();
-        e.preventDefault();
-        e.stopPropagation();
         return true;
     }
     return false;
 };
 
-const tryUnwrap = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
+const tryUnwrap = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
 
     const parentId = editor.runQuery(
@@ -58,13 +52,10 @@ const tryUnwrap = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     )
         return false;
     const unwrapped = editor.runCommand(unwrap({ nodeId: selection.nodeId }));
-    if (unwrapped === false) return false;
-    e.preventDefault();
-    e.stopPropagation();
-    return true;
+    return unwrapped !== false;
 };
 
-const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
+const tryRemove = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
 
@@ -131,8 +122,5 @@ const tryRemove = ({ editor, e }: { editor: Editor; e: KeyboardEvent }) => {
     }
 
     transaction.dispatch();
-
-    e.preventDefault();
-    e.stopPropagation();
     return true;
 };

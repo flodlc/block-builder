@@ -20,6 +20,7 @@ export const useRestoreSelection = ({
     composing: boolean;
     updateRange: (range: Range) => void;
 }) => {
+    const firstRender = useRef(true);
     const timeout = useRef<NodeJS.Timeout>();
     const saveDomSelection = () => {
         if (timeout.current) return;
@@ -37,10 +38,11 @@ export const useRestoreSelection = ({
     }, [saveDomSelection]);
 
     useLayoutEffect(() => {
-        if (!ref.current || composing || !range) return;
+        if (!ref.current || !range) return;
         restoreSelectionIfNeeded(
             ref.current as HTMLDivElement,
-            (editor.state.selection as TextSelection)?.range
+            (editor.state.selection as TextSelection)?.range,
+            composing
         );
         if (timeout.current) clearTimeout(timeout.current);
         if (range[0] !== range[1]) return;
@@ -49,25 +51,39 @@ export const useRestoreSelection = ({
         timeout.current = setTimeout(() => {
             debouncedRestoreSelectionIfNeeded(
                 ref.current as HTMLDivElement,
-                editor
+                editor,
+                composing
             );
             timeout.current = undefined;
         }, 0);
     }, [key, range]);
+
+    useLayoutEffect(() => {
+        firstRender.current = false;
+    });
 };
 
-const restoreSelectionIfNeeded = (container: HTMLDivElement, range?: Range) => {
+const restoreSelectionIfNeeded = (
+    container: HTMLDivElement,
+    range: Range,
+    composing: boolean
+) => {
     if (!container) return;
+    if (!range) return;
     const currentRange = getElementSelection(container);
+    const force = range && !currentRange;
+    if (composing && !force) return;
+
     if (TextSelection.areSameRange(currentRange, range)) return;
     restoreSelection(container, range);
 };
 
 const debouncedRestoreSelectionIfNeeded = _.debounce(
-    (container: HTMLDivElement, editor: Editor) =>
+    (container: HTMLDivElement, editor: Editor, composing: boolean) =>
         restoreSelectionIfNeeded(
             container,
-            (editor.state.selection as TextSelection)?.range
+            (editor.state.selection as TextSelection)?.range,
+            composing
         ),
     20,
     { leading: false, trailing: true }

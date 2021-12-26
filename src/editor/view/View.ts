@@ -4,19 +4,41 @@ import { Editor } from '../model/Editor';
 import React from 'react';
 import { getRange } from './TextInput/utils/restoreSelection';
 
+export type EventManager = {
+    record: (
+        {
+            type,
+            nodeId,
+        }: { type: 'keydown' | 'beforeinput' | 'input'; nodeId?: string },
+        event: Event
+    ) => void;
+    inputFrame: { type: string } | undefined;
+    observers: Record<string, { nodeId?: string; callback: () => boolean }[]>;
+    on: (
+        { type, nodeId }: { type: string; nodeId?: string },
+        callback: () => boolean
+    ) => void;
+    off: (
+        { type, nodeId }: { type: string; nodeId?: string },
+        callback: () => boolean
+    ) => void;
+};
+
 export class View {
     editor: Editor;
     dom: HTMLElement;
     marks: Record<string, any>;
     blocks: Record<string, React.FC<BlockComponentAttrs>>;
     decorations: Record<string, Decoration[]>;
+    eventManager: EventManager;
 
-    constructor(editor: Editor, dom: HTMLElement) {
+    constructor(editor: Editor, dom: HTMLElement, eventManager: EventManager) {
         this.editor = editor;
         this.dom = dom;
         this.marks = {};
         this.blocks = {};
         this.decorations = {};
+        this.eventManager = eventManager;
     }
 
     addDecoration(decoration: Decoration) {

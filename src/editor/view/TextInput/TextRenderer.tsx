@@ -70,13 +70,10 @@ export const TextRenderer = React.memo(
         onChange: (text: MarkedText) => void;
         schema: CompiledSchema;
         willRender: () => void;
-        didRender: () => void;
+        didRender?: () => void;
     }) => {
         willRender();
-        useLayoutEffect(() => {
-            didRender();
-        });
-
+        useLayoutEffect(() => didRender());
         const getUpdateMark =
             ({ from, to }: { from: number; to: number }) =>
             (mark: Mark) => {

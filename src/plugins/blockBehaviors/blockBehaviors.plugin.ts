@@ -1,40 +1,31 @@
 import { PluginFactory } from '../../editor/view/plugin/types';
 import { onBackspace } from './onBackspace';
-import { onTab } from './onTab';
 import { onEnter } from './onEnter';
 import { onDelete } from './onDelete';
-
-const isMobile = window.innerWidth < 900;
+import { onBackTab, onTab } from './onTab';
 
 export const BlockBehaviorsPlugin: PluginFactory =
     () =>
-    ({ dom, editor }) => {
-        const keydownHandler = (e: KeyboardEvent) => {
-            if (!editor.state.selection?.isText()) return;
+    ({ editor, view }) => {
+        const enterHandler = () => onEnter({ editor });
+        const backspaceHandler = () => onBackspace({ editor });
+        const onDeleteHandler = () => onDelete({ editor });
+        const onTabHandler = () => onTab({ editor });
+        const onBackTabHandler = () => onBackTab({ editor });
 
-            switch (e.key) {
-                case 'Backspace':
-                    onBackspace({ e, editor });
-                    break;
-                case 'Tab':
-                    onTab({ e, editor });
-                    break;
-                case 'Delete':
-                    onDelete({ e, editor });
-                    break;
-                case 'Enter':
-                    if (!e.shiftKey || isMobile) {
-                        onEnter({ e, editor });
-                    }
-                    break;
-            }
-        };
-
-        dom.addEventListener('keydown', keydownHandler);
+        view.eventManager.on({ type: 'Enter' }, enterHandler);
+        view.eventManager.on({ type: 'Backspace' }, backspaceHandler);
+        view.eventManager.on({ type: 'Delete' }, onDeleteHandler);
+        view.eventManager.on({ type: 'Tab' }, onTabHandler);
+        view.eventManager.on({ type: 'BackTab' }, onBackTabHandler);
         return {
             key: 'jumps',
             destroy: () => {
-                dom.removeEventListener('keydown', keydownHandler);
+                view.eventManager.off({ type: 'Enter' }, enterHandler);
+                view.eventManager.off({ type: 'Backspace' }, backspaceHandler);
+                view.eventManager.off({ type: 'Delete' }, onDeleteHandler);
+                view.eventManager.off({ type: 'Tab' }, onTabHandler);
+                view.eventManager.off({ type: 'BackTab' }, onBackTabHandler);
             },
         };
     };

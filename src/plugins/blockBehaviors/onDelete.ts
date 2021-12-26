@@ -3,13 +3,7 @@ import { TextSelection } from '../../editor/model/Selection';
 import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
 import { TransactionBuilder } from '../../editor/transaction/TransactionBuilder';
 
-export const onDelete = ({
-    editor,
-    e,
-}: {
-    editor: Editor;
-    e: KeyboardEvent;
-}) => {
+export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
     const textLength = selection.getTextLength(editor.state);
 
@@ -17,7 +11,7 @@ export const onDelete = ({
         selection?.range?.[0] !== textLength ||
         selection?.range?.[1] !== textLength
     )
-        return;
+        return false;
 
     const node = editor.state.nodes[selection.nodeId];
 
@@ -35,7 +29,7 @@ export const onDelete = ({
         const parentId = editor.runQuery(
             (resolvedState) => resolvedState.nodes[nextId].parentId
         );
-        if (!parentId) return;
+        if (!parentId) return false;
         unwrapChildren({ nodeId: nextId, editor, transaction });
         transaction
             .patch({
@@ -47,8 +41,7 @@ export const onDelete = ({
             .removeFrom({ nodeId: nextId, parentId });
     }
     transaction.focus(selection.clone()).dispatch();
-    e.preventDefault();
-    e.stopPropagation();
+    return true;
 };
 
 const unwrapChildren = ({

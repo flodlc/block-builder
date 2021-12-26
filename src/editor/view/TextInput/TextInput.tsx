@@ -12,16 +12,17 @@ import { getElementSelection } from './utils/getElementSelection';
 import { Range, TextSelection } from '../../model/Selection';
 import { PlaceholderWrapper } from './Placeholder';
 import { useNodeDecorations } from './hooks/useNodeDecorations';
-import { useLastValue } from './hooks/useLastValue';
+import { useTextFromValue } from './hooks/useTextFromValue';
 import { useTrailingElements } from './hooks/useTrailingElements';
-import { useHandler } from './actions/useHander';
-import {
-    resetChangesTracking,
-    restoreDom,
-    useTrackDomChanges,
-} from './hooks/useTrackDomNodes';
+import { useTrackDomChanges } from './hooks/useTrackDomNodes';
 import { useRestoreSelection } from './hooks/useRestoreSelection';
 import { useRenderingKey } from './hooks/useRenderingKey';
+import { ViewContext } from '../contexts/ViewContext';
+import { useBackspaceHandler } from './hooks/useBackspaceHandler';
+import { useInputHander } from './hooks/useInputHander';
+import { useEventHandlers } from './hooks/useEventHandlers';
+import { useDeleteHandler } from './hooks/useDeleteHandler';
+import { useSoftBreakHandler } from './hooks/useSoftBreakHandler';
 
 export const TextInput = ({
     onChange = () => false,
@@ -43,10 +44,12 @@ export const TextInput = ({
     contentEditable?: boolean;
 }) => {
     const editor = useContext(EditorContext);
+    const view = useContext(ViewContext);
     const ref = useRef<HTMLDivElement>(null);
+    const firstLoadTime = useRef(Date.now());
     const composingRef = useRef<boolean>(false);
     const decorations = useNodeDecorations({ nodeId, editor });
-    const currentSavedText = useLastValue(value);
+    const currentSavedText = useTextFromValue(value);
     const [render, setRender] = useState(0);
 
     const onInput = (newValue: MarkedText, newRange?: Range) => {
@@ -65,63 +68,68 @@ export const TextInput = ({
         tr.dispatch();
     };
 
-    const handler = useHandler();
-    const handleNativeKeyDown = (e: KeyboardEvent) => {
-        if (!range) return;
-        const handledStatus = handler({
-            e,
-            editor,
-            element: ref.current as HTMLElement,
-            value,
-            range,
-            previousText: currentSavedText,
-        });
-        if (!handledStatus?.value) return;
-        onInput(handledStatus.value, handledStatus.range);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) =>
-        handleNativeKeyDown(e.nativeEvent);
-
-    const handleInput = async (e: InputEvent | Event) => {
-        if (!range) return;
-        const handledStatus = handler({
-            e,
-            editor,
-            element: ref.current as HTMLElement,
-            value,
-            range,
-            previousText: currentSavedText,
-        });
-        if (!handledStatus?.value) {
-            if (e.type === 'input') setRender(render + 1);
-            return;
-        }
-        onInput(handledStatus.value, handledStatus.range);
-    };
-
-    useLayoutEffect(() => {
-        ref.current?.addEventListener('beforeinput', handleInput);
-        return () =>
-            ref.current?.removeEventListener('beforeinput', handleInput);
-    }, [ref.current, handleInput]);
-
-    useLayoutEffect(() => {
-        ref.current?.addEventListener('input', handleInput);
-        return () => ref.current?.removeEventListener('input', handleInput);
-    }, [ref.current, handleInput]);
-
     const handleMarkChange = (markedText: MarkedText) =>
         onInput(markedText, undefined);
 
-    const changesTracker = useTrackDomChanges(ref);
+    const changesTracker = useTrackDomChanges(ref, () => {
+        // we wait 50ms before allowing dom mutations to prevent weird behaviors on android enter
+        if (
+            Date.now() - firstLoadTime.current < 50 ||
+            !view.eventManager.inputFrame
+        ) {
+            setRender(Math.random());
+            return false;
+        }
+        return true;
+    });
+
+    useEventHandlers({ view, nodeId, ref });
+
+    useSoftBreakHandler({
+        ref,
+        value,
+        view,
+        range,
+        onInput,
+        nodeId,
+    });
+
+    useBackspaceHandler({
+        ref,
+        value,
+        view,
+        range,
+        onInput,
+        nodeId,
+    });
+
+    useDeleteHandler({
+        ref,
+        value,
+        view,
+        range,
+        onInput,
+        nodeId,
+    });
+
+    useInputHander({
+        ref,
+        value,
+        currentSavedText,
+        view,
+        onInput,
+        nodeId,
+    });
+
     useTrailingElements(ref);
+    useLayoutEffect(() => changesTracker.current.listen());
 
     const { key } = useRenderingKey({
         ref,
         value,
         decorations,
         composing: composingRef.current,
+        currentSavedText,
         domChanged: !!changesTracker.current.domChanges.length,
     });
 
@@ -143,13 +151,6 @@ export const TextInput = ({
             <div
                 ref={ref}
                 className="editable_content"
-                onKeyDown={handleKeyDown}
-                onKeyDownCapture={(e: React.KeyboardEvent) => {
-                    if (e.nativeEvent.isComposing) {
-                        // bug in chrome when composing: keydown is fired twice on enter.
-                        e.stopPropagation();
-                    }
-                }}
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
                 onCompositionStart={() => (composingRef.current = true)}
@@ -160,8 +161,11 @@ export const TextInput = ({
                 style={{ outline: 'none', padding: style.padding }}
             >
                 <TextRenderer
-                    didRender={() => resetChangesTracking(changesTracker)}
-                    willRender={() => restoreDom(changesTracker)}
+                    willRender={() => {
+                        changesTracker.current.pause();
+                        changesTracker.current.restoreChildren();
+                        changesTracker.current.restoreDom();
+                    }}
                     hashedKey={key}
                     stringText={currentSavedText}
                     onChange={handleMarkChange}

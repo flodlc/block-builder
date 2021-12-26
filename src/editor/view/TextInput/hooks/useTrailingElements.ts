@@ -8,9 +8,7 @@ export const useTrailingElements = (ref: RefObject<HTMLDivElement>) => {
         const br = document.createElement('BR');
         br.setAttribute('data-ignore', 'true');
 
-        return {
-            br,
-        };
+        return { br };
     }, []);
 
     useLayoutEffect(() => {
