@@ -12,7 +12,6 @@ export type EventManager = {
         }: { type: 'keydown' | 'beforeinput' | 'input'; nodeId?: string },
         event: Event
     ) => void;
-    inputFrame: { type: string } | undefined;
     observers: Record<string, { nodeId?: string; callback: () => boolean }[]>;
     on: (
         { type, nodeId }: { type: string; nodeId?: string },

@@ -4,7 +4,6 @@ import _ from 'lodash';
 
 export const useEventManager = () => {
     const observable = useRef<EventManager>({
-        inputFrame: undefined,
         observers: {
             Enter: [],
             SoftBreak: [],
@@ -57,9 +56,6 @@ export const useEventManager = () => {
                 }
             } else if (type === 'beforeinput') {
                 const event = e as InputEvent;
-                observable.current.inputFrame = {
-                    type: event.inputType,
-                };
                 let handled = false;
                 if (
                     event.inputType === 'insertParagraph' ||
@@ -72,12 +68,14 @@ export const useEventManager = () => {
                     handled = trigger('Delete', nodeId);
                 }
                 if (handled) {
-                    observable.current.inputFrame = undefined;
                     e.preventDefault();
                     e.stopPropagation();
                 }
             } else if (type === 'input') {
-                observable.current.inputFrame = undefined;
+                const event = e as InputEvent;
+                if (['deleteCompositionText'].includes(event.inputType)) {
+                    return;
+                }
                 const handled = trigger('input', nodeId);
                 if (handled) {
                     // e.stopPropagation();

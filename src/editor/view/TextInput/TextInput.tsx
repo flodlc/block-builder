@@ -73,10 +73,7 @@ export const TextInput = ({
 
     const changesTracker = useTrackDomChanges(ref, () => {
         // we wait 50ms before allowing dom mutations to prevent weird behaviors on android enter
-        if (
-            Date.now() - firstLoadTime.current < 50 ||
-            !view.eventManager.inputFrame
-        ) {
+        if (Date.now() - firstLoadTime.current < 50) {
             setRender(Math.random());
             return false;
         }
