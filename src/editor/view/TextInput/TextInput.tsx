@@ -71,14 +71,24 @@ export const TextInput = ({
     const handleMarkChange = (markedText: MarkedText) =>
         onInput(markedText, undefined);
 
-    const changesTracker = useTrackDomChanges(ref, () => {
-        // we wait 50ms before allowing dom mutations to prevent weird behaviors on android enter
-        if (Date.now() - firstLoadTime.current < 50) {
+    const changesTracker = useTrackDomChanges(ref, (domChanges) => {
+        const cancel =
+            Date.now() - firstLoadTime.current < 50 ||
+            // we wait 50ms before allowing dom mutations to prevent weird behaviors on android enter
+            domChanges.some((domchange) => domchange.type === 'added_element');
+        if (cancel) {
             setRender(Math.random());
             return false;
         }
         return true;
     });
+
+    useLayoutEffect(() => {
+        if (nodeId === 'bd80a80b-177c-4df4-a34d-55ed10d3cc5d') {
+            // @ts-ignore
+            window.aa = changesTracker;
+        }
+    }, []);
 
     useEventHandlers({ view, nodeId, ref });
 
@@ -119,7 +129,9 @@ export const TextInput = ({
     });
 
     useTrailingElements(ref);
-    useLayoutEffect(() => changesTracker.current.listen());
+    useLayoutEffect(() => {
+        changesTracker.current.listen();
+    });
 
     const { key } = useRenderingKey({
         ref,

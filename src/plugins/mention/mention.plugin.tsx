@@ -26,7 +26,7 @@ export const MentionPlugin: PluginFactory =
 
             if (!editor.state.selection?.isText()) return;
             const selection = editor.state.selection as TextSelection;
-            if (view.isDecorated(selection)) return;
+            // if (view.isDecorated(selection)) return;
 
             const previousText = selection.getTextBefore(editor.state);
             EXPRESSIONS.some((expression) => {
@@ -65,19 +65,21 @@ export const MentionPlugin: PluginFactory =
         const mousedownHandler = () => {
             if (!state) return;
             state = editor.trigger(MENTION_EVENTS.changed, undefined);
+            editor.trigger('decorationsChanged');
         };
 
         const updateDecorationHandler = (suggestionState: MentionPluginState) =>
             updateDecoration({ suggestionState, editor, view });
 
         const changeHandler = () => {
+            // updateDecor({ editor, view });
             const newState = onTr({ editor, state });
             if (!state && !newState) return;
             state = editor.trigger(MENTION_EVENTS.changed, newState);
         };
 
         dom.addEventListener('input', keyDownHandler);
-        dom.addEventListener('mousedown', mousedownHandler);
+        window.addEventListener('mousedown', mousedownHandler);
         editor.on(MENTION_EVENTS.changed, updateDecorationHandler);
         editor.on('tr', changeHandler);
         return {
@@ -95,6 +97,24 @@ export const MentionPlugin: PluginFactory =
             },
         };
     };
+
+const updateDecor = ({ editor, view }: { editor: Editor; view: View }) => {
+    const selection = editor.state.selection as TextSelection;
+    view.clearDecorations('code');
+    const text = selection.getCurrentText(editor.state);
+    let decoStart = 0;
+    text.split('').forEach((char, i) => {
+        if (text.charAt(i + 1) === ' ') {
+            view.addDecoration({
+                key: 'code',
+                nodeId: selection.nodeId,
+                range: [decoStart, i + 1],
+                mark: { t: 'b', d: { color: Math.random() } },
+            });
+            decoStart = i + 2;
+        }
+    });
+};
 
 const updateDecoration = ({
     suggestionState,
@@ -180,8 +200,9 @@ const getSearchText = ({
     if (
         selection.range[0] < searchStartPosition ||
         selection.range[1] > searchEndPosition
-    )
+    ) {
         return undefined;
+    }
 
     return nodeText?.slice(searchStartPosition, searchEndPosition);
 };

@@ -1,9 +1,83 @@
-import React, { ReactElement, useContext, useLayoutEffect } from 'react';
+import React, {
+    memo,
+    ReactElement,
+    RefObject,
+    useContext,
+    useLayoutEffect,
+    useRef,
+} from 'react';
 import { Mark, MarkedText } from '../../model/types';
 import { markText } from '../../transaction/MarkedText/markText';
 import { ViewContext } from '../contexts/ViewContext';
 import { CompiledSchema } from '../../model/schema';
 import { NodeView } from './NodeView';
+
+const MarksWrapper = ({
+    pos,
+    marks,
+    text,
+    onChange,
+    value,
+    schema,
+}: {
+    pos: number;
+    marks?: Mark[];
+    text: string;
+    value?: MarkedText;
+    onChange: (text: MarkedText) => void;
+    schema: CompiledSchema;
+}) => {
+    const getUpdateMark =
+        ({ from, to }: { from: number; to: number }) =>
+        (mark: Mark) => {
+            const updatedMarkedText = markText(value as MarkedText, {
+                mark,
+                range: [from, to],
+            });
+            onChange(updatedMarkedText);
+        };
+    const updateMarkRef = useRef(
+        getUpdateMark({ from: pos, to: pos + text.length })
+    );
+    return (
+        <MarksFactory
+            text={text}
+            marks={marks}
+            updateMarkRef={updateMarkRef}
+            schema={schema}
+        />
+    );
+};
+
+const MarksFactory = memo(
+    ({
+        marks,
+        text,
+        updateMarkRef,
+        schema,
+    }: {
+        marks?: Mark[];
+        text: string;
+        updateMarkRef: RefObject<(mark: Mark) => void>;
+        schema: CompiledSchema;
+    }) => {
+        const updateMark = (mark: Mark) => updateMarkRef.current?.(mark);
+        return (
+            <Marks
+                text={text}
+                marks={marks}
+                updateMark={updateMark}
+                schema={schema}
+            >
+                {text}
+            </Marks>
+        );
+    },
+    (prevProps, props) =>
+        prevProps.text === props.text &&
+        prevProps.marks?.length === props.marks?.length &&
+        JSON.stringify(prevProps.marks) === JSON.stringify(props.marks)
+);
 
 const Marks = ({
     marks,
@@ -74,15 +148,6 @@ export const TextRenderer = React.memo(
     }) => {
         willRender();
         useLayoutEffect(() => didRender());
-        const getUpdateMark =
-            ({ from, to }: { from: number; to: number }) =>
-            (mark: Mark) => {
-                const updatedMarkedText = markText(value as MarkedText, {
-                    mark,
-                    range: [from, to],
-                });
-                onChange(updatedMarkedText);
-            };
 
         const decoratedText =
             value &&
@@ -95,22 +160,18 @@ export const TextRenderer = React.memo(
             <>
                 {decoratedText &&
                     decoratedText.map((markedNode, i) => {
-                        const updateMark = getUpdateMark({
-                            from: pos,
-                            to: pos + markedNode.s.length,
-                        });
+                        const markPos = pos;
                         pos += markedNode.s.length;
-
                         return (
-                            <Marks
+                            <MarksWrapper
                                 key={i}
+                                pos={markPos}
+                                onChange={onChange}
+                                value={value}
                                 text={markedNode.s}
-                                updateMark={updateMark}
                                 marks={markedNode.m}
                                 schema={schema}
-                            >
-                                {markedNode.s}
-                            </Marks>
+                            />
                         );
                     })}
             </>

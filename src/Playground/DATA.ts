@@ -12,7 +12,7 @@ export const BIG_DATA = (() => {
         childrenIds: [],
     };
     nodes['doc'] = docNode;
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 2000; i++) {
         const newNode = schema.text.create();
         newNode.text = [
             {
@@ -151,7 +151,7 @@ export const PLAYGROUND_DATA = {
             },
             ...new Array(0).fill(0).flatMap(() => [
                 {
-                    s: 'bold ',
+                    s: 'bold bold ',
                     m: [
                         {
                             t: 'b',
@@ -159,10 +159,18 @@ export const PLAYGROUND_DATA = {
                     ],
                 },
                 {
-                    s: 'italic ',
+                    s: 'italic italic ',
                     m: [
                         {
                             t: 'i',
+                        },
+                    ],
+                },
+                {
+                    s: 'bold bold \n',
+                    m: [
+                        {
+                            t: 'b',
                         },
                     ],
                 },

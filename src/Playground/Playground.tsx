@@ -23,6 +23,7 @@ import { ItalicPlugin } from '../plugins/italic/italic.plugin';
 import { balloonPlugin } from '../plugins/balloon/balloon.plugin';
 import { Balloon } from './Balloon';
 import { createEditorApi } from './editorApi';
+import { UnderlinePlugin } from '../plugins/underline/underline.plugin';
 
 function Playground() {
     const resetNote = (dataSet: Record<string, Node>) => () => {
@@ -82,6 +83,7 @@ function Playground() {
                     HeadingPlugin(),
                     BoldPlugin(),
                     ItalicPlugin(),
+                    UnderlinePlugin(),
                     BlockSelectionShortcutsPlugin(),
                     ArrowNavigationPlugin(),
                     CopyPastePlugin(),

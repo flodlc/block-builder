@@ -2,15 +2,18 @@ export const getTextNodes = (
     { node, withIgnored = false }: { node: Node; withIgnored?: boolean },
     isRoot = false
 ) => {
-    let nodes: Node[] = [];
+    const nodes: Node[] = [];
     if (node.nodeType === 3) {
-        nodes = node.textContent ? [...nodes, node] : nodes;
+        if (node.textContent) {
+            nodes.push(node);
+        }
+        // nodes = node.textContent ? [...nodes, node] : nodes;
     } else {
         const element = node as HTMLElement;
         if (
             !withIgnored &&
             node.nodeType === 1 &&
-            element.getAttribute('data-ignore')
+            element.matches('[data-ignore="true"]')
         ) {
             return nodes;
         }
@@ -19,14 +22,11 @@ export const getTextNodes = (
             node.nodeType === 1 &&
             (node as HTMLElement).matches('[data-nodeview="true"]')
         ) {
-            nodes = [...nodes, node];
+            nodes.push(node);
         } else {
             for (let i = 0; i < node.childNodes.length; i++) {
                 const child = node.childNodes[i];
-                nodes = [
-                    ...nodes,
-                    ...getTextNodes({ node: child, withIgnored }),
-                ];
+                nodes.push(...getTextNodes({ node: child, withIgnored }));
             }
         }
     }

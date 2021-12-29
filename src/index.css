@@ -45,7 +45,7 @@ hr.text_point {
     font-size: 1em;
     vertical-align: middle;
     color: white;
-    overflow: visible;
+    overflow: hidden;
     display: inline;
     width: 0;
     border:none;
@@ -99,20 +99,6 @@ hr.text_point {
     padding: 3px 6px;
     background: grey;
     border-radius: 4px;
-}
-
-.mention_deco > :first-child {
-    user-select: none;
-    pointer-events: none;
-}
-
-.mention_deco > :first-child > * {
-    display: none;
-}
-
-.mention_deco > :first-child > :last-child {
-    display: inline-block;
-    width: 1px;
 }
 
 .mention_deco .mention_placeholder:after {

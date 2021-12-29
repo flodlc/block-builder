@@ -1,7 +1,6 @@
 import { Mark, MarkedText } from '../../model/types';
 
 export const minifyMarkedText = (text: MarkedText): MarkedText => {
-    // console.trace();
     const minified: MarkedText = [];
     let tempMarks: Mark[] = [];
     let tempString = '' as string;
@@ -37,6 +36,7 @@ function areSameMarkup(marksA: Mark[], marksB: Mark[]) {
     return (
         marksA.length === marksB.length &&
         (marksA.length === 0 ||
+            marksA === marksB ||
             JSON.stringify(marksA) === JSON.stringify(marksB))
     );
 }

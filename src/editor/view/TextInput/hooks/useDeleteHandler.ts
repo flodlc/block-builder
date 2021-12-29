@@ -23,6 +23,7 @@ export const useDeleteHandler = ({
     const deleteHandler = () => {
         const currentRange = getElementSelection(ref.current) ?? range;
         if (!currentRange) return false;
+        if (currentRange[0] !== currentRange[1]) return false;
 
         const newTextState = spliceText({
             text: value,

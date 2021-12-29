@@ -26,6 +26,7 @@ export const useTrackDomChanges = (
         observer: undefined as unknown as MutationObserver,
         listen: () => {
             if (listening.current) return;
+            changesTracker.current.observer.takeRecords();
             changesTracker.current.observer.observe(
                 ref.current as HTMLElement,
                 {
@@ -53,16 +54,21 @@ export const useTrackDomChanges = (
         domChanges: [],
         restoreDom: () => {
             changesTracker.current.domChanges
+                .slice()
                 .reverse()
                 .forEach((item) => item.func());
             changesTracker.current.domChanges = [];
             changesTracker.current.observer?.takeRecords();
         },
         removeAddedElements: () => {
+            const addedElements = [];
             changesTracker.current.domChanges
                 .filter((item) => item.type === 'added_element')
                 .reverse()
-                .forEach((domChange) => domChange.func());
+                .forEach((domChange) => {
+                    addedElements.push(domChange.entry.addedNodes);
+                    domChange.func();
+                });
             changesTracker.current.observer?.takeRecords();
             changesTracker.current.domChanges =
                 changesTracker.current.domChanges.filter(
@@ -97,7 +103,7 @@ export const useTrackDomChanges = (
             changesTracker.current.observer ??
             new MutationObserver((entries) => {
                 const domChanges = getReversedMutations(entries);
-                changesTracker.current.removeAddedElements();
+                // changesTracker.current.removeAddedElements();
                 if (onMutation(domChanges)) {
                     changesTracker.current.domChanges =
                         changesTracker.current.domChanges.concat(domChanges);
@@ -108,7 +114,6 @@ export const useTrackDomChanges = (
                     changesTracker.current.observer.takeRecords();
                 }
             });
-
         return () => {
             changesTracker.current.pause();
         };

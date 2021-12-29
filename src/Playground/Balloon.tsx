@@ -76,6 +76,12 @@ export const Balloon = ({
                 >
                     I
                 </Button>
+                <Button
+                    style={{ color: editorApi.isUnderline() ? '#4747d3' : '' }}
+                    onClick={() => editorApi.toggleUnderline()}
+                >
+                    U
+                </Button>
             </div>
         )
     );
