@@ -1,7 +1,6 @@
 import { Plugin } from './types';
 import { Editor } from '../../model/Editor';
 import { View } from '../View';
-import { compileSchema } from '../../model/schema';
 
 export const registerPlugins = ({
     editor,
@@ -24,12 +23,6 @@ export const registerPlugins = ({
             ...view.marks,
             ...registeredPlugin.addMarks?.(),
         };
-        view.editor.schema = compileSchema({
-            schema: {
-                ...view.editor.schema,
-                ...registeredPlugin.addSchema?.(),
-            },
-        });
         return registeredPlugin;
     });
 };

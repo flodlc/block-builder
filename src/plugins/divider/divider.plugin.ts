@@ -7,12 +7,5 @@ export const DividerPlugin: PluginFactory = () => () => {
         addBlocks: () => ({
             divider: Divider,
         }),
-        addSchema: () => ({
-            divider: {
-                attrs: {},
-                allowText: false,
-                allowChildren: false,
-            },
-        }),
     };
 };

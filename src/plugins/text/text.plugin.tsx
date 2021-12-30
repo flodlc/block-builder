@@ -7,12 +7,5 @@ export const TextPlugin: PluginFactory = () => () => {
         addBlocks: () => ({
             text: Text,
         }),
-        addSchema: () => ({
-            text: {
-                attrs: {},
-                allowText: true,
-                allowChildren: true,
-            },
-        }),
     };
 };

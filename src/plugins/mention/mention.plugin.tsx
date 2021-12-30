@@ -88,18 +88,6 @@ export const MentionPlugin: PluginFactory =
                 mention: Mention,
                 mentionDecoration: MentionDecoration,
             }),
-            addSchema: () => ({
-                mention: {
-                    attrs: {},
-                    allowText: false,
-                    allowChildren: false,
-                },
-                mentionDecoration: {
-                    attrs: {},
-                    allowText: true,
-                    allowChildren: true,
-                },
-            }),
             Component: () => <MentionComponentWrapper editor={editor} />,
             destroy: () => {
                 dom.removeEventListener('input', keyDownHandler);

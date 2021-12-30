@@ -7,17 +7,5 @@ export const CalloutPlugin: PluginFactory = () => () => {
         addBlocks: () => ({
             callout: Callout,
         }),
-        addSchema: () => ({
-            callout: {
-                attrs: {
-                    emoji: {
-                        required: true,
-                        default: '😺',
-                    },
-                },
-                allowText: false,
-                allowChildren: true,
-            },
-        }),
     };
 };

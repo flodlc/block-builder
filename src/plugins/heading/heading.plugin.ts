@@ -7,17 +7,5 @@ export const HeadingPlugin: PluginFactory = () => () => {
         addBlocks: () => ({
             heading: Heading,
         }),
-        addSchema: () => ({
-            heading: {
-                attrs: {
-                    level: {
-                        default: 1,
-                        required: true,
-                    },
-                },
-                allowText: true,
-                allowChildren: false,
-            },
-        }),
     };
 };

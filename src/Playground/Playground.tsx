@@ -16,6 +16,7 @@ import { BlockBehaviorsPlugin } from '../plugins/blockBehaviors/blockBehaviors.p
 import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
+import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
 import { Node } from '../editor/model/types';
 import { ItalicPlugin } from '../plugins/italic/italic.plugin';
@@ -42,6 +43,7 @@ function Playground() {
         new Editor({
             rootId: 'doc',
             nodes: data,
+            schema: SCHEMA,
         })
     );
 

@@ -7,8 +7,5 @@ export const ItalicPlugin: PluginFactory = () => () => {
         addMarks: () => ({
             i: Italic,
         }),
-        addSchema: () => ({
-            u: { attrs: {}, allowText: true, allowChildren: true },
-        }),
     };
 };
