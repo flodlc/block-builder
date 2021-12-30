@@ -7,5 +7,8 @@ export const BoldPlugin: PluginFactory = () => () => {
         addMarks: () => ({
             b: Bold,
         }),
+        addSchema: () => ({
+            b: { attrs: {}, allowText: true, allowChildren: true },
+        }),
     };
 };

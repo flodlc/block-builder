@@ -7,5 +7,8 @@ export const UnderlinePlugin: PluginFactory = () => () => {
         addMarks: () => ({
             u: Underline,
         }),
+        addSchema: () => ({
+            u: { attrs: {}, allowText: true, allowChildren: true },
+        }),
     };
 };

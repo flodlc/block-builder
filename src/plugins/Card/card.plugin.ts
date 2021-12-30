@@ -7,5 +7,12 @@ export const CardPlugin: PluginFactory = () => () => {
         addBlocks: () => ({
             card: Card,
         }),
+        addSchema: () => ({
+            card: {
+                attrs: {},
+                allowText: true,
+                allowChildren: true,
+            },
+        }),
     };
 };

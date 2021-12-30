@@ -7,12 +7,11 @@ import {
     History,
     HistoryItem,
     MarkedText,
-    Schema,
 } from './types';
 import { TransactionBuilder } from '../transaction/TransactionBuilder';
 import { Transaction } from '../transaction/types';
 import { ResolvedState, resolveState } from './StateResolver';
-import { compileSchema, CompiledSchema } from './schema';
+import { CompiledSchema } from './schema';
 
 export type EditorEvent = 'change' | 'tr' | 'input' | string;
 
@@ -25,13 +24,11 @@ export class Editor {
     constructor({
         rootId,
         nodes,
-        schema,
     }: {
         rootId: string;
         nodes: Record<string, Node>;
-        schema: Schema;
     }) {
-        this.schema = compileSchema({ schema });
+        this.schema = {};
         this.history = { items: [] };
         this.state = nodes ? { rootId, nodes } : { rootId: 'doc', nodes: {} };
     }

@@ -1,6 +1,7 @@
 import { Editor } from '../../model/Editor';
 import React from 'react';
 import { View } from '../View';
+import { NodeSchema } from '../../model/types';
 
 export type PluginFactory = (config?: any) => Plugin;
 
@@ -19,5 +20,6 @@ export type RegisteredPlugin = {
     destroy?: () => void;
     Component?: React.FC<{ editor: Editor }>;
     addMarks?: () => Record<string, any>;
+    addSchema?: () => Record<string, NodeSchema>;
     addBlocks?: () => Record<string, any>;
 };

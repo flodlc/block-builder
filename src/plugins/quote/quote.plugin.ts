@@ -7,5 +7,12 @@ export const QuotePlugin: PluginFactory = () => () => {
         addBlocks: () => ({
             quote: Quote,
         }),
+        addSchema: () => ({
+            quote: {
+                attrs: {},
+                allowText: false,
+                allowChildren: true,
+            },
+        }),
     };
 };
