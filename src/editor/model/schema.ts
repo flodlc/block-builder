@@ -4,6 +4,7 @@ import { Node, NodeSchema, Schema } from './types';
 export type CompiledSchema = Record<
     string,
     NodeSchema & {
+        type: string;
         create: (node?: Partial<Node>) => Node;
         patch: (node: Partial<Node>) => Node;
     }
@@ -19,6 +20,7 @@ export const compileSchema = ({
         compiledSchema = {
             ...compiledSchema,
             [type]: {
+                type,
                 create: (node) => {
                     const nodeSchema = schema[type];
                     const attrs = {} as any;

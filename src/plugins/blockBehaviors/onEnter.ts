@@ -1,11 +1,16 @@
 import { Editor } from '../../editor/model/Editor';
 import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
 import { TextSelection } from '../../editor/model/Selection';
+import { nodesBehaviors } from './behaviors.config';
 
 export const onEnter = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
-    const newNode = editor.schema.text.create();
+    const shouldKeepFormat = nodesBehaviors[node.type].keepFormatOnEnter;
+
+    const newNode =
+        editor.schema[shouldKeepFormat ? node.type : 'text'].create();
+
     newNode.text = cutMarkedText(node.text, [selection?.range[1]]);
     const tr = editor.createTransaction();
     if (selection.range[0] === 0) {

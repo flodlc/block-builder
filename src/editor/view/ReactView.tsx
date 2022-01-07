@@ -6,7 +6,9 @@ import { ViewContext } from './contexts/ViewContext';
 import { Plugin, RegisteredPlugin } from './plugin/types';
 import { registerPlugins } from './plugin/registerPlugins';
 import { View } from './View';
-import { useEventManager } from './useEventManager';
+import { useBindDom, useEventManager } from './useEventManager';
+
+export const GLOBAL_EDITABLE = false;
 
 export const ReactView = ({
     editor,
@@ -26,6 +28,7 @@ export const ReactView = ({
     >(undefined);
 
     const eventManager = useEventManager();
+    useBindDom(ref, eventManager);
 
     useLayoutEffect(() => {
         if (!ref.current) return;
@@ -47,7 +50,13 @@ export const ReactView = ({
     const rootNode = editor.state.nodes[editor.state.rootId];
     return (
         <div style={{ position: 'relative' }}>
-            <div className="view" ref={ref} style={{ outline: 'none' }}>
+            <div
+                className="view"
+                contentEditable={GLOBAL_EDITABLE}
+                suppressContentEditableWarning={true}
+                ref={ref}
+                style={{ outline: 'none' }}
+            >
                 {view && (
                     <ViewContext.Provider value={view}>
                         <EditorContext.Provider value={editor}>

@@ -6,6 +6,7 @@ export const SelectionHalo = ({
     blockSelected: boolean;
 }) => (
     <div
+        contentEditable={false}
         style={{
             position: 'absolute',
             height: '100%',

@@ -8,32 +8,24 @@ export const onBackspace = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
     if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0)
         return false;
-
-    if (tryReset({ editor })) {
-        return true;
-    } else if (tryUnwrap({ editor })) {
-        return true;
-    } else if (tryRemove({ editor })) {
-        return true;
-    }
-    return false;
+    if (selection.nodeId === editor.state.rootId) return true;
+    return [tryReset, tryUnwrap, tryRemove].some((callback) =>
+        callback({ editor })
+    );
 };
 
 const tryReset = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
-
-    if (node.type !== 'text') {
-        editor
-            .createTransaction()
-            .patch({
-                nodeId: node.id,
-                patch: editor.schema.text.patch(node),
-            })
-            .dispatch();
-        return true;
-    }
-    return false;
+    if (node.type === 'text') return false;
+    editor
+        .createTransaction()
+        .patch({
+            nodeId: node.id,
+            patch: editor.schema.text.patch(node),
+        })
+        .dispatch();
+    return true;
 };
 
 const tryUnwrap = ({ editor }: { editor: Editor }) => {

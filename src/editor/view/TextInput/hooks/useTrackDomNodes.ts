@@ -53,27 +53,29 @@ export const useTrackDomChanges = (
         },
         domChanges: [],
         restoreDom: () => {
-            changesTracker.current.domChanges
+            const domChanges = changesTracker.current.domChanges;
+            changesTracker.current.domChanges = [];
+            domChanges
                 .slice()
                 .reverse()
-                .forEach((item) => item.func());
-            changesTracker.current.domChanges = [];
-            changesTracker.current.observer?.takeRecords();
+                .forEach((item) => {
+                    item.func();
+                    changesTracker.current.observer?.takeRecords();
+                });
         },
         removeAddedElements: () => {
-            const addedElements = [];
-            changesTracker.current.domChanges
-                .filter((item) => item.type === 'added_element')
-                .reverse()
-                .forEach((domChange) => {
-                    addedElements.push(domChange.entry.addedNodes);
-                    domChange.func();
-                });
-            changesTracker.current.observer?.takeRecords();
+            const domChanges = changesTracker.current.domChanges;
             changesTracker.current.domChanges =
                 changesTracker.current.domChanges.filter(
                     (item) => item.type !== 'added_element'
                 );
+            domChanges
+                .filter((item) => item.type === 'added_element')
+                .reverse()
+                .forEach((domChange) => {
+                    changesTracker.current.observer?.takeRecords();
+                    domChange.func();
+                });
         },
         restoreChildren: () => {
             const types = [
@@ -148,7 +150,9 @@ const getReversedMutations = (entries: MutationRecord[]) => {
                                 ? 'added_text'
                                 : 'added_element',
                         entry,
-                        func: () => entry.target?.removeChild(addedNode),
+                        func: () => {
+                            entry.target?.removeChild(addedNode);
+                        },
                         log: { type: 'remove', addedNode },
                     });
                 });

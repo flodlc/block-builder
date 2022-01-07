@@ -102,7 +102,7 @@ const Marks = ({
     const isNodeView = !schema[mark.t].allowText;
     if (isNodeView) {
         return (
-            <NodeView mark={mark}>
+            <NodeView mark={mark} view={view}>
                 <MarkComponent
                     text={text}
                     updateMark={updateMark}

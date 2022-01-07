@@ -7,6 +7,17 @@ export const hasMark = (text: MarkedText, mark: Mark) =>
     !!text.length &&
     !text.some((textNode) => !textNode?.m?.some((item) => item.t === mark.t));
 
+export const insertNodeMark = (
+    text: MarkedText,
+    { type, range }: { type: string; range: Range }
+) => {
+    const splitNodes = splitMarkedText(text);
+    const markedNode: MarkedNode = { s: '•', type };
+    const markedNodes: MarkedText = splitNodes.slice();
+    markedNodes.splice(range[0], range[1] - range[0], markedNode);
+    return minifyMarkedText(markedNodes);
+};
+
 export const insertMark = (
     text: MarkedText,
     { mark, range }: { mark: Mark; range: Range }

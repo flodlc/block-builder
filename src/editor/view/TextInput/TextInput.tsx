@@ -83,13 +83,6 @@ export const TextInput = ({
         return true;
     });
 
-    useLayoutEffect(() => {
-        if (nodeId === 'bd80a80b-177c-4df4-a34d-55ed10d3cc5d') {
-            // @ts-ignore
-            window.aa = changesTracker;
-        }
-    }, []);
-
     useEventHandlers({ view, nodeId, ref });
 
     useSoftBreakHandler({
@@ -142,8 +135,33 @@ export const TextInput = ({
         domChanged: !!changesTracker.current.domChanges.length,
     });
 
+    useLayoutEffect(() => {
+        const endHandler = () => {
+            composingRef.current = false;
+            setTimeout(() => setRender(render + 1));
+            return false;
+        };
+        view.eventManager.on({ type: 'CompositionEnd', nodeId }, endHandler);
+
+        const startHandler = () => {
+            composingRef.current = true;
+            return false;
+        };
+        view.eventManager.on(
+            { type: 'CompositionStart', nodeId },
+            startHandler
+        );
+        return () => {
+            view.eventManager.off(
+                { type: 'CompositionEnd', nodeId },
+                endHandler
+            );
+        };
+    }, [composingRef, view.eventManager, setRender, render]);
+
     useRestoreSelection({
-        editor,
+        view,
+        nodeId,
         ref,
         range,
         key,
@@ -172,7 +190,7 @@ export const TextInput = ({
                 <TextRenderer
                     willRender={() => {
                         changesTracker.current.pause();
-                        changesTracker.current.restoreChildren();
+                        // changesTracker.current.restoreChildren();
                         changesTracker.current.restoreDom();
                     }}
                     hashedKey={key}

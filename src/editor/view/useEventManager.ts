@@ -1,6 +1,80 @@
-import { useRef } from 'react';
+import { RefObject, useLayoutEffect, useRef } from 'react';
 import { EventManager } from './View';
 import _ from 'lodash';
+import { restoreSelection } from './TextInput/utils/restoreSelection';
+
+export const getNodeIdFromSelection = () => {
+    const node = getSelection()?.focusNode;
+    const element = (
+        node?.nodeType === 1 ? node : node?.parentElement
+    ) as HTMLElement | null;
+    return (
+        element?.closest('[data-uid]')?.getAttribute('data-uid') || undefined
+    );
+};
+
+export const useBindDom = (
+    viewDom: RefObject<HTMLElement>,
+    eventManager: EventManager
+) => {
+    useLayoutEffect(() => {
+        if (!viewDom.current) return;
+        const dom = viewDom.current;
+
+        const keydownHandler = (e: KeyboardEvent) => {
+            const nodeId = getNodeIdFromSelection();
+            if (!nodeId) return;
+            eventManager.record({ type: 'keydown', nodeId }, e);
+        };
+        dom.addEventListener('keydown', keydownHandler);
+
+        const selectionHandler = (e: Event) => {
+            const nodeId = getNodeIdFromSelection();
+            if (!nodeId) return;
+            eventManager.record({ type: 'selectionchange', nodeId }, e);
+        };
+        document.addEventListener('selectionchange', selectionHandler);
+
+        const beforeHandler = (e: Event) => {
+            const nodeId = getNodeIdFromSelection();
+            if (!nodeId) return;
+            eventManager.record({ type: 'beforeinput', nodeId }, e);
+        };
+        dom.addEventListener('beforeinput', beforeHandler);
+
+        const inputHandler = (e: Event) => {
+            const nodeId = getNodeIdFromSelection();
+            if (!nodeId) return;
+            eventManager.record({ type: 'input', nodeId }, e);
+        };
+        dom.addEventListener('input', inputHandler);
+
+        const compositionStartHandler = (e: Event) => {
+            const nodeId = getNodeIdFromSelection();
+            if (!nodeId) return;
+            eventManager.record({ type: 'compositionstart', nodeId }, e);
+        };
+        dom.addEventListener('compositionstart', compositionStartHandler);
+
+        const compositionEndHandler = (e: Event) => {
+            const nodeId = getNodeIdFromSelection();
+            if (!nodeId) return;
+            eventManager.record({ type: 'compositionend', nodeId }, e);
+        };
+        dom.addEventListener('compositionend', compositionEndHandler);
+        return () => {
+            dom.removeEventListener('keydown', keydownHandler);
+            document.removeEventListener('selectionchange', selectionHandler);
+            dom.removeEventListener('beforeinput', beforeHandler);
+            dom.removeEventListener('input', inputHandler);
+            dom.removeEventListener(
+                'compositionstart',
+                compositionStartHandler
+            );
+            dom.removeEventListener('compositionend', compositionEndHandler);
+        };
+    });
+};
 
 export const useEventManager = () => {
     const observable = useRef<EventManager>({
@@ -12,6 +86,10 @@ export const useEventManager = () => {
             input: [],
             Tab: [],
             BackTab: [],
+            CompositionStart: [],
+            CompositionEnd: [],
+            SelectionChange: [],
+            SelectionChangePrevented: [],
         },
         on: ({ type, nodeId }, callback) => {
             observable.current.observers[type] = observable.current.observers[
@@ -34,21 +112,42 @@ export const useEventManager = () => {
             }
         },
         record: ({ type, nodeId }, e) => {
-            if (type === 'keydown') {
+            if (type === 'selectionchange') {
+                const handled = triggerSelectionChange(nodeId, e);
+                if (e !== handled?.e) {
+                    trigger('SelectionChangePrevented', nodeId, e);
+                }
+                if (handled?.handled) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            } else if (type === 'compositionstart') {
+                const handled = trigger('CompositionStart', nodeId, e);
+                if (handled) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            } else if (type === 'compositionend') {
+                const handled = trigger('CompositionEnd', nodeId, e);
+                if (handled) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            } else if (type === 'keydown') {
                 const event = e as KeyboardEvent;
                 let handled = false;
                 if (event.key === 'Backspace') {
-                    handled = trigger('Backspace', nodeId);
+                    handled = trigger('Backspace', nodeId, e);
                 } else if (event.key === 'Enter' && !event.shiftKey) {
-                    handled = triggerEnter(nodeId) ?? false;
+                    handled = triggerEnter(nodeId, e) ?? false;
                 } else if (event.key === 'Enter' && event.shiftKey) {
-                    handled = trigger('SoftBreak', nodeId);
+                    handled = trigger('SoftBreak', nodeId, e);
                 } else if (event.key === 'Delete') {
-                    handled = trigger('Delete', nodeId);
+                    handled = trigger('Delete', nodeId, e);
                 } else if (event.key === 'Tab' && event.shiftKey) {
-                    handled = trigger('BackTab', nodeId);
+                    handled = trigger('BackTab', nodeId, e);
                 } else if (event.key === 'Tab') {
-                    handled = trigger('Tab', nodeId);
+                    handled = trigger('Tab', nodeId, e);
                 }
                 if (handled) {
                     event.preventDefault();
@@ -61,11 +160,11 @@ export const useEventManager = () => {
                     event.inputType === 'insertParagraph' ||
                     /\n/.test(event.data ?? '')
                 ) {
-                    handled = triggerEnter(nodeId) ?? false;
+                    handled = triggerEnter(nodeId, e) ?? false;
                 } else if (event.inputType === 'deleteContentBackward') {
-                    handled = trigger('Backspace', nodeId);
+                    handled = trigger('Backspace', nodeId, e);
                 } else if (event.inputType === 'deleteContentForward') {
-                    handled = trigger('Delete', nodeId);
+                    handled = trigger('Delete', nodeId, e);
                 }
                 if (handled) {
                     e.preventDefault();
@@ -76,7 +175,7 @@ export const useEventManager = () => {
                 if (['deleteCompositionText'].includes(event.inputType)) {
                     return;
                 }
-                const handled = trigger('input', nodeId);
+                const handled = trigger('input', nodeId, e);
                 if (handled) {
                     // e.stopPropagation();
                     return;
@@ -87,14 +186,18 @@ export const useEventManager = () => {
 
     // needs a throttle to prevent twice firing n chrome when composing
     const triggerEnter = _.throttle(
-        (nodeId?: string) => {
-            return trigger('Enter', nodeId);
+        (nodeId: string | undefined, e: Event) => {
+            return trigger('Enter', nodeId, e);
         },
         40,
         { leading: true, trailing: false }
     );
 
-    const trigger = (type: string, nodeId?: string) => {
+    const triggerSelectionChange = (nodeId: string | undefined, e: Event) => {
+        return { handled: trigger('SelectionChange', nodeId, e), e };
+    };
+
+    const trigger = (type: string, nodeId: string | undefined, e: Event) => {
         return observable.current.observers?.[type]?.some((observer) => {
             if (!observer.nodeId || observer.nodeId === nodeId) {
                 return observer.callback();

@@ -4,16 +4,19 @@ import { Range, TextSelection } from '../../../model/Selection';
 import { getElementSelection } from '../utils/getElementSelection';
 import _ from 'lodash';
 import { Editor } from '../../../model/Editor';
+import { View } from '../../View';
 
 export const useRestoreSelection = ({
-    editor,
+    view,
+    nodeId,
     ref,
     range,
     key,
     composing,
     updateRange,
 }: {
-    editor: Editor;
+    view: View;
+    nodeId: string;
     ref: RefObject<HTMLDivElement>;
     range?: Range;
     key: number;
@@ -31,17 +34,29 @@ export const useRestoreSelection = ({
     };
 
     useLayoutEffect(() => {
-        const selectHandler = () => saveDomSelection();
-        document.addEventListener('selectionchange', selectHandler);
-        return () =>
-            document.removeEventListener('selectionchange', selectHandler);
+        const selectHandler = () => {
+            saveDomSelection();
+            return true;
+        };
+
+        view.eventManager.on(
+            { type: 'SelectionChange', nodeId },
+            selectHandler
+        );
+
+        return () => {
+            view.eventManager.off(
+                { type: 'SelectionChange', nodeId },
+                selectHandler
+            );
+        };
     }, [saveDomSelection]);
 
     useLayoutEffect(() => {
         if (!ref.current || !range) return;
         restoreSelectionIfNeeded(
             ref.current as HTMLDivElement,
-            (editor.state.selection as TextSelection)?.range,
+            (view.editor.state.selection as TextSelection)?.range,
             composing
         );
         if (timeout.current) clearTimeout(timeout.current);
@@ -51,7 +66,7 @@ export const useRestoreSelection = ({
         timeout.current = setTimeout(() => {
             debouncedRestoreSelectionIfNeeded(
                 ref.current as HTMLDivElement,
-                editor,
+                view.editor,
                 composing
             );
             timeout.current = undefined;
@@ -68,6 +83,7 @@ const restoreSelectionIfNeeded = (
     range: Range,
     composing: boolean
 ) => {
+    // console.log('restore', range, container, Date.now());
     if (!container) return;
     if (!range) return;
     const currentRange = getElementSelection(container);

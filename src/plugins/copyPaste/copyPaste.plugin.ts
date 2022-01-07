@@ -1,8 +1,7 @@
 import { PluginFactory } from '../../editor/view/plugin/types';
 import { TextSelection } from '../../editor/model/Selection';
-import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
-import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
-import { Editor } from '../../editor/model/Editor';
+import { serializeNode } from './htmlSerializer';
+import { insertHtml } from './insertHtml';
 
 export const CopyPastePlugin: PluginFactory =
     () =>
@@ -11,44 +10,31 @@ export const CopyPastePlugin: PluginFactory =
             e.preventDefault();
             const html = e.clipboardData?.getData?.('text/html');
             if (!html) return;
-            // parse(html);
+            insertHtml(html, editor);
+        };
 
+        const copyHandler = (e: ClipboardEvent) => {
+            e.preventDefault();
+            const nodeId = (editor.state.selection as TextSelection).nodeId;
+            const html = serializeNode(
+                editor.schema,
+                editor.state.nodes[nodeId],
+                editor.state.nodes
+            );
             const wrapper = document.createElement('div');
             wrapper.innerHTML = html;
-            const text = wrapper.innerText;
-
-            insertInline({ editor, text });
+            console.log(wrapper);
+            e.clipboardData?.setData('text/html', wrapper.innerHTML);
+            e.clipboardData?.setData('text/plain', wrapper.textContent ?? '');
         };
-        dom.addEventListener('paste', pasteHandler);
 
+        dom.addEventListener('paste', pasteHandler);
+        document.addEventListener('copy', copyHandler);
         return {
             key: 'copyPaste',
             destroy() {
                 dom.removeEventListener('paste', pasteHandler);
+                document.removeEventListener('copy', copyHandler);
             },
         };
     };
-
-const insertInline = ({ editor, text }: { editor: Editor; text: string }) => {
-    const selection = editor.state.selection as TextSelection;
-    if (!selection.isText()) return;
-
-    const newText = joinMarkedTexts(editor.state.nodes[selection.nodeId].text, [
-        { s: text },
-    ]);
-    const newTextLength = getMarkedTextLength(newText);
-
-    editor
-        .createTransaction()
-        .patch({
-            patch: {
-                text: joinMarkedTexts(
-                    editor.state.nodes[selection.nodeId].text,
-                    [{ s: text }]
-                ),
-            },
-            nodeId: selection.nodeId,
-        })
-        .focus(selection.setRange([newTextLength, newTextLength]))
-        .dispatch();
-};

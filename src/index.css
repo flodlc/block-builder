@@ -19,6 +19,25 @@ code {
     flex-direction: column;
 }
 
+.oli:first-child {
+    counter-reset: oli;
+}
+
+:not(.oli) + .oli {
+    counter-reset: oli;
+}
+
+.oli {
+    counter-increment: oli;
+}
+
+.oli:before {
+    content: counter(oli) '.';
+    position: absolute;
+    left: 0;
+    padding: 4px 0;
+}
+
 .header {
     display: flex;
     background-color: #1d1d1d;

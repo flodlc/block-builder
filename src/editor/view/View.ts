@@ -4,12 +4,23 @@ import { Editor } from '../model/Editor';
 import React from 'react';
 import { getRange } from './TextInput/utils/restoreSelection';
 
+type NativEventType =
+    | 'selectionchange'
+    | 'keydown'
+    | 'beforeinput'
+    | 'input'
+    | 'compositionstart'
+    | 'compositionend';
+
 export type EventManager = {
     record: (
         {
             type,
             nodeId,
-        }: { type: 'keydown' | 'beforeinput' | 'input'; nodeId?: string },
+        }: {
+            type: NativEventType;
+            nodeId?: string;
+        },
         event: Event
     ) => void;
     observers: Record<string, { nodeId?: string; callback: () => boolean }[]>;

@@ -24,6 +24,7 @@ import { balloonPlugin } from '../plugins/balloon/balloon.plugin';
 import { Balloon } from './Balloon';
 import { createEditorApi } from './editorApi';
 import { UnderlinePlugin } from '../plugins/underline/underline.plugin';
+import { oliPlugin } from '../plugins/oli/oli.plugin';
 
 function Playground() {
     const resetNote = (dataSet: Record<string, Node>) => () => {
@@ -77,6 +78,7 @@ function Playground() {
                     HistoryShortcutsPlugin(),
                     CalloutPlugin(),
                     DividerPlugin(),
+                    oliPlugin(),
                     QuotePlugin(),
                     CardPlugin(),
                     TextPlugin(),

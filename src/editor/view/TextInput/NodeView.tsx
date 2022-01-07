@@ -1,14 +1,17 @@
 import { Mark } from '../../model/types';
 import React, { RefObject, useLayoutEffect, useRef } from 'react';
+import { View } from '../View';
 
 export const NodeView = ({
     children,
+    view,
 }: {
     mark: Mark;
+    view: View;
     children: React.ReactElement;
 }) => {
     const ref = useRef<HTMLElement>(null);
-    const buffersRef = useBuffers(ref);
+    const buffersRef = useBuffers(ref, view);
     return (
         <span
             onClick={(e: React.MouseEvent) => {
@@ -17,7 +20,7 @@ export const NodeView = ({
                     ref.current as HTMLElement
                 ).getBoundingClientRect();
                 if (e.clientX > elementRect.left + elementRect.width / 2) {
-                    getSelection()?.collapse(buffersRef.current?.nextBuffer, 1);
+                    getSelection()?.collapse(buffersRef.current?.nextBuffer, 2);
                 } else {
                     getSelection()?.collapse(buffersRef.current?.prevBuffer, 0);
                 }
@@ -37,17 +40,23 @@ export const NodeView = ({
     );
 };
 
-const useBuffers = (ref: RefObject<HTMLElement>) => {
+const useBuffers = (ref: RefObject<HTMLElement>, view: View) => {
     const buffers = useRef<{ prevBuffer: Text; nextBuffer: Text }>();
     useLayoutEffect(() => {
         const prevBuffer = document.createTextNode('\uFEFF');
-        const nextBuffer = document.createTextNode('\uFEFF');
+        const nextBuffer = document.createTextNode('\uFEFF\uFEFF');
         buffers.current = { prevBuffer, nextBuffer };
         if (!ref.current) return;
 
-        setBuffers(ref.current as HTMLElement, nextBuffer, prevBuffer);
+        setBuffers(ref.current as HTMLElement, {
+            nextBuffer,
+            prevBuffer,
+        });
         const handler = () => {
-            setBuffers(ref.current as HTMLElement, nextBuffer, prevBuffer);
+            setBuffers(ref.current as HTMLElement, {
+                nextBuffer,
+                prevBuffer,
+            });
         };
         const root = ref.current.closest('.editable_content');
         root?.addEventListener('input', handler);
@@ -57,9 +66,32 @@ const useBuffers = (ref: RefObject<HTMLElement>) => {
             removeBuffers(buffers);
         };
     }, []);
+
+    useLayoutEffect(() => {
+        const selectionHandler = () => {
+            const selection = getSelection();
+            if (
+                selection &&
+                selection?.focusNode === buffers.current?.nextBuffer
+            ) {
+                if ((selection?.focusOffset ?? 0) === 0) {
+                    selection.collapse(buffers.current?.nextBuffer, 2);
+                }
+            }
+            return false;
+        };
+        view.eventManager.on({ type: 'SelectionChange' }, selectionHandler);
+        return () => {
+            view.eventManager.off(
+                { type: 'SelectionChange' },
+                selectionHandler
+            );
+        };
+    }, []);
+
     useLayoutEffect(() => {
         resetBuffers(buffers);
-        // return () => removeBuffers(buffers);
+        return () => removeBuffers(buffers);
     });
     useLayoutEffect(() => {
         return () => removeBuffers(buffers);
@@ -67,15 +99,19 @@ const useBuffers = (ref: RefObject<HTMLElement>) => {
     return buffers;
 };
 
-function setBuffers(element: HTMLElement, nextBuffer: Text, prevBuffer: Text) {
+function setBuffers(
+    element: HTMLElement,
+    { prevBuffer, nextBuffer }: { nextBuffer: Text; prevBuffer: Text }
+) {
     if (element?.nextSibling !== nextBuffer) {
         element?.parentElement?.insertBefore(nextBuffer, element?.nextSibling);
     } else if (nextBuffer?.textContent) {
         const index = nextBuffer.textContent.indexOf('\uFEFF');
         if (index > 0) {
             nextBuffer.deleteData(index, 1);
-            nextBuffer.insertData(0, '\uFEFF');
+            nextBuffer.insertData(0, '\uFEFF\uFEFF');
         }
+        // const index2 = nextBuffer.textContent.indexOf('\uFEFF');
     }
     if (element?.previousSibling !== prevBuffer) {
         element?.parentElement?.insertBefore(prevBuffer, element);
@@ -94,8 +130,8 @@ function resetBuffers(
     >
 ) {
     const nextBuffer = buffers.current?.nextBuffer;
-    if (nextBuffer?.textContent !== '\uFEFF') {
-        nextBuffer?.replaceData(0, nextBuffer?.length ?? 0, '\uFEFF');
+    if (nextBuffer?.textContent !== '\uFEFF\uFEFF') {
+        nextBuffer?.replaceData(0, nextBuffer?.length ?? 0, '\uFEFF\uFEFF');
     }
     const prevBuffer = buffers.current?.prevBuffer;
     if (prevBuffer?.textContent !== '\uFEFF') {

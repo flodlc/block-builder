@@ -80,6 +80,7 @@ export const Callout: React.FC<BlockComponentAttrs> = ({
             className="callout"
         >
             <div
+                contentEditable={false}
                 onClick={onClick}
                 style={{
                     marginRight: '15px',

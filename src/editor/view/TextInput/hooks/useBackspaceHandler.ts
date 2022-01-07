@@ -5,6 +5,7 @@ import { RefObject, useLayoutEffect } from 'react';
 import { View } from '../../View';
 import { Range } from '../../../model/Selection';
 import { MarkedText } from '../../../model/types';
+import { restoreSelection } from '../utils/restoreSelection';
 
 export const useBackspaceHandler = ({
     ref,
@@ -43,7 +44,12 @@ export const useBackspaceHandler = ({
                 currentRange[1],
             ],
         });
-        onInput(newTextState.value, newTextState.range);
+        // restoreSelection(ref.current as HTMLElement, newTextState.range);
+        setTimeout(() => {
+            restoreSelection(ref.current as HTMLElement, newTextState.range);
+            onInput(newTextState.value, newTextState.range);
+        }, 0);
+        // onInput(newTextState.value, newTextState.range);
         return true;
     };
     useLayoutEffect(() => {

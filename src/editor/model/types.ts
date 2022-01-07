@@ -7,7 +7,7 @@ export type MarkedText = MarkedNode[];
  * We keep a compact format to make the doc light.
  * MarkedNode = { string: string; marks: {type: string, data: any}[] }
  */
-export type MarkedNode = { s: string; m?: Mark[] };
+export type MarkedNode = { s: string; m?: Mark[]; type?: string };
 export type Mark<T = any> = { t: string; d?: T };
 
 export interface Node {
@@ -37,7 +37,7 @@ export type EventHandler<T = any> = (data: T) => void;
 
 export type NodeSchema = {
     allowText: boolean;
-    allowChildren: boolean;
+    allowChildren: boolean | string[];
     attrs: Record<
         string,
         {
@@ -45,6 +45,15 @@ export type NodeSchema = {
             required?: boolean;
         }
     >;
+    parse?: (domNode: HTMLElement) => Partial<Node> | false;
+    serialize?: (params: {
+        serializedText: string;
+        serializedChildren: string;
+        node: Node;
+        prevNode?: Node;
+        nextNode?: Node;
+    }) => string;
+    inline?: boolean;
 };
 
 export type Schema = Record<string, NodeSchema>;

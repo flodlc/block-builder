@@ -24,7 +24,7 @@ export const PlaceholderWrapper = ({
     style: any;
 }) => {
     return (
-        <div style={style} className="placeholder">
+        <div contentEditable={false} style={style} className="placeholder">
             {children ?? <DefaultPlaceholderContent />}
         </div>
     );

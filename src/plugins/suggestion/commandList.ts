@@ -1,8 +1,17 @@
 import { TextSelection } from '../../editor/model/Selection';
 import { Editor } from '../../editor/model/Editor';
 import { turnInCommand } from '../commands/turnIn.command';
+import { insertHtml } from '../copyPaste/insertHtml';
 
 export const getCommandList = ({ editor }: { editor: Editor }) => [
+    {
+        label: 'insert html',
+        callback: () => {
+            const html = prompt('paste your html here');
+            if (!html) return;
+            insertHtml(`<blockquote>${html}</blockquote>`, editor);
+        },
+    },
     {
         label: 'Turn in Heading 1',
         callback: () => {

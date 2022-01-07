@@ -11,14 +11,6 @@ export const useEventHandlers = ({
     ref: RefObject<HTMLDivElement>;
 }) => {
     useLayoutEffect(() => {
-        const handler = (e: KeyboardEvent) => {
-            view.eventManager.record({ type: 'keydown', nodeId }, e);
-        };
-        ref.current?.addEventListener('keydown', handler);
-        return () => ref.current?.removeEventListener('keydown', handler);
-    }, [ref.current]);
-
-    useLayoutEffect(() => {
         const handler = (e: Event) =>
             view.eventManager.record({ type: 'beforeinput', nodeId }, e);
         ref.current?.addEventListener('beforeinput', handler);

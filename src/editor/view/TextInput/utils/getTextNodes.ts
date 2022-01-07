@@ -7,7 +7,6 @@ export const getTextNodes = (
         if (node.textContent) {
             nodes.push(node);
         }
-        // nodes = node.textContent ? [...nodes, node] : nodes;
     } else {
         const element = node as HTMLElement;
         if (
