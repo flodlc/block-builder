@@ -5,5 +5,5 @@ export const Link = ({
     children,
     mark,
 }: MarkComponentAttrs<{ href: string }>) => {
-    return <a href={mark.data?.href}>{children}</a>;
+    return <a href={mark.attrs?.href}>{children}</a>;
 };

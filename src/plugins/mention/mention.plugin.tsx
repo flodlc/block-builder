@@ -125,7 +125,7 @@ const updateDecoration = ({
                 slashPosition,
                 slashPosition + searchText.length + triggeringExpression.length,
             ] as Range,
-            mark: { type: 'mentionDecoration', data: suggestionState },
+            mark: { type: 'mentionDecoration', attrs: suggestionState },
         });
     } else {
         view.clearDecorations('mention');

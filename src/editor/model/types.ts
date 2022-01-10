@@ -15,7 +15,7 @@ export type MarkedNode<T = any> = {
     type?: string;
     attrs?: T;
 };
-export type Mark<T = any> = { type: string; data?: T };
+export type Mark<T = any> = { type: string; attrs?: T };
 
 export interface Node {
     id: string;

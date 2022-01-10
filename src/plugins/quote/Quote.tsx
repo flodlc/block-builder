@@ -13,13 +13,12 @@ export const Quote: React.FC<BlockComponentAttrs> = ({
                 position: 'relative',
                 padding: '0px 16px',
                 margin: '4px 0',
-                display: 'flex',
                 borderLeft: '3px solid white',
             }}
             data-uid={node.id}
             className="quote"
         >
-            <div style={{ flex: 1 }}>
+            <div>
                 <Children parentId={node.id} childrenIds={node.childrenIds} />
             </div>
             <SelectionHalo blockSelected={blockSelected} />

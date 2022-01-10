@@ -5,7 +5,7 @@ import { MarkComponentAttrs } from '../../editor/view/types';
 export const MentionDecoration = ({
     mark,
 }: MarkComponentAttrs<MentionPluginState>) => {
-    const searchText = mark.data?.searchText as string;
+    const searchText = mark.attrs?.searchText as string;
 
     return (
         <span
@@ -36,7 +36,7 @@ export const MentionDecoration = ({
                 </svg>
             </span>
             <span style={{ display: 'none' }} data-noselect={true}>
-                {mark.data?.triggeringExpression}
+                {mark.attrs?.triggeringExpression}
             </span>
             <span>{searchText}</span>
             {!searchText ? (

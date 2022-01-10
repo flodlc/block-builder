@@ -4,10 +4,10 @@ export const linkSchema: MarkSchema = {
     inline: true,
     parse: (node: HTMLElement) => {
         if (!node.matches('a')) return false;
-        return { data: { href: node.getAttribute('href') } };
+        return { attrs: { href: node.getAttribute('href') } };
     },
     serialize: ({ serializedContent, mark }) =>
-        `<a href=${mark.data.href}>${serializedContent}</a>`,
+        `<a href=${mark.attrs.href}>${serializedContent}</a>`,
     attrs: {
         href: {
             default: '',

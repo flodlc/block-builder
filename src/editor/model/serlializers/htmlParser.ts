@@ -51,6 +51,17 @@ const isBlock = (node: Node) => {
     );
 };
 
+const ignoredTags: Record<string, boolean> = {
+    script: true,
+};
+
+const isIgnoredTag = (node: Node) => {
+    return (
+        node.nodeType === 1 &&
+        ignoredTags[(node as HTMLElement).tagName.toLocaleLowerCase()]
+    );
+};
+
 export const parseHtml = ({
     html,
     schema,
@@ -238,6 +249,7 @@ const parseChildren = ({
     let blocks = [] as ModelNode[];
     let openedBlock: ModelNode | undefined = undefined;
     Array.from(domNode.childNodes).forEach((childNode) => {
+        if (isIgnoredTag(childNode)) return;
         if (isBlock(childNode)) {
             const parsed = parse({
                 domNode: childNode,
