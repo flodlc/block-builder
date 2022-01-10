@@ -26,7 +26,7 @@ export const Uli: React.FC<BlockComponentAttrs> = ({
                 nodeId={node.id}
                 value={node.text}
                 range={textSelection?.range}
-                placeholder={<>Ordered List</>}
+                placeholder={<>Bullet List</>}
                 keepPlaceholder={true}
             />
             <div
