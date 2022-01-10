@@ -54,7 +54,7 @@ export const MentionComponent = ({
                 editor.runCommand(
                     insertMention({
                         selection: getSearchSelection(),
-                        data: { value: item.value() },
+                        data: item.value(),
                     })
                 ),
         };

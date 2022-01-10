@@ -1,21 +1,11 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
 import React from 'react';
 import { BlockComponentAttrs } from '../../editor/view/types';
+import { TextSelection } from '../../editor/model/Selection';
+import { TextInput } from '../../editor/view/TextInput/TextInput';
 import { Children } from '../../editor/view/Children';
 import { SelectionHalo } from '../../editor/view/SelectionHalo';
-import { TextInput } from '../../editor/view/TextInput/TextInput';
-import { TextSelection } from '../../editor/model/Selection';
 
-export const oliPlugin: PluginFactory = () => () => {
-    return {
-        key: 'oli',
-        addBlocks() {
-            return { oli: Oli };
-        },
-    };
-};
-
-const Oli: React.FC<BlockComponentAttrs> = ({
+export const Oli: React.FC<BlockComponentAttrs> = ({
     node,
     blockSelected,
     selection,

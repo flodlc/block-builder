@@ -19,6 +19,13 @@ code {
     flex-direction: column;
 }
 
+.uli:before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    padding: 4px 0;
+}
+
 .oli:first-child {
     counter-reset: oli;
 }

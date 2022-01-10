@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Mark } from '../../editor/model/types';
+import { NodeComponentAttrs } from '../../editor/view/types';
+import { MentionValue } from './mention.types';
 
 function getValue(value: { type: string; date?: string; name?: string }) {
     if (!value) return undefined;
@@ -22,12 +23,16 @@ function getPrefix(value: { type: string }) {
     if (value.type === 'person') return '@';
 }
 
-export const Mention = ({ mark }: { mark: Mark }) => {
-    const displayed = useMemo(() => getValue(mark.d?.value), [mark.d?.value]);
+export const Mention = ({ node }: NodeComponentAttrs<MentionValue>) => {
+    const displayed = useMemo(
+        () => getValue(node.attrs as MentionValue),
+        [node.attrs]
+    );
     return (
         <span style={{ color: '#ffffff99' }}>
-            <span style={{ opacity: 0.6 }}>{getPrefix(mark.d?.value)}</span>
-            {mark.d?.name}
+            <span style={{ opacity: 0.6 }}>
+                {getPrefix(node.attrs as MentionValue)}
+            </span>
             {displayed}
         </span>
     );

@@ -1,7 +1,9 @@
-export const DATA = [
+import { MentionValue } from './mention.types';
+
+export const DATA: { label: string; value: () => MentionValue }[] = [
     {
         label: 'Today',
-        value: () => ({ type: 'date', date: new Date() }),
+        value: () => ({ type: 'date', date: new Date().toISOString() }),
     },
     {
         label: 'Florian',

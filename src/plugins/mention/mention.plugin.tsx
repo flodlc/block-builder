@@ -1,7 +1,11 @@
 import React from 'react';
 import { PluginFactory } from '../../editor/view/plugin/types';
 import { MentionDecoration } from './MentionDecoration';
-import { Range, TextSelection } from '../../editor/model/Selection';
+import {
+    isTextSelection,
+    Range,
+    TextSelection,
+} from '../../editor/model/Selection';
 import { Editor } from '../../editor/model/Editor';
 import { View } from '../../editor/view/View';
 import escapeStringRegexp from 'escape-string-regexp';
@@ -24,9 +28,8 @@ export const MentionPlugin: PluginFactory =
                 return;
             }
 
-            if (!editor.state.selection?.isText()) return;
-            const selection = editor.state.selection as TextSelection;
-            // if (view.isDecorated(selection)) return;
+            const selection = editor.state.selection;
+            if (!isTextSelection(selection)) return;
 
             const previousText = selection.getTextBefore(editor.state);
             EXPRESSIONS.some((expression) => {
@@ -98,24 +101,6 @@ export const MentionPlugin: PluginFactory =
         };
     };
 
-const updateDecor = ({ editor, view }: { editor: Editor; view: View }) => {
-    const selection = editor.state.selection as TextSelection;
-    view.clearDecorations('code');
-    const text = selection.getCurrentText(editor.state);
-    let decoStart = 0;
-    text.split('').forEach((char, i) => {
-        if (text.charAt(i + 1) === ' ') {
-            view.addDecoration({
-                key: 'code',
-                nodeId: selection.nodeId,
-                range: [decoStart, i + 1],
-                mark: { t: 'b', d: { color: Math.random() } },
-            });
-            decoStart = i + 2;
-        }
-    });
-};
-
 const updateDecoration = ({
     suggestionState,
     editor,
@@ -140,7 +125,7 @@ const updateDecoration = ({
                 slashPosition,
                 slashPosition + searchText.length + triggeringExpression.length,
             ] as Range,
-            mark: { t: 'mentionDecoration', d: suggestionState },
+            mark: { type: 'mentionDecoration', data: suggestionState },
         });
     } else {
         view.clearDecorations('mention');

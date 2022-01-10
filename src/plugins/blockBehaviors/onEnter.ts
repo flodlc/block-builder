@@ -2,14 +2,17 @@ import { Editor } from '../../editor/model/Editor';
 import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
 import { TextSelection } from '../../editor/model/Selection';
 import { nodesBehaviors } from './behaviors.config';
+import { CompiledNodeSchema } from '../../editor/model/types';
 
 export const onEnter = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
     const shouldKeepFormat = nodesBehaviors[node.type].keepFormatOnEnter;
 
-    const newNode =
-        editor.schema[shouldKeepFormat ? node.type : 'text'].create();
+    const newNodeSchema = editor.schema[
+        shouldKeepFormat ? node.type : 'text'
+    ] as CompiledNodeSchema;
+    const newNode = newNodeSchema.create();
 
     newNode.text = cutMarkedText(node.text, [selection?.range[1]]);
     const tr = editor.createTransaction();
@@ -22,10 +25,11 @@ export const onEnter = ({ editor }: { editor: Editor }): boolean => {
             (resolvedState) => resolvedState.nodes[node.id].previousId
         );
 
+        const textSchema = editor.schema.text as CompiledNodeSchema;
         tr.insertAfter({
             parent: parentId,
             after: previousId,
-            node: editor.schema.text.create(),
+            node: textSchema.create(),
         })
             .focus(selection.clone())
             .dispatch();

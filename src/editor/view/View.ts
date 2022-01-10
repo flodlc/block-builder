@@ -1,4 +1,10 @@
-import { BlockComponentAttrs, Coords, Decoration } from './types';
+import {
+    BlockComponentAttrs,
+    Coords,
+    Decoration,
+    MarkComponentAttrs,
+    NodeComponentAttrs,
+} from './types';
 import { TextSelection } from '../model/Selection';
 import { Editor } from '../model/Editor';
 import React from 'react';
@@ -37,7 +43,7 @@ export type EventManager = {
 export class View {
     editor: Editor;
     dom: HTMLElement;
-    marks: Record<string, any>;
+    marks: Record<string, React.FC<MarkComponentAttrs | NodeComponentAttrs>>;
     blocks: Record<string, React.FC<BlockComponentAttrs>>;
     decorations: Record<string, Decoration[]>;
     eventManager: EventManager;

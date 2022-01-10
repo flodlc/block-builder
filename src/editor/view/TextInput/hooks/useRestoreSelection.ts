@@ -83,7 +83,6 @@ const restoreSelectionIfNeeded = (
     range: Range,
     composing: boolean
 ) => {
-    // console.log('restore', range, container, Date.now());
     if (!container) return;
     if (!range) return;
     const currentRange = getElementSelection(container);

@@ -8,6 +8,9 @@ export const splitMarkedText = (text: MarkedText) => {
 };
 
 const splitMarkedNode = (markedNode: MarkedNode): MarkedText => {
-    const splitChars = markedNode.s.split('') ?? [];
-    return splitChars?.map((char) => ({ s: char, m: markedNode.m }));
+    const splitChars = markedNode.text.split('') ?? [];
+    return splitChars?.map((char) => ({
+        ...markedNode,
+        text: char,
+    }));
 };

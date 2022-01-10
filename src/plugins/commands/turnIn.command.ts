@@ -1,4 +1,5 @@
 import { Editor } from '../../editor/model/Editor';
+import { isNodeSchema } from '../../editor/model/types';
 
 export const turnInCommand =
     ({
@@ -34,11 +35,13 @@ const patchIn = ({
     type: string;
     attrs?: any;
 }) => {
+    const newTypeSchema = editor.schema[type];
+    if (!isNodeSchema(newTypeSchema)) return;
     editor
         .createTransaction()
         .patch({
             nodeId,
-            patch: editor.schema[type].create({
+            patch: newTypeSchema.patch({
                 ...editor.state.nodes[nodeId],
                 attrs,
             }),
@@ -60,7 +63,9 @@ const wrapIn = ({
     ) as string;
     if (!parentId) return false;
 
-    const wrappingNode = editor.schema[type].create();
+    const typeSchema = editor.schema[type];
+    if (!isNodeSchema(typeSchema)) return;
+    const wrappingNode = typeSchema.create();
     const node = editor.state.nodes[nodeId];
 
     editor

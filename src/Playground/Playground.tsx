@@ -16,24 +16,35 @@ import { BlockBehaviorsPlugin } from '../plugins/blockBehaviors/blockBehaviors.p
 import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
-import { SCHEMA } from './SCHEMA';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
 import { Node } from '../editor/model/types';
 import { ItalicPlugin } from '../plugins/italic/italic.plugin';
-import { balloonPlugin } from '../plugins/balloon/balloon.plugin';
+import { BalloonPlugin } from '../plugins/balloon/balloonPlugin';
 import { Balloon } from './Balloon';
 import { createEditorApi } from './editorApi';
 import { UnderlinePlugin } from '../plugins/underline/underline.plugin';
-import { oliPlugin } from '../plugins/oli/oli.plugin';
+import { OliPlugin } from '../plugins/oli/oliPlugin';
+import { SCHEMA } from './SCHEMA/SCHEMA';
+import { LinkPlugin } from '../plugins/link/link.plugin';
+import { UliPlugin } from '../plugins/uli/uliPlugin';
 
 function Playground() {
     const resetNote = (dataSet: Record<string, Node>) => () => {
         localStorage.clear();
         localStorage.setItem('nodes', JSON.stringify(dataSet));
+        localStorage.setItem('last_saved', new Date().toISOString());
         window.location.reload();
     };
 
     const data = useMemo(() => {
+        const lastSaved = localStorage.getItem('last_saved');
+        if (
+            !lastSaved ||
+            new Date(lastSaved).getTime() < new Date('10/01/2020').getTime()
+        ) {
+            localStorage.clear();
+        }
+
         const storedDataString = localStorage.getItem('nodes');
         return storedDataString
             ? JSON.parse(storedDataString)
@@ -51,6 +62,7 @@ function Playground() {
     useEffect(() => {
         editor.on('change', () => {
             localStorage.setItem('nodes', JSON.stringify(editor.state.nodes));
+            localStorage.setItem('last_saved', new Date().toISOString());
         });
     }, []);
 
@@ -78,7 +90,8 @@ function Playground() {
                     HistoryShortcutsPlugin(),
                     CalloutPlugin(),
                     DividerPlugin(),
-                    oliPlugin(),
+                    OliPlugin(),
+                    UliPlugin(),
                     QuotePlugin(),
                     CardPlugin(),
                     TextPlugin(),
@@ -86,10 +99,11 @@ function Playground() {
                     BoldPlugin(),
                     ItalicPlugin(),
                     UnderlinePlugin(),
+                    LinkPlugin(),
                     BlockSelectionShortcutsPlugin(),
                     ArrowNavigationPlugin(),
                     CopyPastePlugin(),
-                    balloonPlugin(),
+                    BalloonPlugin(),
                 ]}
                 editor={editor}
             />

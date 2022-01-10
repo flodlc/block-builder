@@ -1,6 +1,6 @@
 import React from 'react';
 import { PluginFactory } from '../../editor/view/plugin/types';
-import { BlockSelection, TextSelection } from '../../editor/model/Selection';
+import { BlockSelection, isTextSelection } from '../../editor/model/Selection';
 import { BlockSelectionWrapper } from './BlockSelection';
 import { Editor } from '../../editor/model/Editor';
 import { View } from '../../editor/view/View';
@@ -28,13 +28,13 @@ export const BlockSelectionPlugin: PluginFactory =
         let draggingState: DraggingState | void;
 
         const onkeydown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && editor.state.selection?.isText()) {
+            if (!isTextSelection(editor.state.selection)) return;
+            if (e.key === 'Escape' && editor.state.selection) {
                 e.preventDefault();
                 e.stopPropagation();
-                const selection = editor.state.selection as TextSelection;
                 editor
                     .createTransaction()
-                    .focus(new BlockSelection([selection.nodeId]))
+                    .focus(new BlockSelection([editor.state.selection.nodeId]))
                     .dispatch(false);
             }
         };
@@ -81,13 +81,11 @@ export const BlockSelectionPlugin: PluginFactory =
                 current: currentMousePosition,
             });
 
-            getSelection()?.removeAllRanges();
             const nodeIds = getNodeIdsUnderSelection(
                 view.dom,
                 draggingState.start,
                 currentMousePosition
             ).filter((nodeId) => nodeId !== editor.state.rootId);
-
             requestAnimationFrame(() => {
                 hasSelectedBlocks = true;
                 editor

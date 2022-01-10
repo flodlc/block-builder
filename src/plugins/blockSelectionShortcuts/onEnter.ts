@@ -1,6 +1,7 @@
 import { Editor } from '../../editor/model/Editor';
 import { BlockSelection, TextSelection } from '../../editor/model/Selection';
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
+import { CompiledNodeSchema } from '../../editor/model/types';
 
 export const onEnter = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as BlockSelection;
@@ -23,7 +24,8 @@ export const onEnter = ({ editor }: { editor: Editor }) => {
         );
         if (!parent) return;
 
-        const newNode = editor.schema.text.create();
+        const textSchema = editor.schema.text as CompiledNodeSchema;
+        const newNode = textSchema.create();
         editor
             .createTransaction()
             .insertAfter({

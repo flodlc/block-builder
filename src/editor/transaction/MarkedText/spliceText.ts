@@ -19,12 +19,12 @@ export const spliceText = ({
     const updatedText: MarkedText = splitNodes.slice();
 
     const previousCharNode = updatedText[range[0] - 1];
-    const previousMarks = previousCharNode?.m?.filter(
-        (mark) => editor.schema[mark.t].allowText
+    const previousMarks = previousCharNode?.marks?.filter(
+        (mark) => editor.schema[mark.type].allowText
     );
     const newSection: MarkedNode = {
-        s: textInput,
-        m: previousMarks,
+        text: textInput,
+        marks: previousMarks,
     };
     range = [Math.max(range[0], 0), range[1]];
     updatedText.splice(range[0], range[1] - range[0], newSection);

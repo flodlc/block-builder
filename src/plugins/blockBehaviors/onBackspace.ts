@@ -3,6 +3,7 @@ import { Editor } from '../../editor/model/Editor';
 import { TextSelection } from '../../editor/model/Selection';
 import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
+import { CompiledNodeSchema } from '../../editor/model/types';
 
 export const onBackspace = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
@@ -18,11 +19,12 @@ const tryReset = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
     if (node.type === 'text') return false;
+    const textSchema = editor.schema.text as CompiledNodeSchema;
     editor
         .createTransaction()
         .patch({
             nodeId: node.id,
-            patch: editor.schema.text.patch(node),
+            patch: textSchema.patch(node),
         })
         .dispatch();
     return true;

@@ -26,11 +26,7 @@ export const useBackspaceHandler = ({
         const currentRange = getElementSelection(ref.current) ?? range;
         if (!currentRange) return false;
         if (currentRange[0] === 0 && currentRange[1] === 0) return false;
-        const previousIsNodeView = isPreviousNodeView(
-            view.editor.schema,
-            value,
-            currentRange[0]
-        );
+        const previousIsNodeView = isPreviousNodeView(value, currentRange[0]);
 
         if (!previousIsNodeView) return false;
         const newTextState = spliceText({

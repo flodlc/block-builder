@@ -8,3 +8,9 @@ export type MentionPluginState = {
     startBoundingRect: Coords;
     slashPosition: number;
 };
+
+export type MentionValue = {
+    type: string;
+    date?: string;
+    name?: string;
+};

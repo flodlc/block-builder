@@ -1,7 +1,7 @@
 import { TextSelection } from '../../editor/model/Selection';
 import { Editor } from '../../editor/model/Editor';
 import { turnInCommand } from '../commands/turnIn.command';
-import { insertHtml } from '../copyPaste/insertHtml';
+import { insertHtml } from '../commands/insertHtml';
 
 export const getCommandList = ({ editor }: { editor: Editor }) => [
     {

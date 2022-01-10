@@ -1,4 +1,3 @@
-import { Editor } from '../model/Editor';
 import { Node } from '../model/types';
 import { Step } from './types';
 import { AbstractSelection } from '../model/Selection';
@@ -44,13 +43,17 @@ export class TransactionBuilder {
     };
 
     dispatch = (keepHistory = true) => {
-        this.editor.applyTransaction({ steps: this.steps, keepHistory });
+        this.dispatchCallback(this.steps, keepHistory);
     };
 
     steps: Step[] = [];
-    editor: Editor;
 
-    constructor(editor: Editor) {
-        this.editor = editor;
+    private readonly dispatchCallback: (
+        steps: Step[],
+        keepHistory: boolean
+    ) => void;
+
+    constructor(dispatch: (steps: Step[], keepHistory: boolean) => void) {
+        this.dispatchCallback = dispatch;
     }
 }

@@ -10,9 +10,10 @@ import {
     Schema,
 } from './types';
 import { TransactionBuilder } from '../transaction/TransactionBuilder';
-import { Transaction } from '../transaction/types';
+import { AppliedTransaction, Transaction } from '../transaction/types';
 import { ResolvedState, resolveState } from './StateResolver';
 import { compileSchema, CompiledSchema } from './schema';
+import { normalizeState } from './serlializers/modelNormalizer';
 
 export type EditorEvent = 'change' | 'tr' | 'input' | string;
 
@@ -81,7 +82,47 @@ export class Editor {
         }
     };
 
-    createTransaction = () => new TransactionBuilder(this);
+    createTransaction = () =>
+        new TransactionBuilder((steps, keepHistory) => {
+            this.applyTransaction({ steps, keepHistory });
+        });
+
+    private normalizeAfterTransaction = ({
+        state,
+        appliedTransaction,
+    }: {
+        state: State;
+        appliedTransaction: AppliedTransaction;
+    }) => {
+        const normalizedAppliedTransaction = { ...appliedTransaction };
+        const normalizedState = normalizeState(
+            this.schema,
+            state,
+            ({ transaction: normalizeTransaction, state, error }) => {
+                console.error(`Invalid state fixed: ${error}`);
+                const {
+                    state: normalizedState,
+                    appliedTransaction: appliedNormalizeTransaction,
+                } = applyTransaction({
+                    state,
+                    transaction: normalizeTransaction,
+                });
+                normalizedAppliedTransaction.steps = [
+                    ...appliedTransaction.steps,
+                    ...appliedNormalizeTransaction.steps,
+                ];
+                normalizedAppliedTransaction.reversedSteps = [
+                    ...appliedTransaction.reversedSteps,
+                    ...appliedNormalizeTransaction.reversedSteps,
+                ];
+                return {
+                    state: normalizedState,
+                    appliedTransaction: appliedNormalizeTransaction,
+                };
+            }
+        );
+        return { normalizedState, normalizedAppliedTransaction };
+    };
 
     applyTransaction(transaction: Transaction) {
         const previousState = this.state;
@@ -89,7 +130,11 @@ export class Editor {
             state: this.state,
             transaction,
         });
-        this.state = state;
+
+        const { normalizedAppliedTransaction, normalizedState } =
+            this.normalizeAfterTransaction({ state, appliedTransaction });
+
+        this.state = normalizedState;
         delete this.resolvedState;
 
         this.trigger('tr');
@@ -97,12 +142,13 @@ export class Editor {
         if (transaction.keepHistory) {
             this.history = produce(this.history, (history) => {
                 history.items.push({
-                    transaction: appliedTransaction,
+                    transaction: normalizedAppliedTransaction,
                     state: previousState,
                 });
             });
             this.trigger('change');
         }
+        return { state, normalizedAppliedTransaction };
     }
 
     private reverseTransaction(state: State, item: HistoryItem) {

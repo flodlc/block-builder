@@ -3,7 +3,7 @@ import { TextSelection } from '../../editor/model/Selection';
 import { BALLOON_EVENTS } from './balloon.const';
 import { BalloonPluginState } from './balloon.types';
 
-export const balloonPlugin: PluginFactory =
+export const BalloonPlugin: PluginFactory =
     () =>
     ({ editor, view, dom }) => {
         let state: BalloonPluginState = {

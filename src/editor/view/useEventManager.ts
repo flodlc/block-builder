@@ -1,7 +1,6 @@
 import { RefObject, useLayoutEffect, useRef } from 'react';
 import { EventManager } from './View';
 import _ from 'lodash';
-import { restoreSelection } from './TextInput/utils/restoreSelection';
 
 export const getNodeIdFromSelection = () => {
     const node = getSelection()?.focusNode;
@@ -115,20 +114,20 @@ export const useEventManager = () => {
             if (type === 'selectionchange') {
                 const handled = triggerSelectionChange(nodeId, e);
                 if (e !== handled?.e) {
-                    trigger('SelectionChangePrevented', nodeId, e);
+                    trigger('SelectionChangePrevented', nodeId);
                 }
                 if (handled?.handled) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
             } else if (type === 'compositionstart') {
-                const handled = trigger('CompositionStart', nodeId, e);
+                const handled = trigger('CompositionStart', nodeId);
                 if (handled) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
             } else if (type === 'compositionend') {
-                const handled = trigger('CompositionEnd', nodeId, e);
+                const handled = trigger('CompositionEnd', nodeId);
                 if (handled) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -137,17 +136,17 @@ export const useEventManager = () => {
                 const event = e as KeyboardEvent;
                 let handled = false;
                 if (event.key === 'Backspace') {
-                    handled = trigger('Backspace', nodeId, e);
+                    handled = trigger('Backspace', nodeId);
                 } else if (event.key === 'Enter' && !event.shiftKey) {
-                    handled = triggerEnter(nodeId, e) ?? false;
+                    handled = triggerEnter(nodeId) ?? false;
                 } else if (event.key === 'Enter' && event.shiftKey) {
-                    handled = trigger('SoftBreak', nodeId, e);
+                    handled = trigger('SoftBreak', nodeId);
                 } else if (event.key === 'Delete') {
-                    handled = trigger('Delete', nodeId, e);
+                    handled = trigger('Delete', nodeId);
                 } else if (event.key === 'Tab' && event.shiftKey) {
-                    handled = trigger('BackTab', nodeId, e);
+                    handled = trigger('BackTab', nodeId);
                 } else if (event.key === 'Tab') {
-                    handled = trigger('Tab', nodeId, e);
+                    handled = trigger('Tab', nodeId);
                 }
                 if (handled) {
                     event.preventDefault();
@@ -160,11 +159,11 @@ export const useEventManager = () => {
                     event.inputType === 'insertParagraph' ||
                     /\n/.test(event.data ?? '')
                 ) {
-                    handled = triggerEnter(nodeId, e) ?? false;
+                    handled = triggerEnter(nodeId) ?? false;
                 } else if (event.inputType === 'deleteContentBackward') {
-                    handled = trigger('Backspace', nodeId, e);
+                    handled = trigger('Backspace', nodeId);
                 } else if (event.inputType === 'deleteContentForward') {
-                    handled = trigger('Delete', nodeId, e);
+                    handled = trigger('Delete', nodeId);
                 }
                 if (handled) {
                     e.preventDefault();
@@ -175,7 +174,7 @@ export const useEventManager = () => {
                 if (['deleteCompositionText'].includes(event.inputType)) {
                     return;
                 }
-                const handled = trigger('input', nodeId, e);
+                const handled = trigger('input', nodeId);
                 if (handled) {
                     // e.stopPropagation();
                     return;
@@ -186,18 +185,18 @@ export const useEventManager = () => {
 
     // needs a throttle to prevent twice firing n chrome when composing
     const triggerEnter = _.throttle(
-        (nodeId: string | undefined, e: Event) => {
-            return trigger('Enter', nodeId, e);
+        (nodeId: string | undefined) => {
+            return trigger('Enter', nodeId);
         },
         40,
         { leading: true, trailing: false }
     );
 
     const triggerSelectionChange = (nodeId: string | undefined, e: Event) => {
-        return { handled: trigger('SelectionChange', nodeId, e), e };
+        return { handled: trigger('SelectionChange', nodeId), e };
     };
 
-    const trigger = (type: string, nodeId: string | undefined, e: Event) => {
+    const trigger = (type: string, nodeId: string | undefined) => {
         return observable.current.observers?.[type]?.some((observer) => {
             if (!observer.nodeId || observer.nodeId === nodeId) {
                 return observer.callback();

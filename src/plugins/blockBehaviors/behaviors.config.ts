@@ -1,4 +1,4 @@
-import { SCHEMA } from '../../Playground/SCHEMA';
+import { SCHEMA } from '../../Playground/SCHEMA/SCHEMA';
 
 export type NodeBehaviors = {
     keepFormatOnEnter: boolean;

@@ -1,5 +1,6 @@
 import { State } from './types';
 import { getMarkedTextLength } from '../transaction/MarkedText/getMarkedTextLength';
+import { resolveState } from './StateResolver';
 
 export abstract class AbstractSelection {
     protected type?: 'text' | 'block';
@@ -40,6 +41,17 @@ export class BlockSelection extends AbstractSelection {
         return Boolean(this.nodeIds.get(nodeId));
     }
 
+    getFirstLevelBlockIds(state: State) {
+        const resolvedState = resolveState(state);
+        const selected = new Map<string, string>();
+        Array.from(this.nodeIds.values()).forEach((nodeId) => {
+            const node = resolvedState.nodes[nodeId];
+            if (node.parentId && selected.get(node.parentId)) return;
+            selected.set(nodeId, nodeId);
+        });
+        return selected;
+    }
+
     addBlockToSelection(nodeId: string) {
         const newMap = new Map<string, string>(this.nodeIds);
         newMap.set(nodeId, nodeId);
@@ -66,7 +78,7 @@ export class TextSelection extends AbstractSelection {
 
     getCurrentText(state: State) {
         const node = state.nodes[this.nodeId];
-        return node.text?.reduce((prev, curr) => prev + curr.s, '') ?? '';
+        return node.text?.reduce((prev, curr) => prev + curr.text, '') ?? '';
     }
 
     getTextBefore(state: State) {
@@ -79,12 +91,11 @@ export class TextSelection extends AbstractSelection {
         return getMarkedTextLength(node.text ?? []);
     }
 
-    isSame(selection?: AbstractSelection) {
-        if (!selection?.isText()) return false;
-        const s = selection as TextSelection;
+    isSame(selection?: AbstractSelection | TextSelection) {
+        if (!isTextSelection(selection)) return false;
         return (
-            this.nodeId === s.nodeId &&
-            TextSelection.areSameRange(this.range, s.range)
+            this.nodeId === selection.nodeId &&
+            TextSelection.areSameRange(this.range, selection.range)
         );
     }
 
@@ -111,3 +122,15 @@ export class TextSelection extends AbstractSelection {
         );
     }
 }
+
+export const isBlockSelection = (
+    selection?: AbstractSelection | BlockSelection
+): selection is BlockSelection => {
+    return !!selection?.isBlock();
+};
+
+export const isTextSelection = (
+    selection?: AbstractSelection | TextSelection
+): selection is TextSelection => {
+    return !!selection?.isText();
+};

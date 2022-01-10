@@ -1,13 +1,11 @@
 import React from 'react';
-import { Mark } from '../../editor/model/types';
 import { MentionPluginState } from './mention.types';
+import { MarkComponentAttrs } from '../../editor/view/types';
 
 export const MentionDecoration = ({
     mark,
-}: {
-    mark: Mark<MentionPluginState>;
-}) => {
-    const searchText = mark.d?.searchText as string;
+}: MarkComponentAttrs<MentionPluginState>) => {
+    const searchText = mark.data?.searchText as string;
 
     return (
         <span
@@ -38,7 +36,7 @@ export const MentionDecoration = ({
                 </svg>
             </span>
             <span style={{ display: 'none' }} data-noselect={true}>
-                {mark.d?.triggeringExpression}
+                {mark.data?.triggeringExpression}
             </span>
             <span>{searchText}</span>
             {!searchText ? (

@@ -1,5 +1,6 @@
-import { Mark, Node } from '../model/types';
+import { Mark, MarkedNode, Node } from '../model/types';
 import { AbstractSelection, Range } from '../model/Selection';
+import React from 'react';
 
 export type ViewConfig = {
     marks: Record<string, any>;
@@ -23,6 +24,17 @@ export type BlockComponentAttrs = {
     node: Node;
     selection: AbstractSelection;
     blockSelected: boolean;
+};
+
+export type MarkComponentAttrs<T = any> = {
+    children: React.ReactElement | React.ReactElement[];
+    mark: Mark<T>;
+    updateMark: (mark: Mark<T>) => void;
+    node: MarkedNode;
+};
+
+export type NodeComponentAttrs<T = any> = {
+    node: MarkedNode<T>;
 };
 
 export type Coords = {

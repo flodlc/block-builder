@@ -1,5 +1,6 @@
 import { Editor } from '../../editor/model/Editor';
 import { BlockSelection, TextSelection } from '../../editor/model/Selection';
+import { CompiledNodeSchema } from '../../editor/model/types';
 
 export const onBackspace = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as BlockSelection;
@@ -27,7 +28,8 @@ export const onBackspace = ({ editor }: { editor: Editor }) => {
             return {};
         });
 
-        const node = editor.schema.text.create();
+        const textSchema = editor.schema.text as CompiledNodeSchema;
+        const node = textSchema.create();
         transaction.insertAfter({
             parent: parentId as string,
             after: previousId,

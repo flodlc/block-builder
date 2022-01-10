@@ -1,6 +1,6 @@
-import { MarkedText } from '../editor/model/types';
-import { SCHEMA } from './SCHEMA';
+import { CompiledNodeSchema, MarkedText, Node } from '../editor/model/types';
 import { compileSchema } from '../editor/model/schema';
+import { SCHEMA } from './SCHEMA/SCHEMA';
 
 export const BIG_DATA = (() => {
     const schema = compileSchema({ schema: SCHEMA });
@@ -8,15 +8,16 @@ export const BIG_DATA = (() => {
     const docNode: any = {
         id: 'doc',
         type: 'card',
-        text: [{ s: 'My big note', m: [] }],
+        text: [{ text: 'My big note', marks: [] }],
         childrenIds: [],
     };
     nodes['doc'] = docNode;
-    for (let i = 0; i < 2000; i++) {
-        const newNode = schema.text.create();
+    for (let i = 0; i < 1000; i++) {
+        const textSchema = schema.text as CompiledNodeSchema;
+        const newNode = textSchema.create();
         newNode.text = [
             {
-                s: 'Suite aux faux pas de Nice, le club rhodanien voulait faire la bonne opération dans la course au podium.',
+                text: 'Suite aux faux pas de Nice, le club rhodanien voulait faire la bonne opération dans la course au podium.',
             },
         ] as MarkedText;
         docNode.childrenIds.push(newNode.id);
@@ -29,15 +30,15 @@ export const SINGLE_TEXT_DATA = {
     doc: {
         id: 'doc',
         type: 'text',
-        text: [{ s: 'My first note' }],
+        text: [{ text: 'My first note' }],
     },
 };
 
-export const PLAYGROUND_DATA = {
+export const PLAYGROUND_DATA: Record<string, Node> = {
     doc: {
         id: 'doc',
         type: 'card',
-        text: [{ s: 'My note', m: [] }],
+        text: [{ text: 'My note', marks: [] }],
         childrenIds: [
             'c4e3f5b0-53d8-4123-aa94-20f01328477a',
             'bd80a80b-177c-4df4-a34d-55ed10d3cc5d',
@@ -58,30 +59,34 @@ export const PLAYGROUND_DATA = {
     bcdaa: {
         id: 'bcdaa',
         type: 'text',
-        text: [{ s: 'Clipped content from a blog article' }],
+        text: [{ text: 'Clipped content from a blog article' }],
     },
     bcadaa: {
         id: 'bcadaa',
         type: 'text',
-        text: [{ s: 'Here is a mention', m: [] }],
+        text: [{ text: 'Here is a mention', marks: [] }],
     },
     sdfsffs: {
         id: 'sdfsffs',
         type: 'heading',
         attrs: { level: 2 },
-        text: [{ s: 'How to take smart notes ?' }],
+        text: [{ text: 'How to take smart notes ?' }],
     },
     fjsnsjdnf: {
         id: 'fjsnsjdnf',
         type: 'text',
-        text: [{ s: 'Harum voluptas eum nulla harum necessitatibus.' }],
+        text: [
+            {
+                text: 'Harum voluptas eum nulla harum necessitatibus.',
+            },
+        ],
     },
     kdsfkdf: {
         id: 'kdsfkdf',
         type: 'text',
         text: [
             {
-                s: 'Harum voluptas eum nulla harum necessitatibus. Corrupti fugiat modi doloribus officia voluptatem suscipit.',
+                text: 'Harum voluptas eum nulla harum necessitatibus. Corrupti fugiat modi doloribus officia voluptatem suscipit.',
             },
         ],
     },
@@ -90,7 +95,7 @@ export const PLAYGROUND_DATA = {
         type: 'text',
         text: [
             {
-                s: 'Let’s look at how a single source can proceed through the layers of progressive summarization.',
+                text: 'Let’s look at how a single source can proceed through the layers of progressive summarization.',
             },
         ],
     },
@@ -100,16 +105,20 @@ export const PLAYGROUND_DATA = {
         attrs: { emoji: '👽' },
         childrenIds: ['bcd'],
     },
-    spoasdsdf: { id: 'spoasdsdf', type: 'text', text: [] },
-    skdfsdf: { id: 'skdfsdf', type: 'text', text: [] },
-    bcd: { id: 'bcd', type: 'text', text: [{ s: 'Child of callout' }] },
+    spoasdsdf: { id: 'spoasdsdf', text: [], type: 'text' },
+    skdfsdf: { id: 'skdfsdf', text: [], type: 'text' },
+    bcd: {
+        id: 'bcd',
+        type: 'text',
+        text: [{ text: 'Child of callout' }],
+    },
     diviii: { id: 'diviii', type: 'divider' },
     dsdffze: {
         id: 'dsdffze',
         type: 'text',
         text: [
             {
-                s: 'Expedita cupiditate facilis ut minus neque. Eum ut non ipsa debitis.',
+                text: 'Expedita cupiditate facilis ut minus neque. Eum ut non ipsa debitis.',
             },
         ],
     },
@@ -118,20 +127,14 @@ export const PLAYGROUND_DATA = {
         type: 'text',
         text: [
             {
-                s: '•',
-                m: [
-                    {
-                        t: 'mention',
-                        d: {
-                            value: {
-                                type: 'date',
-                                date: '2021-12-06T16:46:35.813Z',
-                            },
-                        },
-                    },
-                ],
+                text: '•',
+                type: 'mention',
+                attrs: {
+                    type: 'date',
+                    date: '2021-12-06T16:46:35.813Z',
+                },
             },
-            { s: ' ', m: [] },
+            { text: ' ', marks: [] },
         ],
         childrenIds: [],
         attrs: {},
@@ -141,61 +144,49 @@ export const PLAYGROUND_DATA = {
         type: 'text',
         text: [
             {
-                s: '•',
-                m: [
-                    {
-                        t: 'mention',
-                        d: { value: { type: 'person', name: 'Florian' } },
-                    },
-                ],
+                text: '•',
+                type: 'mention',
+                attrs: { type: 'person', name: 'Florian' },
             },
             ...new Array(0).fill(0).flatMap(() => [
                 {
-                    s: 'bold bold ',
+                    text: 'bold bold ',
                     m: [
                         {
-                            t: 'b',
+                            type: 'b',
                         },
                     ],
                 },
                 {
-                    s: 'italic italic ',
+                    text: 'italic italic ',
                     m: [
                         {
-                            t: 'i',
+                            type: 'i',
                         },
                     ],
                 },
                 {
-                    s: 'bold bold \n',
+                    text: 'bold bold \n',
                     m: [
                         {
-                            t: 'b',
+                            type: 'b',
                         },
                     ],
                 },
             ]),
-            { s: ' ', m: [] },
+            { text: ' ', m: [] },
             {
-                s: '•',
-                m: [
-                    {
-                        t: 'mention',
-                        d: { value: { type: 'person', name: 'Mike' } },
-                    },
-                ],
+                text: '•',
+                type: 'mention',
+                attrs: { type: 'person', name: 'Mike' },
             },
-            { s: ' ', m: [] },
+            { text: ' ', m: [] },
             {
-                s: '•',
-                m: [
-                    {
-                        t: 'mention',
-                        d: { value: { type: 'person', name: 'Tyson' } },
-                    },
-                ],
+                text: '•',
+                attrs: { type: 'person', name: 'Tyson' },
+                type: 'mention',
             },
-            { s: ' ', m: [] },
+            { text: ' ', m: [] },
         ],
         childrenIds: [],
         attrs: {},

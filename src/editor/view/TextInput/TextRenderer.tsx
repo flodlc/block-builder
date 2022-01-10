@@ -6,23 +6,22 @@ import React, {
     useLayoutEffect,
     useRef,
 } from 'react';
-import { Mark, MarkedText } from '../../model/types';
+import { Mark, MarkedNode, MarkedText } from '../../model/types';
 import { markText } from '../../transaction/MarkedText/markText';
 import { ViewContext } from '../contexts/ViewContext';
 import { CompiledSchema } from '../../model/schema';
 import { NodeView } from './NodeView';
+import { NodeComponentAttrs } from '../types';
 
 const MarksWrapper = ({
     pos,
-    marks,
-    text,
+    node,
     onChange,
     value,
     schema,
 }: {
     pos: number;
-    marks?: Mark[];
-    text: string;
+    node: MarkedNode;
     value?: MarkedText;
     onChange: (text: MarkedText) => void;
     schema: CompiledSchema;
@@ -37,12 +36,11 @@ const MarksWrapper = ({
             onChange(updatedMarkedText);
         };
     const updateMarkRef = useRef(
-        getUpdateMark({ from: pos, to: pos + text.length })
+        getUpdateMark({ from: pos, to: pos + node.text.length })
     );
     return (
         <MarksFactory
-            text={text}
-            marks={marks}
+            node={node}
             updateMarkRef={updateMarkRef}
             schema={schema}
         />
@@ -51,79 +49,81 @@ const MarksWrapper = ({
 
 const MarksFactory = memo(
     ({
-        marks,
-        text,
+        node,
         updateMarkRef,
         schema,
     }: {
-        marks?: Mark[];
-        text: string;
+        node: MarkedNode;
         updateMarkRef: RefObject<(mark: Mark) => void>;
         schema: CompiledSchema;
     }) => {
         const updateMark = (mark: Mark) => updateMarkRef.current?.(mark);
         return (
             <Marks
-                text={text}
-                marks={marks}
+                marks={node.marks}
+                node={node}
                 updateMark={updateMark}
                 schema={schema}
             >
-                {text}
+                {node.text}
             </Marks>
         );
     },
     (prevProps, props) =>
-        prevProps.text === props.text &&
-        prevProps.marks?.length === props.marks?.length &&
-        JSON.stringify(prevProps.marks) === JSON.stringify(props.marks)
+        prevProps.node.text === props.node.text &&
+        prevProps.node.type === props.node.type &&
+        prevProps.node.marks?.length === props.node.marks?.length &&
+        JSON.stringify(prevProps.node.marks) ===
+            JSON.stringify(props.node.marks)
 );
 
 const Marks = ({
+    node,
     marks,
-    text,
     updateMark,
     children,
     schema,
 }: {
+    node: MarkedNode;
     marks?: Mark[];
-    text: string;
     updateMark: (mark: Mark) => void;
     children: ReactElement[] | ReactElement | string;
     schema: CompiledSchema;
 }) => {
-    const mark = marks?.[0];
-    if (!mark) return <>{children}</>;
-
     const view = useContext(ViewContext);
-    const MarkComponent = view.marks[mark.t];
-    if (!MarkComponent) return <>{children}</>;
 
-    const isNodeView = !schema[mark.t].allowText;
-    if (isNodeView) {
+    const mark = marks?.[0];
+    if (mark) {
+        const MarkComponent = view.marks[mark.type];
+        if (!MarkComponent) return <>{children}</>;
         return (
-            <NodeView mark={mark} view={view}>
-                <MarkComponent
-                    text={text}
+            <MarkComponent node={node} updateMark={updateMark} mark={mark}>
+                <Marks
+                    node={node}
                     updateMark={updateMark}
-                    mark={mark}
-                />
-            </NodeView>
+                    marks={marks.slice(1)}
+                    schema={schema}
+                >
+                    {children}
+                </Marks>
+            </MarkComponent>
         );
     }
 
-    return (
-        <MarkComponent text={text} updateMark={updateMark} mark={mark}>
-            <Marks
-                text={text}
-                updateMark={updateMark}
-                marks={marks.slice(1)}
-                schema={schema}
-            >
-                {children}
-            </Marks>
-        </MarkComponent>
-    );
+    const LeafMark = view.marks[
+        node.type ?? ''
+    ] as React.FC<NodeComponentAttrs>;
+    if (!LeafMark) return <>{children}</>;
+
+    if (node.type) {
+        return (
+            <NodeView view={view}>
+                <LeafMark node={node} />
+            </NodeView>
+        );
+    } else {
+        return <>{children}</>;
+    }
 };
 
 export const TextRenderer = React.memo(
@@ -161,15 +161,14 @@ export const TextRenderer = React.memo(
                 {decoratedText &&
                     decoratedText.map((markedNode, i) => {
                         const markPos = pos;
-                        pos += markedNode.s.length;
+                        pos += markedNode.text.length;
                         return (
                             <MarksWrapper
                                 key={i}
                                 pos={markPos}
                                 onChange={onChange}
                                 value={value}
-                                text={markedNode.s}
-                                marks={markedNode.m}
+                                node={markedNode}
                                 schema={schema}
                             />
                         );

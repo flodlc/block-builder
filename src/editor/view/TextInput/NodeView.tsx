@@ -1,4 +1,3 @@
-import { Mark } from '../../model/types';
 import React, { RefObject, useLayoutEffect, useRef } from 'react';
 import { View } from '../View';
 
@@ -6,7 +5,6 @@ export const NodeView = ({
     children,
     view,
 }: {
-    mark: Mark;
     view: View;
     children: React.ReactElement;
 }) => {

@@ -28,7 +28,6 @@ export const BlockSelection = ({
 }) => {
     if (!start || !current) return <></>;
     const ref = useRef(null);
-
     return (
         <div
             ref={ref}
