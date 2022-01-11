@@ -39,7 +39,11 @@ const insertLines = ({
 
     const node = editor.state.nodes[textSelection.nodeId];
     const firstBlock = nodes[blockIds[0]];
-    if (blockIds.length === 1 && !firstBlock.childrenIds?.length) {
+    if (
+        blockIds.length === 1 &&
+        firstBlock.text?.length &&
+        !firstBlock.childrenIds?.length
+    ) {
         editor
             .createTransaction()
             .patch({

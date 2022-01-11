@@ -43,6 +43,11 @@ export const MentionPlugin: PluginFactory =
                 )
                     return false;
 
+                const startBoundingCoords = view.getCoordsAtPos(
+                    selection.nodeId,
+                    selection.range[0]
+                );
+                if (!startBoundingCoords) return;
                 state = editor.trigger(MENTION_EVENTS.changed, {
                     searchText: '',
                     close: () => {
@@ -55,10 +60,7 @@ export const MentionPlugin: PluginFactory =
                         .length,
                     triggeringExpression: expression,
                     slashPosition: selection.range[0] - expression.length,
-                    startBoundingRect: view.getCoordsAtPos(
-                        selection.nodeId,
-                        selection.range[0]
-                    ),
+                    startBoundingRect: startBoundingCoords,
                 });
                 editor.trigger('decorationsChanged');
                 return true;

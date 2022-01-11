@@ -39,11 +39,13 @@ const getNextTargetSelection = (editor: Editor, view: View) => {
         selection.nodeId,
         selection.range[0]
     );
+    if (!selectionRect) return;
     const previousNodeTextLength = getMarkedTextLength(nextNode.text ?? []);
     let targetPos = previousNodeTextLength;
     let targetDistance = 100000;
     for (let pos = 0; pos <= previousNodeTextLength; pos++) {
         const rectAtPos = view.getCoordsAtPos(nextNode.id, pos);
+        if (!rectAtPos) return;
         const distanceWithPos = getDistance(selectionRect, rectAtPos);
         if (distanceWithPos < targetDistance) {
             targetDistance = distanceWithPos;

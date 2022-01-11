@@ -35,6 +35,11 @@ export const SuggestionPlugin: PluginFactory =
                 if (view.isDecorated(selection)) {
                     return;
                 }
+                const startBoundingRect = view.getCoordsAtPos(
+                    selection.nodeId,
+                    selection.range[0]
+                );
+                if (!startBoundingRect) return;
                 state = editor.trigger(SUGGESTION_EVENTS.changed, {
                     searchText: '',
                     close: () => {
@@ -47,10 +52,7 @@ export const SuggestionPlugin: PluginFactory =
                         .length,
                     triggeringExpression: '/',
                     slashPosition: selection.range[0] - 1,
-                    startBoundingRect: view.getCoordsAtPos(
-                        selection.nodeId,
-                        selection.range[0]
-                    ),
+                    startBoundingRect,
                 });
             }
         };

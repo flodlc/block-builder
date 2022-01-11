@@ -42,6 +42,7 @@ const blockTags: Record<string, boolean> = {
     table: true,
     tfoot: true,
     ul: true,
+    img: true,
 };
 
 const isBlock = (node: Node) => {
@@ -259,6 +260,7 @@ const parseChildren = ({
             });
             if (
                 !inlineText.length &&
+                parsed?.blocks[0]?.text?.length &&
                 matchedNode &&
                 isInlineAllowed(schema, parentType)
             ) {
@@ -266,6 +268,7 @@ const parseChildren = ({
                 const first = parsed?.blocks.shift();
                 inlineText = first?.text ?? [];
             }
+
             if (parsed) {
                 inlineText = joinMarkedTexts(inlineText, parsed.inline ?? []);
                 blocks = [...blocks, ...parsed.blocks];

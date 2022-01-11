@@ -5,11 +5,27 @@ import { insertHtml } from '../commands/insertHtml';
 
 export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
-        label: 'insert html',
+        label: 'Insert html',
         callback: () => {
             const html = prompt('paste your html here');
             if (!html) return;
             insertHtml(`<blockquote>${html}</blockquote>`, editor);
+        },
+    },
+    {
+        label: 'Turn in Image',
+        callback: () => {
+            const selection = editor.state.selection as TextSelection;
+            const nodeId = selection.nodeId;
+            editor.runCommand(
+                turnInCommand({
+                    nodeId,
+                    type: 'image',
+                    attrs: {
+                        src: 'https://images.unsplash.com/photo-1449034446853-66c86144b0ad?ixlib=rb-1.2.1&q=85&fm=jpg&crop=entropy&cs=srgb&w=3600',
+                    },
+                })
+            );
         },
     },
     {

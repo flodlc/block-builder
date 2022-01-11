@@ -12,6 +12,7 @@ import { uSchema } from './u.schema';
 import { mentionDecorationSchema, mentionSchema } from './mention.schema';
 import { headingSchema } from './heading.schema';
 import { linkSchema } from './link.schema';
+import { imageSchema } from './image.schema';
 
 export const SCHEMA: Schema = {
     text: textSchema,
@@ -21,6 +22,7 @@ export const SCHEMA: Schema = {
     callout: calloutSchema,
     card: cardSchema,
     divider: dividerSchema,
+    image: imageSchema,
     quote: quoteSchema,
     i: iSchema,
     b: bSchema,

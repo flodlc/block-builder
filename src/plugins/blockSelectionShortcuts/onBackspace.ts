@@ -27,6 +27,7 @@ export const onBackspace = ({ editor }: { editor: Editor }) => {
             }
             return {};
         });
+        if (!parentId) return;
 
         const textSchema = editor.schema.text as CompiledNodeSchema;
         const node = textSchema.create();

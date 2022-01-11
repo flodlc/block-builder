@@ -12,15 +12,11 @@ export const CopyPastePlugin: PluginFactory =
         const pasteHandler = (e: ClipboardEvent) => {
             e.preventDefault();
             let html = e.clipboardData?.getData?.('text/html');
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = html ?? '';
 
-            const htmlFromPlainText = e.clipboardData
-                ?.getData?.('text/plain')
-                ?.split(/\n/)
-                .filter((item) => item)
-                .reduce((acc, section) => acc + `<p>${section.trim()}</p>`, '');
-            html = html || htmlFromPlainText;
+            if (!html) {
+                const plainText = e.clipboardData?.getData?.('text/plain');
+                html = parsePlainText(plainText);
+            }
 
             if (!html) return;
             insertHtml(html, editor);
@@ -73,3 +69,9 @@ export const CopyPastePlugin: PluginFactory =
             },
         };
     };
+
+const parsePlainText = (text = '') =>
+    text
+        ?.split(/\n/)
+        .filter((item) => item)
+        .reduce((acc, section) => acc + `<p>${section.trim()}</p>`, '');

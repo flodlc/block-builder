@@ -6,6 +6,7 @@ export const textSchema: NodeSchema = {
         return {};
     },
     serialize: ({ serializedText, serializedChildren }) => {
+        if (!serializedText) return serializedChildren;
         return `<p>${serializedText}</p>${serializedChildren}`;
     },
     attrs: {},

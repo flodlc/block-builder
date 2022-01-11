@@ -94,8 +94,9 @@ export class View {
             side = 1,
             relativeToView = true,
         }: { side?: 1 | -1; relativeToView?: boolean } = {}
-    ): Coords {
+    ): Coords | undefined {
         const charDomRect = getDomRectAtPos(this.dom, nodeId, pos, side);
+        if (!charDomRect) return undefined;
         return relativeToView
             ? changeCoordsReference(charDomRect, this.dom)
             : charDomRect;
@@ -122,8 +123,9 @@ const getDomRectAtPos = (
     nodeId: string,
     pos: number,
     side: 1 | -1 = 1
-): Coords => {
+): Coords | undefined => {
     const editable = getEditable(viewDom, nodeId);
+    if (!editable) return undefined;
     const range = getRange(editable, [pos, pos + (side > 0 ? 1 : 0)]);
     const rangeRects = range.getClientRects();
     if (editable.textContent?.length && rangeRects.length) {
