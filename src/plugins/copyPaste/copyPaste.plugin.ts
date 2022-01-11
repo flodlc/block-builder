@@ -11,7 +11,17 @@ export const CopyPastePlugin: PluginFactory =
     ({ dom, editor }) => {
         const pasteHandler = (e: ClipboardEvent) => {
             e.preventDefault();
-            const html = e.clipboardData?.getData?.('text/html');
+            let html = e.clipboardData?.getData?.('text/html');
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = html ?? '';
+
+            const htmlFromPlainText = e.clipboardData
+                ?.getData?.('text/plain')
+                ?.split(/\n/)
+                .filter((item) => item)
+                .reduce((acc, section) => acc + `<p>${section.trim()}</p>`, '');
+            html = html || htmlFromPlainText;
+
             if (!html) return;
             insertHtml(html, editor);
         };
