@@ -199,7 +199,7 @@ export const useEventManager = () => {
     const trigger = (type: string, nodeId: string | undefined) => {
         return observable.current.observers?.[type]?.some((observer) => {
             if (!observer.nodeId || observer.nodeId === nodeId) {
-                return observer.callback();
+                return observer.callback({ nodeId });
             }
             return false;
         });

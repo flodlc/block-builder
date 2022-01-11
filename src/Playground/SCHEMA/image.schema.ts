@@ -13,9 +13,7 @@ export const imageSchema: NodeSchema = {
         };
     },
     attrs: {
-        src: {
-            required: false,
-        },
+        src: { required: false },
     },
     allowText: true,
     allowChildren: false,

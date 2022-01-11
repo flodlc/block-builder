@@ -194,7 +194,7 @@ export const PLAYGROUND_DATA: Record<string, Node> = {
     '1907f312-3972-4263-8f77-2f58c6eeb188': {
         id: '1907f312-3972-4263-8f77-2f58c6eeb188',
         type: 'image',
-        text: [],
+        text: [{ text: 'Time Square, NY' }],
         childrenIds: [],
         attrs: {
             src: 'https://media.istockphoto.com/photos/taxis-in-times-square-with-7th-avenue-new-york-city-manhattan-picture-id1277102943?b=1&k=20&m=1277102943&s=170667a&w=0&h=tp_vCWDpgrKsUBtl2ZI-8yy2fMHtoZJPcaZBTcnN9nc=',

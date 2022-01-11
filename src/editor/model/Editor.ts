@@ -94,34 +94,31 @@ export class Editor {
         state: State;
         appliedTransaction: AppliedTransaction;
     }) => {
-        const normalizedAppliedTransaction = { ...appliedTransaction };
-        const normalizedState = normalizeState(
+        let hasNormalized = false;
+        const { normalizedState, normalizeTransactions } = normalizeState(
             this.schema,
             state,
             ({ transaction: normalizeTransaction, state, error }) => {
                 console.error(`Invalid state fixed: ${error}`);
-                const {
-                    state: normalizedState,
-                    appliedTransaction: appliedNormalizeTransaction,
-                } = applyTransaction({
+                hasNormalized = true;
+                return applyTransaction({
                     state,
                     transaction: normalizeTransaction,
                 });
-                normalizedAppliedTransaction.steps = [
-                    ...appliedTransaction.steps,
-                    ...appliedNormalizeTransaction.steps,
-                ];
-                normalizedAppliedTransaction.reversedSteps = [
-                    ...appliedTransaction.reversedSteps,
-                    ...appliedNormalizeTransaction.reversedSteps,
-                ];
-                return {
-                    state: normalizedState,
-                    appliedTransaction: appliedNormalizeTransaction,
-                };
             }
         );
-        return { normalizedState, normalizedAppliedTransaction };
+        return {
+            normalizedState,
+            hasNormalized,
+            normalizedAppliedTransaction: {
+                steps: appliedTransaction.steps.concat(
+                    normalizeTransactions.flatMap((item) => item.steps)
+                ),
+                reversedSteps: appliedTransaction.reversedSteps.concat(
+                    normalizeTransactions.flatMap((item) => item.reversedSteps)
+                ),
+            },
+        };
     };
 
     applyTransaction(transaction: Transaction) {
@@ -131,7 +128,7 @@ export class Editor {
             transaction,
         });
 
-        const { normalizedAppliedTransaction, normalizedState } =
+        const { normalizedAppliedTransaction, normalizedState, hasNormalized } =
             this.normalizeAfterTransaction({ state, appliedTransaction });
 
         this.state = normalizedState;
@@ -139,7 +136,7 @@ export class Editor {
 
         this.trigger('tr');
 
-        if (transaction.keepHistory) {
+        if (transaction.keepHistory || hasNormalized) {
             this.history = produce(this.history, (history) => {
                 history.items.push({
                     transaction: normalizedAppliedTransaction,

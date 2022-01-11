@@ -29,14 +29,20 @@ export type EventManager = {
         },
         event: Event
     ) => void;
-    observers: Record<string, { nodeId?: string; callback: () => boolean }[]>;
+    observers: Record<
+        string,
+        {
+            nodeId?: string;
+            callback: ({ nodeId }: { nodeId?: string }) => boolean;
+        }[]
+    >;
     on: (
         { type, nodeId }: { type: string; nodeId?: string },
-        callback: () => boolean
+        callback: ({ nodeId }: { nodeId?: string }) => boolean
     ) => void;
     off: (
         { type, nodeId }: { type: string; nodeId?: string },
-        callback: () => boolean
+        callback: ({ nodeId }: { nodeId?: string }) => boolean
     ) => void;
 };
 

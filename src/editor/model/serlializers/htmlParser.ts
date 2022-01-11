@@ -87,7 +87,7 @@ export const parseHtml = ({
                 rootId: block.id,
             },
             ({ transaction, state }) => applyTransaction({ state, transaction })
-        );
+        ).normalizedState;
     });
 
     return {

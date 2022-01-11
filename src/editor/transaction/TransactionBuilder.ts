@@ -46,6 +46,10 @@ export class TransactionBuilder {
         this.dispatchCallback(this.steps, keepHistory);
     };
 
+    getTransaction = (keepHistory = true) => {
+        return { steps: this.steps, keepHistory };
+    };
+
     steps: Step[] = [];
 
     private readonly dispatchCallback: (
@@ -53,7 +57,10 @@ export class TransactionBuilder {
         keepHistory: boolean
     ) => void;
 
-    constructor(dispatch: (steps: Step[], keepHistory: boolean) => void) {
+    constructor(
+        dispatch: (steps: Step[], keepHistory: boolean) => void = () =>
+            undefined
+    ) {
         this.dispatchCallback = dispatch;
     }
 }
