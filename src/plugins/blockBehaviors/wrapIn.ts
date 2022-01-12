@@ -3,10 +3,7 @@ import { Editor } from '../../editor/model/Editor';
 export const wrapInPrevious =
     ({ nodeId }: { nodeId: string }) =>
     (editor: Editor) => {
-        const parentId = editor.runQuery(
-            (resolvedState) => resolvedState.nodes[nodeId].parentId
-        ) as string;
-
+        const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
         if (!parentId) return false;
         const index =
             editor.state.nodes[parentId]?.childrenIds?.indexOf(nodeId) ?? 0;
@@ -24,14 +21,7 @@ export const wrapInPrevious =
 
         editor
             .createTransaction()
-            .removeFrom({
-                nodeId,
-                parentId,
-            })
-            .insertAfter({
-                parent: targetId,
-                node,
-                after: wrappingLastChild,
-            })
+            .removeFrom({ nodeId, parentId })
+            .insertAfter({ parentId: targetId, node, after: wrappingLastChild })
             .dispatch();
     };

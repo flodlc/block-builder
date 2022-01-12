@@ -1,15 +1,15 @@
 import { Editor } from '../../../model/Editor';
 import { TextSelection } from '../../../model/Selection';
-import { nextEditable } from '../../../model/queries/nextEditable';
+import { View } from '../../View';
 
-const getTargetSelection = (editor: Editor) => {
+const getTargetSelection = (editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;
-    const previousNode = editor.runQuery(nextEditable(selection.nodeId));
-    if (!previousNode) return;
-    return new TextSelection(previousNode?.id, [0, 0]);
+    const nextNode = view.getNextDisplayedTextField(selection.nodeId);
+    if (!nextNode) return;
+    return new TextSelection(nextNode?.id, [0, 0]);
 };
 
-export const onArrowRight = (e: KeyboardEvent, editor: Editor) => {
+export const onArrowRight = (e: KeyboardEvent, editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;
     const previousNodeTextLength = selection.getTextLength(editor.state);
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -26,7 +26,7 @@ export const onArrowRight = (e: KeyboardEvent, editor: Editor) => {
     }
     e.preventDefault();
     e.stopPropagation();
-    const targetSelection = getTargetSelection(editor);
+    const targetSelection = getTargetSelection(editor, view);
     if (!targetSelection) return;
     editor.createTransaction().focus(targetSelection).dispatch(false);
 };

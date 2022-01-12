@@ -28,7 +28,7 @@ export const Text: React.FC<BlockComponentAttrs> = ({
                 range={textSelection?.range}
                 nodeId={node.id}
             />
-            {(node.childrenIds?.length ?? 0) > 0 && (
+            {!!node.childrenIds?.length && (
                 <div
                     style={{
                         paddingLeft: '24px',

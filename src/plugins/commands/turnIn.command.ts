@@ -58,9 +58,7 @@ const wrapIn = ({
     nodeId: string;
     type: string;
 }) => {
-    const parentId = editor.runQuery(
-        (resolvedState) => resolvedState.nodes[nodeId].parentId
-    ) as string;
+    const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
     if (!parentId) return false;
 
     const typeSchema = editor.schema[type];
@@ -73,14 +71,14 @@ const wrapIn = ({
         .insertAfter({
             after: nodeId,
             node: wrappingNode,
-            parent: parentId as string,
+            parentId,
         })
         .removeFrom({
             nodeId,
             parentId,
         })
         .insertAfter({
-            parent: wrappingNode.id,
+            parentId: wrappingNode.id,
             node,
         })
         .dispatch();

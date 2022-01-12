@@ -28,6 +28,7 @@ import { SCHEMA } from './SCHEMA/SCHEMA';
 import { LinkPlugin } from '../plugins/link/link.plugin';
 import { UliPlugin } from '../plugins/uli/uliPlugin';
 import { ImagePlugin } from '../plugins/image/image.plugin';
+import { ToggleListPlugin } from '../plugins/toggleList/toggleList.plugin';
 
 function Playground() {
     const resetNote = (dataSet: Record<string, Node>) => () => {
@@ -106,6 +107,7 @@ function Playground() {
                     CopyPastePlugin(),
                     BalloonPlugin(),
                     ImagePlugin(),
+                    ToggleListPlugin(),
                 ]}
                 editor={editor}
             />

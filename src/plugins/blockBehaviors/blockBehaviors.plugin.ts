@@ -7,8 +7,8 @@ import { onBackTab, onTab } from './onTab';
 export const BlockBehaviorsPlugin: PluginFactory =
     () =>
     ({ editor, view }) => {
-        const enterHandler = () => onEnter({ editor });
-        const backspaceHandler = () => onBackspace({ editor });
+        const enterHandler = () => onEnter({ editor, view });
+        const backspaceHandler = () => onBackspace({ editor, view });
         const onDeleteHandler = () => onDelete({ editor });
         const onTabHandler = () => onTab({ editor });
         const onBackTabHandler = () => onBackTab({ editor });

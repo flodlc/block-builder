@@ -29,15 +29,20 @@ export const Oli: React.FC<BlockComponentAttrs> = ({
                 placeholder={<>Ordered List</>}
                 keepPlaceholder={true}
             />
-            <div
-                style={{
-                    paddingLeft: '24px',
-                    marginTop: '2px',
-                    marginBottom: '-2px',
-                }}
-            >
-                <Children parentId={node.id} childrenIds={node.childrenIds} />
-            </div>
+            {!!node.childrenIds?.length && (
+                <div
+                    style={{
+                        paddingLeft: '24px',
+                        marginTop: '2px',
+                        marginBottom: '-2px',
+                    }}
+                >
+                    <Children
+                        parentId={node.id}
+                        childrenIds={node.childrenIds}
+                    />
+                </div>
+            )}
             <SelectionHalo blockSelected={blockSelected} />
         </div>
     );

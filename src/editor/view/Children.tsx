@@ -12,6 +12,7 @@ export const Children = ({
 }) => {
     return (
         <>
+            <div data-children-uid={parentId} />
             {childrenIds &&
                 childrenIds.map((childId) => (
                     <Child key={childId} parentId={parentId} nodeId={childId} />

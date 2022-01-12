@@ -19,10 +19,10 @@ export const ArrowNavigationPlugin: PluginFactory =
                 onArrowDown(e, editor, view);
             }
             if (e.key === 'ArrowLeft') {
-                onArrowLeft(e, editor);
+                onArrowLeft(e, editor, view);
             }
             if (e.key === 'ArrowRight') {
-                onArrowRight(e, editor);
+                onArrowRight(e, editor, view);
             }
         };
 

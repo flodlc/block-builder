@@ -1,6 +1,5 @@
 import { Editor } from '../../../model/Editor';
 import { TextSelection } from '../../../model/Selection';
-import { previousEditable } from '../../../model/queries/previousEditable';
 import { getMarkedTextLength } from '../../../transaction/MarkedText/getMarkedTextLength';
 import { View } from '../../View';
 import { Coords } from '../../types';
@@ -28,7 +27,7 @@ const getDistance = (selectionRect: Coords, charRect: Coords) => {
 
 const getPreviousTargetSelection = (editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;
-    const previousNode = editor.runQuery(previousEditable(selection.nodeId));
+    const previousNode = view.getNextDisplayedTextField(selection.nodeId, -1);
     if (!previousNode) return;
     const selectionRect = view.getCoordsAtPos(
         selection.nodeId,

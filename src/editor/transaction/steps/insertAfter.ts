@@ -5,17 +5,17 @@ export const insertAfter = ({
     state,
     node,
     after,
-    parent,
+    parentId,
 }: {
     state: State;
     node: Node;
     after?: string;
-    parent: string;
+    parentId: string;
 }) => {
     return {
         state: produce(state, (draftState) => {
             draftState.nodes[node.id] = node;
-            const parentNode = draftState.nodes[parent];
+            const parentNode = draftState.nodes[parentId];
 
             parentNode.childrenIds = parentNode?.childrenIds ?? [];
 
@@ -29,7 +29,7 @@ export const insertAfter = ({
         reversedSteps: {
             name: 'removeFrom',
             nodeId: node.id,
-            parentId: parent,
+            parentId,
         },
     };
 };

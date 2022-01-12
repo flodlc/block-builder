@@ -54,6 +54,7 @@ const isBlock = (node: Node) => {
 
 const ignoredTags: Record<string, boolean> = {
     script: true,
+    meta: true,
 };
 
 const isIgnoredTag = (node: Node) => {
@@ -111,6 +112,16 @@ const parseText = (
         return [
             {
                 text: domNode.textContent?.replace(/\n/g, ' ') ?? '',
+                marks: marks,
+            },
+        ];
+    } else if (
+        domNode.nodeType === 1 &&
+        (domNode as HTMLElement).tagName.toLocaleLowerCase() === 'br'
+    ) {
+        return [
+            {
+                text: '\n',
                 marks: marks,
             },
         ];
@@ -285,7 +296,7 @@ const parseChildren = ({
                 }
             }
         } else {
-            if (!childNode.textContent?.trim()) return;
+            if (!childNode.textContent) return;
             if (isInlineAllowed(schema, parentType) && !openedBlock) {
                 inlineText = joinMarkedTexts(
                     inlineText,

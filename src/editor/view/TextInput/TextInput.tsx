@@ -178,6 +178,7 @@ export const TextInput = ({
             <div
                 ref={ref}
                 className="editable_content"
+                data-editable-uid={nodeId}
                 contentEditable={contentEditable}
                 suppressContentEditableWarning={true}
                 onCompositionStart={() => (composingRef.current = true)}

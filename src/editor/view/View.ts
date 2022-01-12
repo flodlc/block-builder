@@ -9,6 +9,7 @@ import { TextSelection } from '../model/Selection';
 import { Editor } from '../model/Editor';
 import React from 'react';
 import { getRange } from './TextInput/utils/restoreSelection';
+import { Node } from '../model/types';
 
 type NativEventType =
     | 'selectionchange'
@@ -107,6 +108,49 @@ export class View {
             ? changeCoordsReference(charDomRect, this.dom)
             : charDomRect;
     }
+
+    hasDisplayedChildren(nodeId: string) {
+        return !!getNodeChildrenMarker(nodeId);
+    }
+
+    hasDisplayedTextField(nodeId: string) {
+        return !!getEditable(this.dom, nodeId);
+    }
+
+    isNodeDisplayed(nodeId: string) {
+        return !!getNodeInDom(this.dom, nodeId);
+    }
+
+    getNextDisplayedTextField(
+        nodeId: string,
+        direction: 1 | -1 = 1
+    ): Node | undefined {
+        return this.editor.runQuery((resolvedState) => {
+            const index = resolvedState.flatTree.indexOf(nodeId);
+            let cursorIndex = index + direction;
+            while (cursorIndex < resolvedState.flatTree.length) {
+                const cursorId = resolvedState.flatTree[cursorIndex];
+                if (this.hasDisplayedTextField(cursorId)) {
+                    return this.editor.state.nodes[cursorId];
+                }
+                cursorIndex = cursorIndex + direction;
+            }
+        });
+    }
+
+    getNextDisplayedNode(nodeId: string, direction: 1 | -1 = 1) {
+        return this.editor.runQuery((resolvedState) => {
+            const index = resolvedState.flatTree.indexOf(nodeId);
+            let cursorIndex = index + direction;
+            while (cursorIndex < resolvedState.flatTree.length) {
+                const cursorId = resolvedState.flatTree[cursorIndex];
+                if (this.isNodeDisplayed(cursorId)) {
+                    return this.editor.state.nodes[cursorId];
+                }
+                cursorIndex = cursorIndex + direction;
+            }
+        });
+    }
 }
 
 const changeCoordsReference = (
@@ -146,7 +190,16 @@ const getDomRectAtPos = (
     }
 };
 
+const getNodeChildrenMarker = (nodeId: string) => {
+    return document.querySelector(
+        `[data-uid="${nodeId}"] [data-children-uid="${nodeId}"]`
+    ) as HTMLElement;
+};
+
 const getEditable = (viewDom: HTMLElement, nodeId: string) =>
     document.querySelector(
-        `[data-uid="${nodeId}"] .editable_content`
+        `[data-uid="${nodeId}"] .editable_content[data-editable-uid="${nodeId}"]`
     ) as HTMLElement;
+
+const getNodeInDom = (viewDom: HTMLElement, nodeId: string) =>
+    document.querySelector(`[data-uid="${nodeId}"]`) as HTMLElement;

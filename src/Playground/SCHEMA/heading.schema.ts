@@ -22,7 +22,7 @@ export const headingSchema: NodeSchema = {
             if (!parentId) return;
             transaction
                 .removeFrom({ parentId: node.id, nodeId: child.id })
-                .insertAfter({ parent: parentId, after: node.id, node: child })
+                .insertAfter({ parentId, after: node.id, node: child })
                 .dispatch();
         }
     },

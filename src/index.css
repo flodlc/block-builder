@@ -14,6 +14,10 @@ code {
         monospace;
 }
 
+a {
+    color: #6da2db;
+}
+
 .editor {
     display: flex;
     flex-direction: column;

@@ -13,6 +13,7 @@ import { mentionDecorationSchema, mentionSchema } from './mention.schema';
 import { headingSchema } from './heading.schema';
 import { linkSchema } from './link.schema';
 import { imageSchema } from './image.schema';
+import { toggleListSchema } from './toggleList.schema';
 
 export const SCHEMA: Schema = {
     text: textSchema,
@@ -24,6 +25,7 @@ export const SCHEMA: Schema = {
     divider: dividerSchema,
     image: imageSchema,
     quote: quoteSchema,
+    toggleList: toggleListSchema,
     i: iSchema,
     b: bSchema,
     u: uSchema,

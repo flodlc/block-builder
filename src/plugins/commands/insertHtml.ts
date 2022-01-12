@@ -68,10 +68,11 @@ const insertLines = ({
         return;
     }
 
-    const parentId = editor.runQuery(
+    let parentId = editor.runQuery(
         (resolvedState) =>
             resolvedState.nodes[textSelection.nodeId]?.parentId as string
     );
+    if (!parentId) parentId = editor.state.rootId;
 
     const tr = editor.createTransaction();
     blockIds?.forEach((blockId, i) => {
@@ -81,6 +82,7 @@ const insertLines = ({
     if (!node.text?.length) {
         tr.removeFrom({ nodeId: node.id, parentId });
     }
+
     tr.focus(new BlockSelection(blockIds)).dispatch();
 };
 
@@ -94,7 +96,7 @@ const insertLine = (
     const node = nodes[blockId];
     tr.insertAfter({
         node: { ...node, childrenIds: [] },
-        parent: parentId,
+        parentId,
         after: prev,
     });
     node.childrenIds?.forEach((id, i) => {

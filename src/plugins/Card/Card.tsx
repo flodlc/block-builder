@@ -24,14 +24,9 @@ export const Card: React.FC<BlockComponentAttrs> = ({ node, selection }) => {
                 range={textSelection?.range}
                 nodeId={node.id}
             />
-            {!!node.childrenIds?.length && (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Children
-                        parentId={node.id}
-                        childrenIds={node.childrenIds}
-                    />
-                </div>
-            )}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <Children parentId={node.id} childrenIds={node.childrenIds} />
+            </div>
         </div>
     );
 };

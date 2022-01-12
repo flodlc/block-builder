@@ -33,7 +33,9 @@ export const Image = ({
                 position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
-                margin: '20px 0',
+                width: '100%',
+                maxWidth: `${node.attrs?.width}px`,
+                margin: '20px auto',
             }}
         >
             {node.attrs?.src && (
@@ -87,6 +89,76 @@ export const Image = ({
             )}
             {!node.attrs?.src && <>No image</>}
             <SelectionHalo blockSelected={blockSelected} />
+            <div
+                onClick={() => {
+                    editor
+                        .createTransaction()
+                        .patch({
+                            nodeId: node.id,
+                            patch: {
+                                attrs: {
+                                    ...node.attrs,
+                                    width: Math.max(
+                                        (node.attrs?.width ?? 716) - 50,
+                                        216
+                                    ),
+                                },
+                            },
+                        })
+                        .dispatch();
+                }}
+                style={{
+                    position: 'absolute',
+                    right: '10px',
+                    opacity: '0.75',
+                    top: 'calc(50% - 30px)',
+                    background: 'black',
+                    height: '35px',
+                    width: '35px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '100px',
+                    cursor: 'pointer',
+                }}
+            >
+                -
+            </div>
+            <div
+                onClick={() => {
+                    editor
+                        .createTransaction()
+                        .patch({
+                            nodeId: node.id,
+                            patch: {
+                                attrs: {
+                                    ...node.attrs,
+                                    width: Math.min(
+                                        (node.attrs?.width ?? 716) + 50,
+                                        716
+                                    ),
+                                },
+                            },
+                        })
+                        .dispatch();
+                }}
+                style={{
+                    position: 'absolute',
+                    right: '-45px',
+                    opacity: '0.75',
+                    top: 'calc(50% - 30px)',
+                    background: 'black',
+                    height: '35px',
+                    width: '35px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '100px',
+                    cursor: 'pointer',
+                }}
+            >
+                +
+            </div>
         </div>
     );
 };

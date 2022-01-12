@@ -3,14 +3,12 @@ import { Editor } from '../../editor/model/Editor';
 export const unwrap =
     ({ nodeId }: { nodeId: string }) =>
     (editor: Editor) => {
-        const parentId = editor.runQuery(
-            (resolvedState) => resolvedState.nodes[nodeId].parentId
-        ) as string;
+        const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
         if (!parentId) return false;
 
         const granParenId = editor.runQuery(
-            (resolvedState) => resolvedState.nodes[parentId].parentId
-        ) as string;
+            ({ nodes }) => nodes[parentId].parentId
+        );
         if (!granParenId) return false;
 
         const parent = editor.state.nodes[parentId];
@@ -18,15 +16,8 @@ export const unwrap =
 
         const tr = editor
             .createTransaction()
-            .insertAfter({
-                parent: granParenId,
-                after: parentId,
-                node,
-            })
-            .removeFrom({
-                parentId,
-                nodeId,
-            });
+            .insertAfter({ parentId: granParenId, after: parentId, node })
+            .removeFrom({ parentId, nodeId });
 
         const indexInParent = parent.childrenIds?.indexOf(nodeId) ?? 0;
 
@@ -34,22 +25,16 @@ export const unwrap =
             ?.slice(indexInParent + 1)
             .reverse()
             .forEach((nextSiblingId) => {
-                tr.removeFrom({
-                    nodeId: nextSiblingId,
-                    parentId,
-                });
+                tr.removeFrom({ nodeId: nextSiblingId, parentId });
                 tr.insertAfter({
-                    parent: nodeId,
+                    parentId: nodeId,
                     after: node.childrenIds?.[node.childrenIds?.length - 1],
                     node: editor.state.nodes[nextSiblingId],
                 });
             });
 
         if (!editor.schema[parent.type].allowText && indexInParent === 0) {
-            tr.removeFrom({
-                nodeId: parentId,
-                parentId: granParenId,
-            });
+            tr.removeFrom({ nodeId: parentId, parentId: granParenId });
         }
 
         tr.dispatch();

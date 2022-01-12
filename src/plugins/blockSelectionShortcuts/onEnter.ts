@@ -19,10 +19,8 @@ export const onEnter = ({ editor }: { editor: Editor }) => {
             )
             .dispatch(false);
     } else {
-        const parent = editor.runQuery(
-            (resolvedState) => resolvedState.nodes[firstNodeId].parentId
-        );
-        if (!parent) return;
+        const { parentId } = editor.runQuery(({ nodes }) => nodes[firstNodeId]);
+        if (!parentId) return;
 
         const textSchema = editor.schema.text as CompiledNodeSchema;
         const newNode = textSchema.create();
@@ -30,7 +28,7 @@ export const onEnter = ({ editor }: { editor: Editor }) => {
             .createTransaction()
             .insertAfter({
                 after: firstNodeId,
-                parent,
+                parentId,
                 node: newNode,
             })
             .focus(new TextSelection(newNode.id, [0, 0]))

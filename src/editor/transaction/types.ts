@@ -17,7 +17,7 @@ interface InsertAfterStep {
     name: 'insertAfter';
     node: Node;
     after?: string;
-    parent: string;
+    parentId: string;
 }
 
 interface FocusStep {

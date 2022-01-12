@@ -4,14 +4,21 @@ import { TextSelection } from '../../editor/model/Selection';
 import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
 import { CompiledNodeSchema } from '../../editor/model/types';
+import { View } from '../../editor/view/View';
 
-export const onBackspace = ({ editor }: { editor: Editor }): boolean => {
+export const onBackspace = ({
+    editor,
+    view,
+}: {
+    editor: Editor;
+    view: View;
+}): boolean => {
     const selection = editor.state.selection as TextSelection;
     if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0)
         return false;
     if (selection.nodeId === editor.state.rootId) return true;
     return [tryReset, tryUnwrap, tryRemove].some((callback) =>
-        callback({ editor })
+        callback({ editor, view })
     );
 };
 
@@ -22,10 +29,7 @@ const tryReset = ({ editor }: { editor: Editor }) => {
     const textSchema = editor.schema.text as CompiledNodeSchema;
     editor
         .createTransaction()
-        .patch({
-            nodeId: node.id,
-            patch: textSchema.patch(node),
-        })
+        .patch({ nodeId: node.id, patch: textSchema.patch(node) })
         .dispatch();
     return true;
 };
@@ -33,37 +37,32 @@ const tryReset = ({ editor }: { editor: Editor }) => {
 const tryUnwrap = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
 
-    const parentId = editor.runQuery(
-        (resolvedState) => resolvedState.nodes[selection.nodeId].parentId
+    const { parentId } = editor.runQuery(
+        ({ nodes }) => nodes[selection.nodeId]
     );
     if (!parentId) return false;
     const parent = editor.state.nodes[parentId];
-
+    const parentSchema = editor.schema[parent.type];
     const currentIndex = parent.childrenIds?.indexOf(selection.nodeId) ?? -1;
+
     if (
-        currentIndex > 0 &&
+        (currentIndex > 0 || parentSchema.allowText) &&
         currentIndex < (parent.childrenIds?.length ?? 0) - 1
-    )
+    ) {
         return false;
+    }
     const unwrapped = editor.runCommand(unwrap({ nodeId: selection.nodeId }));
     return unwrapped !== false;
 };
 
-const tryRemove = ({ editor }: { editor: Editor }) => {
+const tryRemove = ({ editor, view }: { editor: Editor; view: View }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
 
-    const prevId = editor.runQuery((resolvedState) => {
-        const index = resolvedState.flatTree.indexOf(node.id);
-        return resolvedState.flatTree[index - 1];
-    });
-
-    const prev = editor.state.nodes[prevId];
+    const prev = view.getNextDisplayedNode(node.id, -1);
     if (!prev) return false;
 
-    const parentId = editor.runQuery(
-        (resolvedState) => resolvedState.nodes[node.id].parentId
-    );
+    const { parentId } = editor.runQuery(({ nodes }) => nodes[node.id]);
     if (!parentId) return false;
 
     const transaction = editor.createTransaction();
@@ -74,44 +73,27 @@ const tryRemove = ({ editor }: { editor: Editor }) => {
             .reverse()
             .forEach((childId) => {
                 transaction
-                    .removeFrom({
-                        parentId: node.id,
-                        nodeId: childId,
-                    })
+                    .removeFrom({ parentId: node.id, nodeId: childId })
                     .insertAfter({
                         node: editor.state.nodes[childId],
-                        parent: parentId,
+                        parentId,
                         after: node.id,
                     });
             });
 
+        const prevTextLength = prev.text ? getMarkedTextLength(prev.text) : 0;
+        const prevText = joinMarkedTexts(prev.text, node.text);
         transaction
-            .removeFrom({
-                parentId,
-                nodeId: node.id,
-            })
-            .patch({
-                nodeId: prev.id,
-                patch: {
-                    text: joinMarkedTexts(prev.text, node.text),
-                },
-            })
+            .removeFrom({ parentId, nodeId: node.id })
+            .patch({ nodeId: prev.id, patch: { text: prevText } })
             .focus(
-                new TextSelection(prev.id, [
-                    prev.text ? getMarkedTextLength(prev.text) : 0,
-                    prev.text ? getMarkedTextLength(prev.text) : 0,
-                ])
+                new TextSelection(prev.id, [prevTextLength, prevTextLength])
             );
     } else {
-        const parentId = editor.runQuery(
-            (resolvedState) => resolvedState.nodes[prevId].parentId
-        );
+        const { parentId } = editor.runQuery(({ nodes }) => nodes[prev.id]);
         if (!parentId) return false;
         transaction
-            .removeFrom({
-                parentId,
-                nodeId: prev.id,
-            })
+            .removeFrom({ parentId, nodeId: prev.id })
             .focus(selection.clone());
     }
 

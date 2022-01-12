@@ -28,13 +28,13 @@ export class TransactionBuilder {
     insertAfter = ({
         node,
         after,
-        parent,
+        parentId,
     }: {
         node: Node;
         after?: string;
-        parent: string;
+        parentId: string;
     }): TransactionBuilder => {
-        this.steps.push({ name: 'insertAfter', node, after, parent });
+        this.steps.push({ name: 'insertAfter', node, after, parentId });
         return this;
     };
     focus = (selection?: AbstractSelection): TransactionBuilder => {

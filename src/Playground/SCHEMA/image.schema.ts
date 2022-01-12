@@ -14,6 +14,7 @@ export const imageSchema: NodeSchema = {
     },
     attrs: {
         src: { required: false },
+        width: {},
     },
     allowText: true,
     allowChildren: false,

@@ -7,14 +7,10 @@ export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
     const textLength = selection.getTextLength(editor.state);
 
-    if (
-        selection?.range?.[0] !== textLength ||
-        selection?.range?.[1] !== textLength
-    )
-        return false;
+    const range = selection?.range;
+    if (range?.[0] !== textLength || range?.[1] !== textLength) return false;
 
     const node = editor.state.nodes[selection.nodeId];
-
     const nextId = editor.runQuery((resolvedState) => {
         const index = resolvedState.flatTree.indexOf(node.id);
         return resolvedState.flatTree[index + 1];
@@ -26,18 +22,13 @@ export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     if (node.childrenIds?.length && editor.state.rootId !== node.id) {
         unwrapChildren({ nodeId: node.id, editor, transaction });
     } else {
-        const parentId = editor.runQuery(
-            (resolvedState) => resolvedState.nodes[nextId].parentId
-        );
+        const { parentId } = editor.runQuery(({ nodes }) => nodes[nextId]);
         if (!parentId) return false;
         unwrapChildren({ nodeId: nextId, editor, transaction });
+
+        const text = joinMarkedTexts(node.text, next.text);
         transaction
-            .patch({
-                nodeId: node.id,
-                patch: {
-                    text: joinMarkedTexts(node.text, next.text),
-                },
-            })
+            .patch({ nodeId: node.id, patch: { text } })
             .removeFrom({ nodeId: nextId, parentId });
     }
     transaction.focus(selection.clone()).dispatch();
@@ -53,9 +44,7 @@ const unwrapChildren = ({
     nodeId: string;
     transaction: TransactionBuilder;
 }) => {
-    const parentId = editor.runQuery(
-        (resolvedState) => resolvedState.nodes[nodeId].parentId
-    );
+    const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
     if (!parentId) return;
     const node = editor.state.nodes[nodeId];
     (node.childrenIds ?? [])
@@ -64,14 +53,7 @@ const unwrapChildren = ({
         .forEach((childId) => {
             const child = editor.state.nodes[childId];
             transaction
-                .removeFrom({
-                    parentId: nodeId,
-                    nodeId: childId,
-                })
-                .insertAfter({
-                    node: child,
-                    parent: parentId,
-                    after: nodeId,
-                });
+                .removeFrom({ parentId: nodeId, nodeId: childId })
+                .insertAfter({ node: child, parentId, after: nodeId });
         });
 };

@@ -39,6 +39,14 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         },
     },
     {
+        label: 'Turn in Toggle List',
+        callback: () => {
+            const selection = editor.state.selection as TextSelection;
+            const nodeId = selection.nodeId;
+            editor.runCommand(turnInCommand({ nodeId, type: 'toggleList' }));
+        },
+    },
+    {
         label: 'Turn in Heading 2',
         callback: () => {
             const selection = editor.state.selection as TextSelection;

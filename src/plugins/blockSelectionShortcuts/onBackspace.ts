@@ -32,7 +32,7 @@ export const onBackspace = ({ editor }: { editor: Editor }) => {
         const textSchema = editor.schema.text as CompiledNodeSchema;
         const node = textSchema.create();
         transaction.insertAfter({
-            parent: parentId as string,
+            parentId,
             after: previousId,
             node,
         });

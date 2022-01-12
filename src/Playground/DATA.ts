@@ -43,6 +43,8 @@ export const PLAYGROUND_DATA: Record<string, Node> = {
             'c4e3f5b0-53d8-4123-aa94-20f01328477a',
             'bd80a80b-177c-4df4-a34d-55ed10d3cc5d',
             '1907f312-3972-4263-8f77-2f58c6eeb188',
+            'toggg',
+            'emmmm',
             'abcaa',
             'sdfsffs',
             'fjsnsjdnf',
@@ -98,6 +100,17 @@ export const PLAYGROUND_DATA: Record<string, Node> = {
                 text: 'Let’s look at how a single source can proceed through the layers of progressive summarization.',
             },
         ],
+    },
+    toggg: {
+        id: 'toggg',
+        type: 'toggleList',
+        text: [{ text: 'Here is a Togggle list' }],
+        childrenIds: [],
+    },
+    emmmm: {
+        id: 'emmmm',
+        type: 'text',
+        text: [],
     },
     abc: {
         id: 'abc',

@@ -2,7 +2,6 @@ import { Editor } from '../../../model/Editor';
 import { TextSelection } from '../../../model/Selection';
 import { getMarkedTextLength } from '../../../transaction/MarkedText/getMarkedTextLength';
 import { View } from '../../View';
-import { nextEditable } from '../../../model/queries/nextEditable';
 import { Coords } from '../../types';
 
 const isLastLine = (editor: Editor, view: View) => {
@@ -33,8 +32,9 @@ const getDistance = (selectionRect: Coords, charRect: Coords) => {
 
 const getNextTargetSelection = (editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;
-    const nextNode = editor.runQuery(nextEditable(selection.nodeId));
+    const nextNode = view.getNextDisplayedTextField(selection.nodeId);
     if (!nextNode) return;
+
     const selectionRect = view.getCoordsAtPos(
         selection.nodeId,
         selection.range[0]

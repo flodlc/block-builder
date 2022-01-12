@@ -6,7 +6,7 @@ export const oliSchema: NodeSchema = {
         if (error === STATE_ERRORS.INVALID_CHILD && child) {
             child.childrenIds?.forEach((childId) => {
                 transaction.insertAfter({
-                    parent: node.id,
+                    parentId: node.id,
                     node: state.nodes[childId],
                     after: child.id,
                 });
