@@ -5,6 +5,7 @@ import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedT
 import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
 import { CompiledNodeSchema } from '../../editor/model/types';
 import { View } from '../../editor/view/View';
+import { nodesBehaviors } from './behaviors.config';
 
 export const onBackspace = ({
     editor,
@@ -36,12 +37,13 @@ const tryReset = ({ editor }: { editor: Editor }) => {
 
 const tryUnwrap = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
-
     const { parentId } = editor.runQuery(
         ({ nodes }) => nodes[selection.nodeId]
     );
     if (!parentId) return false;
     const parent = editor.state.nodes[parentId];
+    if (!nodesBehaviors[parent.type].unwrapOnBackspaceParent) return false;
+
     const parentSchema = editor.schema[parent.type];
     const currentIndex = parent.childrenIds?.indexOf(selection.nodeId) ?? -1;
 

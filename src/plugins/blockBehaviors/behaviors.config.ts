@@ -1,27 +1,31 @@
 import { SCHEMA } from '../../Playground/SCHEMA/SCHEMA';
-import { Node } from '../../editor/model/types';
 
 export type NodeBehaviors = {
     keepFormatOnEnter: boolean;
-    childrenOnEnter: ({ node }: { node: Node }) => boolean;
+    resetOnEmptyEnter: boolean;
+    unwrapOnBackspaceParent: boolean;
 };
 
 const defaultNodeBehaviors = {
     keepFormatOnEnter: false,
-    childrenOnEnter: () => false,
+    resetOnEmptyEnter: false,
+    unwrapOnBackspaceParent: true,
+    insertAsChild: true,
 };
 
 const nodesBehaviorsConfig: Record<string, Partial<NodeBehaviors>> = {
     oli: {
         keepFormatOnEnter: true,
+        resetOnEmptyEnter: true,
     },
     uli: {
         keepFormatOnEnter: true,
+        resetOnEmptyEnter: true,
     },
     toggleList: {
-        childrenOnEnter: ({ node }: { node: Node }) => {
-            return true;
-        },
+        keepFormatOnEnter: true,
+        resetOnEmptyEnter: true,
+        unwrapOnBackspaceParent: true,
     },
 };
 

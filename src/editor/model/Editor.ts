@@ -99,7 +99,7 @@ export class Editor {
             this.schema,
             state,
             ({ transaction: normalizeTransaction, state, error }) => {
-                console.error(`Invalid state fixed: ${error}`);
+                if (error) console.error(`Invalid state fixed: ${error}`);
                 hasNormalized = true;
                 return applyTransaction({
                     state,

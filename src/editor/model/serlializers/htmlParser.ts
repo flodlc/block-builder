@@ -279,7 +279,6 @@ const parseChildren = ({
                 const first = parsed?.blocks.shift();
                 inlineText = first?.text ?? [];
             }
-
             if (parsed) {
                 inlineText = joinMarkedTexts(inlineText, parsed.inline ?? []);
                 blocks = [...blocks, ...parsed.blocks];
@@ -319,6 +318,10 @@ const parseChildren = ({
     });
     return {
         inlineText,
-        blocks: blocks.filter((item) => item),
+        blocks: blocks.filter(
+            (item) =>
+                item.text?.reduce((acc, cur) => acc + cur.text, '').trim() ||
+                item.childrenIds?.length
+        ),
     };
 };

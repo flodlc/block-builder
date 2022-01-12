@@ -5,7 +5,6 @@ export const unwrap =
     (editor: Editor) => {
         const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
         if (!parentId) return false;
-
         const granParenId = editor.runQuery(
             ({ nodes }) => nodes[parentId].parentId
         );
@@ -36,6 +35,5 @@ export const unwrap =
         if (!editor.schema[parent.type].allowText && indexInParent === 0) {
             tr.removeFrom({ nodeId: parentId, parentId: granParenId });
         }
-
         tr.dispatch();
     };
