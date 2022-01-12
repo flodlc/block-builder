@@ -42,7 +42,7 @@ function Playground() {
         const lastSaved = localStorage.getItem('last_saved');
         if (
             !lastSaved ||
-            new Date(lastSaved).getTime() < new Date('10/01/2020').getTime()
+            new Date(lastSaved).getTime() < new Date('12/01/2020').getTime()
         ) {
             localStorage.clear();
         }
