@@ -34,6 +34,7 @@ export const Image = ({
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
+                transition: 'max-width 200ms',
                 maxWidth: `${node.attrs?.width}px`,
                 margin: '20px auto',
             }}

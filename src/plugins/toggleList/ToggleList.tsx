@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useContext, useLayoutEffect, useState } from 'react';
 import { BlockComponentAttrs } from '../../editor/view/types';
 import { Children } from '../../editor/view/Children';
 import { SelectionHalo } from '../../editor/view/SelectionHalo';
@@ -40,9 +40,7 @@ export const ToggleList = ({
         >
             <div
                 style={{ width: '22px' }}
-                onClick={() => {
-                    setExpanded(!expanded);
-                }}
+                onClick={() => setExpanded(!expanded)}
             >
                 <div style={{ padding: '4px', cursor: 'pointer' }}>
                     <svg

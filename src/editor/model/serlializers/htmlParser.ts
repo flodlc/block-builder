@@ -318,10 +318,12 @@ const parseChildren = ({
     });
     return {
         inlineText,
-        blocks: blocks.filter(
-            (item) =>
+        blocks: blocks.filter((item) => {
+            return (
+                item.type !== 'text' ||
                 item.text?.reduce((acc, cur) => acc + cur.text, '').trim() ||
                 item.childrenIds?.length
-        ),
+            );
+        }),
     };
 };
