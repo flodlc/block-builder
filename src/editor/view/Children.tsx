@@ -1,4 +1,11 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
 import { EditorContext } from './contexts/EditorContext';
 import { ViewContext } from './contexts/ViewContext';
 import { AbstractSelection } from '../model/Selection';
@@ -10,6 +17,14 @@ export const Children = ({
     childrenIds?: string[];
     parentId: string;
 }) => {
+    const scrollRef = useRef(0);
+    scrollRef.current = document.scrollingElement?.scrollTop ?? 0;
+    useLayoutEffect(() => {
+        if (!document.scrollingElement) return;
+        if (document.scrollingElement.scrollTop === scrollRef.current) return;
+        document.scrollingElement.scrollTop = scrollRef.current;
+    });
+
     return (
         <>
             <div data-children-uid={parentId} />
