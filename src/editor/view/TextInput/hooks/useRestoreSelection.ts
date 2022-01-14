@@ -1,9 +1,9 @@
 import { RefObject, useLayoutEffect, useRef } from 'react';
 import { restoreSelection } from '../utils/restoreSelection';
-import { Range, TextSelection } from '../../../model/Selection';
+import { Range, TextSelection } from '../../../model';
 import { getElementSelection } from '../utils/getElementSelection';
 import _ from 'lodash';
-import { Editor } from '../../../model/Editor';
+import { Editor } from '../../../model';
 import { View } from '../../View';
 
 export const useRestoreSelection = ({

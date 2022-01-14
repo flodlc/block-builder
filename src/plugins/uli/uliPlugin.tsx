@@ -1,4 +1,4 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
+import { PluginFactory } from '../..';
 import { Uli } from './Uli';
 export const UliPlugin: PluginFactory = () => () => {
     return {

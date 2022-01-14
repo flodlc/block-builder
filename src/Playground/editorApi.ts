@@ -1,6 +1,6 @@
 import { boldApi } from '../plugins/bold/bold.api';
 import { italicApi } from '../plugins/italic/italic.api';
-import { Editor } from '../editor/model/Editor';
+import { Editor } from '../editor/model';
 import { underlineApi } from '../plugins/underline/underline.api';
 
 export const createEditorApi = (editor: Editor) => ({

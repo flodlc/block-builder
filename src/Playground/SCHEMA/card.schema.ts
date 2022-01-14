@@ -1,4 +1,4 @@
-import { NodeSchema } from '../../editor/model/types';
+import { NodeSchema } from '../../editor/model';
 
 export const cardSchema: NodeSchema = {
     serialize: ({ serializedChildren, serializedText }) => {

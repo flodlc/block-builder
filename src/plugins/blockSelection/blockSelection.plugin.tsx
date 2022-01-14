@@ -1,9 +1,12 @@
 import React from 'react';
-import { PluginFactory } from '../../editor/view/plugin/types';
-import { BlockSelection, isTextSelection } from '../../editor/model/Selection';
+import {
+    BlockSelection,
+    Editor,
+    isTextSelection,
+    PluginFactory,
+    View,
+} from '../..';
 import { BlockSelectionWrapper } from './BlockSelection';
-import { Editor } from '../../editor/model/Editor';
-import { View } from '../../editor/view/View';
 
 export type DraggingState = {
     start: {

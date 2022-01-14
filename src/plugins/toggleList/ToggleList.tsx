@@ -1,11 +1,10 @@
-import React, { useContext, useLayoutEffect, useState } from 'react';
-import { BlockComponentAttrs } from '../../editor/view/types';
-import { Children } from '../../editor/view/Children';
-import { SelectionHalo } from '../../editor/view/SelectionHalo';
-import { TextInput } from '../../editor/view/TextInput/TextInput';
-import { TextSelection } from '../../editor/model/Selection';
-import { EditorContext } from '../../editor/view/contexts/EditorContext';
-import { CompiledNodeSchema } from '../../editor/model/types';
+import React, { useLayoutEffect, useState } from 'react';
+import { BlockComponentAttrs, useEditor } from '../..';
+import { Children } from '../..';
+import { SelectionHalo } from '../../Playground/SelectionHalo';
+import { TextInput } from '../..';
+import { TextSelection } from '../..';
+import { CompiledNodeSchema } from '../..';
 
 export const ToggleList = ({
     node,
@@ -14,7 +13,7 @@ export const ToggleList = ({
 }: BlockComponentAttrs) => {
     const textSelection = selection as TextSelection;
     const [expanded, setExpanded] = useState(false);
-    const editor = useContext(EditorContext);
+    const editor = useEditor();
     useLayoutEffect(() => {
         if (!expanded && node.childrenIds?.length) {
             setExpanded(true);

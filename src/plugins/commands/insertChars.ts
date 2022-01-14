@@ -1,7 +1,7 @@
-import { TextSelection } from '../../editor/model/Selection';
-import { spliceText } from '../../editor/transaction/MarkedText/spliceText';
-import { MarkedText } from '../../editor/model/types';
-import { Editor } from '../../editor/model/Editor';
+import { TextSelection } from '../..';
+import { spliceText } from '../..';
+import { MarkedText } from '../..';
+import { Editor } from '../..';
 
 export const insertChars =
     ({ textInput }: { textInput: string }) =>

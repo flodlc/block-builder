@@ -7,7 +7,7 @@ import {
     MarkedText,
     Node,
 } from '../types';
-import { cutMarkedText } from '../../transaction/MarkedText/cutMarkedText';
+import { cutMarkedText } from '../transaction/MarkedText/cutMarkedText';
 import { Range } from '../Selection';
 
 export const serializeNode = (

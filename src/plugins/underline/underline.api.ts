@@ -1,11 +1,7 @@
-import {
-    hasMark,
-    markText,
-    unmarkText,
-} from '../../editor/transaction/MarkedText/markText';
-import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
-import { isTextSelection } from '../../editor/model/Selection';
-import { Editor } from '../../editor/model/Editor';
+import { hasMark, markText, unmarkText } from '../..';
+import { cutMarkedText } from '../..';
+import { isTextSelection } from '../..';
+import { Editor } from '../..';
 
 export const underlineApi = (editor: Editor) => ({
     isUnderline: () => {

@@ -1,5 +1,5 @@
-import { Mark, MarkedNode, Node } from '../model/types';
-import { AbstractSelection, Range } from '../model/Selection';
+import { Mark, MarkedNode, Node } from '../model';
+import { AbstractSelection, Range } from '../model';
 import React from 'react';
 
 export type ViewConfig = {

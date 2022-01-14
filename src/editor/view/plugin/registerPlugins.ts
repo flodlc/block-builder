@@ -1,5 +1,5 @@
 import { Plugin } from './types';
-import { Editor } from '../../model/Editor';
+import { Editor } from '../../model';
 import { View } from '../View';
 
 export const registerPlugins = ({

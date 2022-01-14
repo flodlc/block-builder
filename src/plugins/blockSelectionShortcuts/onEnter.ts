@@ -1,7 +1,7 @@
-import { Editor } from '../../editor/model/Editor';
-import { BlockSelection, TextSelection } from '../../editor/model/Selection';
-import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
-import { CompiledNodeSchema } from '../../editor/model/types';
+import { Editor } from '../..';
+import { BlockSelection, TextSelection } from '../..';
+import { getMarkedTextLength } from '../..';
+import { CompiledNodeSchema } from '../..';
 
 export const onEnter = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as BlockSelection;

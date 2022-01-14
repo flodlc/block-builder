@@ -1,4 +1,4 @@
-import { NodeSchema } from '../../editor/model/types';
+import { NodeSchema } from '../../editor/model';
 
 export const quoteSchema: NodeSchema = {
     serialize: ({ serializedChildren }) => {

@@ -1,7 +1,7 @@
-import { Mark, MarkedNode, MarkedText } from '../../model/types';
+import { Mark, MarkedNode, MarkedText } from '../../types';
 import { splitMarkedText } from './splitMarkedText';
 import { minifyMarkedText } from './minifyMarkedText';
-import { Range } from '../../model/Selection';
+import { Range } from '../../Selection';
 
 export const hasMark = (text: MarkedText, mark: Mark) =>
     !!text.length &&

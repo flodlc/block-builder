@@ -1,9 +1,9 @@
 import React from 'react';
-import { BlockComponentAttrs } from '../../editor/view/types';
-import { TextSelection } from '../../editor/model/Selection';
-import { TextInput } from '../../editor/view/TextInput/TextInput';
-import { Children } from '../../editor/view/Children';
-import { SelectionHalo } from '../../editor/view/SelectionHalo';
+import { BlockComponentAttrs } from '../..';
+import { TextSelection } from '../..';
+import { TextInput } from '../..';
+import { Children } from '../..';
+import { SelectionHalo } from '../../Playground/SelectionHalo';
 
 export const Uli: React.FC<BlockComponentAttrs> = ({
     node,

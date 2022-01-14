@@ -1,9 +1,9 @@
-import { Editor } from '../../editor/model/Editor';
-import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
-import { TextSelection } from '../../editor/model/Selection';
+import { Editor } from '../..';
+import { cutMarkedText } from '../..';
+import { TextSelection } from '../..';
 import { nodesBehaviors } from './behaviors.config';
-import { CompiledNodeSchema } from '../../editor/model/types';
-import { View } from '../../editor/view/View';
+import { CompiledNodeSchema } from '../..';
+import { View } from '../..';
 
 export const onEnter = ({
     editor,

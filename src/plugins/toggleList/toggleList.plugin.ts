@@ -1,4 +1,4 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
+import { PluginFactory } from '../..';
 import { ToggleList } from './ToggleList';
 
 export const ToggleListPlugin: PluginFactory = () => () => {

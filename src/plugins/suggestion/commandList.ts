@@ -1,5 +1,5 @@
-import { TextSelection } from '../../editor/model/Selection';
-import { Editor } from '../../editor/model/Editor';
+import { TextSelection } from '../..';
+import { Editor } from '../..';
 import { turnInCommand } from '../commands/turnIn.command';
 import { insertHtml } from '../commands/insertHtml';
 

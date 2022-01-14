@@ -1,14 +1,13 @@
-import React, { useContext } from 'react';
-import { BlockComponentAttrs } from '../../editor/view/types';
-import { SelectionHalo } from '../../editor/view/SelectionHalo';
-import { EditorContext } from '../../editor/view/contexts/EditorContext';
-import { BlockSelection } from '../../editor/model/Selection';
+import React from 'react';
+import { BlockComponentAttrs, useEditor } from '../..';
+import { SelectionHalo } from '../../Playground/SelectionHalo';
+import { BlockSelection } from '../..';
 
 export const Divider: React.FC<BlockComponentAttrs> = ({
     node,
     blockSelected,
 }) => {
-    const editor = useContext(EditorContext);
+    const editor = useEditor();
 
     const select = () => {
         editor

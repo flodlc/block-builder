@@ -1,6 +1,6 @@
-import { NodeSchema } from '../../editor/model/types';
-import { resolveState } from '../../editor/model/StateResolver';
-import { STATE_ERRORS } from '../../editor/model/serlializers/modelNormalizer';
+import { NodeSchema } from '../../editor/model';
+import { resolveState } from '../../editor/model';
+import { STATE_ERRORS } from '../../editor/model';
 
 export const headingSchema: NodeSchema = {
     serialize: ({ serializedText, serializedChildren, node }) => {

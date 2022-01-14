@@ -5,9 +5,9 @@ import {
     MarkedText,
     Node as ModelNode,
 } from '../types';
-import { joinMarkedTexts } from '../../transaction/MarkedText/joinMarkedTexts';
+import { joinMarkedTexts } from '../transaction/MarkedText/joinMarkedTexts';
 import { normalizeState } from './modelNormalizer';
-import { applyTransaction } from '../../transaction/transactions';
+import { applyTransaction } from '../transaction/transactions';
 
 const blockTags: Record<string, boolean> = {
     address: true,

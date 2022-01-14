@@ -1,4 +1,4 @@
-import { CompiledNodeSchema, MarkedText, Node } from '../editor/model/types';
+import { CompiledNodeSchema, MarkedText, Node } from '../editor/model';
 import { compileSchema } from '../editor/model/schema';
 import { SCHEMA } from './SCHEMA/SCHEMA';
 

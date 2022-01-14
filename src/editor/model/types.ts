@@ -1,6 +1,6 @@
-import { AppliedTransaction } from '../transaction/types';
+import { AppliedTransaction } from './transaction/types';
 import { AbstractSelection } from './Selection';
-import { TransactionBuilder } from '../transaction/TransactionBuilder';
+import { TransactionBuilder } from './transaction/TransactionBuilder';
 import { CompiledSchema } from './schema';
 
 export type MarkedText = MarkedNode[];

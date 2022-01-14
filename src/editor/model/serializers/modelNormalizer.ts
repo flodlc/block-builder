@@ -1,7 +1,7 @@
 import { CompiledSchema } from '../schema';
 import { CompiledNodeSchema, Node, State } from '../types';
-import { TransactionBuilder } from '../../transaction/TransactionBuilder';
-import { AppliedTransaction, Transaction } from '../../transaction/types';
+import { TransactionBuilder } from '../transaction/TransactionBuilder';
+import { AppliedTransaction, Transaction } from '../transaction/types';
 
 export enum STATE_ERRORS {
     INVALID_CHILD = 'INVALID_CHILD',

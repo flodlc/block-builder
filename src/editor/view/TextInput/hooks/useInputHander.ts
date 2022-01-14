@@ -1,9 +1,9 @@
 import { RefObject, useLayoutEffect } from 'react';
 import { View } from '../../View';
-import { MarkedText } from '../../../model/types';
-import { Range } from '../../../model/Selection';
-import { Editor } from '../../../model/Editor';
-import { spliceText } from '../../../transaction/MarkedText/spliceText';
+import { MarkedText } from '../../../model';
+import { Range } from '../../../model';
+import { Editor } from '../../../model';
+import { spliceText } from '../../../model';
 import { getInputDiff } from '../utils/getInputDiff';
 
 export const useInputHander = ({

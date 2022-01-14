@@ -1,7 +1,7 @@
-import { Editor } from '../../editor/model/Editor';
-import { insertNodeMark } from '../../editor/transaction/MarkedText/markText';
-import { TextSelection } from '../../editor/model/Selection';
-import { spliceText } from '../../editor/transaction/MarkedText/spliceText';
+import { Editor } from '../..';
+import { insertNodeMark } from '../..';
+import { TextSelection } from '../..';
+import { spliceText } from '../..';
 import { MentionValue } from './mention.types';
 
 export const insertMention =

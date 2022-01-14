@@ -1,14 +1,20 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Editor } from '../model/Editor';
-import { EditorContext } from './contexts/EditorContext';
+import { Editor } from '../model';
+import { EditorContext } from '../model';
 import { Child } from './Children';
 import { ViewContext } from './contexts/ViewContext';
 import { Plugin, RegisteredPlugin } from './plugin/types';
 import { registerPlugins } from './plugin/registerPlugins';
 import { View } from './View';
 import { useBindDom, useEventManager } from './useEventManager';
+import { ArrowNavigationPlugin } from './corePlugins/arrowNavigation/arrowNavigation.plugin';
+import { HistoryShortcutsPlugin } from './corePlugins/historyShortcuts/historyShortcuts.plugin';
 
 export const GLOBAL_EDITABLE = false;
+const CORE_PLUGINS: Plugin[] = [
+    ArrowNavigationPlugin(),
+    HistoryShortcutsPlugin(),
+];
 
 export const ReactView = ({
     editor,
@@ -35,7 +41,7 @@ export const ReactView = ({
         const view = new View(editor, ref.current, eventManager);
         const registeredPlugins = registerPlugins({
             editor,
-            plugins,
+            plugins: [...CORE_PLUGINS, ...plugins],
             view,
             dom: ref.current,
         });

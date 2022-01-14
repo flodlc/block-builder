@@ -1,6 +1,6 @@
-import { Editor } from '../../../model/Editor';
-import { TextSelection } from '../../../model/Selection';
-import { getMarkedTextLength } from '../../../transaction/MarkedText/getMarkedTextLength';
+import { Editor } from '../../../model';
+import { TextSelection } from '../../../model';
+import { getMarkedTextLength } from '../../../model';
 import { View } from '../../View';
 
 const getTargetSelection = (editor: Editor, view: View) => {

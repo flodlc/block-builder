@@ -1,4 +1,4 @@
-import { NodeSchema } from '../../editor/model/types';
+import { NodeSchema } from '../../editor/model';
 
 export const uliSchema: NodeSchema = {
     parse: (node: HTMLElement) => {

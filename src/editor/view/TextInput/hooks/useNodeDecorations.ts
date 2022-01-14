@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
-import { ViewContext } from '../../contexts/ViewContext';
+import { useEffect, useState } from 'react';
 import { Decoration } from '../../types';
-import { Editor } from '../../../model/Editor';
+import { Editor } from '../../../model';
+import { useView } from '../../contexts/ViewContext';
 
 export const useNodeDecorations = ({
     nodeId,
@@ -10,7 +10,7 @@ export const useNodeDecorations = ({
     nodeId: string;
     editor: Editor;
 }) => {
-    const view = useContext(ViewContext);
+    const view = useView();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, setDecorations] = useState<Decoration[]>();
 

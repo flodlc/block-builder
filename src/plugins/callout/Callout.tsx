@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
-import { Children } from '../../editor/view/Children';
-import { EditorContext } from '../../editor/view/contexts/EditorContext';
-import { SelectionHalo } from '../../editor/view/SelectionHalo';
-import { BlockComponentAttrs } from '../../editor/view/types';
+import React from 'react';
+import { Children, useEditor } from '../..';
+import { SelectionHalo } from '../../Playground/SelectionHalo';
+import { BlockComponentAttrs } from '../..';
 
 const EMOJIS = [
     '👌',
@@ -53,7 +52,7 @@ export const Callout: React.FC<BlockComponentAttrs> = ({
     node,
     blockSelected,
 }) => {
-    const editor = useContext(EditorContext);
+    const editor = useEditor();
     const onClick = () => {
         const emoji = EMOJIS.sort(() => 0.5 - Math.random())[0];
         editor

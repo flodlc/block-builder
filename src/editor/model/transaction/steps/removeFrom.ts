@@ -1,4 +1,4 @@
-import { Node, State } from '../../model/types';
+import { Node, State } from '../../types';
 import produce from 'immer';
 
 export const removeFrom = ({

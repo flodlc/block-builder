@@ -1,4 +1,4 @@
-import { Range } from '../../../model/Selection';
+import { Range } from '../../../model';
 import { diffText } from './diffText';
 import { getTextNodes } from './getTextNodes';
 

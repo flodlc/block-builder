@@ -1,5 +1,5 @@
-import { Node } from '../model/types';
-import { AbstractSelection } from '../model/Selection';
+import { Node } from '../types';
+import { AbstractSelection } from '../Selection';
 
 interface PatchStep {
     name: 'patch';

@@ -1,8 +1,8 @@
-import { MarkedNode, MarkedText } from '../../model/types';
+import { MarkedNode, MarkedText } from '../../types';
 import { splitMarkedText } from './splitMarkedText';
 import { minifyMarkedText } from './minifyMarkedText';
-import { Range } from '../../model/Selection';
-import { Editor } from '../../model/Editor';
+import { Range } from '../../Selection';
+import { Editor } from '../../Editor';
 
 export const spliceText = ({
     text,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MarkComponentAttrs } from '../../editor/view/types';
+import { MarkComponentAttrs } from '../..';
 
 export const Link = ({
     children,

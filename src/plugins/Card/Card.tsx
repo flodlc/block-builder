@@ -1,8 +1,8 @@
 import React from 'react';
-import { TextSelection } from '../../editor/model/Selection';
-import { TextInput } from '../../editor/view/TextInput/TextInput';
-import { Children } from '../../editor/view/Children';
-import { BlockComponentAttrs } from '../../editor/view/types';
+import { TextSelection } from '../..';
+import { TextInput } from '../..';
+import { Children } from '../..';
+import { BlockComponentAttrs } from '../..';
 
 export const Card: React.FC<BlockComponentAttrs> = ({ node, selection }) => {
     const textSelection = selection as TextSelection;

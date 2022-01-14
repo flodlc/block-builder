@@ -1,5 +1,5 @@
-import { NodeSchema } from '../../editor/model/types';
-import { STATE_ERRORS } from '../../editor/model/serlializers/modelNormalizer';
+import { NodeSchema } from '../../editor/model';
+import { STATE_ERRORS } from '../../editor/model';
 
 export const oliSchema: NodeSchema = {
     normalize: ({ child, error, transaction, node, state }) => {

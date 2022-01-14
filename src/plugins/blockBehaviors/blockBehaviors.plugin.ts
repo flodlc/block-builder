@@ -1,8 +1,8 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
 import { onBackspace } from './onBackspace';
 import { onEnter } from './onEnter';
 import { onDelete } from './onDelete';
 import { onBackTab, onTab } from './onTab';
+import { PluginFactory } from '../..';
 
 export const BlockBehaviorsPlugin: PluginFactory =
     () =>

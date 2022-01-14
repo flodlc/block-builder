@@ -1,6 +1,6 @@
-import { Node } from '../model/types';
+import { Node } from '../types';
 import { Step } from './types';
-import { AbstractSelection } from '../model/Selection';
+import { AbstractSelection } from '../Selection';
 
 export class TransactionBuilder {
     patch = ({

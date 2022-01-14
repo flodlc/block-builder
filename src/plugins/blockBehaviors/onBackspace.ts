@@ -1,11 +1,13 @@
 import { unwrap } from './unwrap';
-import { Editor } from '../../editor/model/Editor';
-import { TextSelection } from '../../editor/model/Selection';
-import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
-import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
-import { CompiledNodeSchema } from '../../editor/model/types';
-import { View } from '../../editor/view/View';
 import { nodesBehaviors } from './behaviors.config';
+import {
+    CompiledNodeSchema,
+    Editor,
+    getMarkedTextLength,
+    joinMarkedTexts,
+    TextSelection,
+    View,
+} from '../..';
 
 export const onBackspace = ({
     editor,

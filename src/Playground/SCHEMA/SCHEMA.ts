@@ -1,4 +1,4 @@
-import { Schema } from '../../editor/model/types';
+import { Schema } from '../../editor/model';
 import { textSchema } from './text.schema';
 import { oliSchema } from './oli.schema';
 import { calloutSchema } from './callout.schema';

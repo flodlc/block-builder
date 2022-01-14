@@ -1,9 +1,9 @@
 import { getElementSelection } from '../utils/getElementSelection';
-import { spliceText } from '../../../transaction/MarkedText/spliceText';
+import { spliceText } from '../../../model';
 import { RefObject, useLayoutEffect } from 'react';
 import { View } from '../../View';
-import { Range } from '../../../model/Selection';
-import { MarkedText } from '../../../model/types';
+import { Range } from '../../../model';
+import { MarkedText } from '../../../model';
 
 export const useDeleteHandler = ({
     ref,

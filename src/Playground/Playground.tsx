@@ -1,15 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Editor } from '../editor/model/Editor';
+import { Editor } from '../editor/model';
 import { ReactView } from '../editor/view/ReactView';
 import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
 import { BlockSelectionPlugin } from '../plugins/blockSelection/blockSelection.plugin';
 import { SuggestionPlugin } from '../plugins/suggestion/suggestion.plugin';
-import { HistoryShortcutsPlugin } from '../editor/view/corePlugins/historyShortcuts/historyShortcuts.plugin';
 import { CalloutPlugin } from '../plugins/callout/callout.plugin';
 import { TextPlugin } from '../plugins/text/text.plugin';
 import { BoldPlugin } from '../plugins/bold/bold.plugin';
 import { BlockSelectionShortcutsPlugin } from '../plugins/blockSelectionShortcuts/blockSelectionShortcuts.plugin';
-import { ArrowNavigationPlugin } from '../editor/view/corePlugins/arrowNavigation/arrowNavigation.plugin';
 import { CopyPastePlugin } from '../plugins/copyPaste/copyPaste.plugin';
 import { MentionPlugin } from '../plugins/mention/mention.plugin';
 import { BlockBehaviorsPlugin } from '../plugins/blockBehaviors/blockBehaviors.plugin';
@@ -17,7 +15,7 @@ import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
-import { Node } from '../editor/model/types';
+import { Node } from '../editor/model';
 import { ItalicPlugin } from '../plugins/italic/italic.plugin';
 import { BalloonPlugin } from '../plugins/balloon/balloonPlugin';
 import { Balloon } from './Balloon';
@@ -89,7 +87,6 @@ function Playground() {
                     MentionPlugin(),
                     BlockSelectionPlugin(),
                     SuggestionPlugin(),
-                    HistoryShortcutsPlugin(),
                     CalloutPlugin(),
                     DividerPlugin(),
                     OliPlugin(),
@@ -103,7 +100,6 @@ function Playground() {
                     UnderlinePlugin(),
                     LinkPlugin(),
                     BlockSelectionShortcutsPlugin(),
-                    ArrowNavigationPlugin(),
                     CopyPastePlugin(),
                     BalloonPlugin(),
                     ImagePlugin(),

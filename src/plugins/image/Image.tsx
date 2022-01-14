@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { BlockComponentAttrs } from '../../editor/view/types';
-import { SelectionHalo } from '../../editor/view/SelectionHalo';
-import { TextInput } from '../../editor/view/TextInput/TextInput';
-import { BlockSelection, TextSelection } from '../../editor/model/Selection';
-import { EditorContext } from '../../editor/view/contexts/EditorContext';
+import { BlockComponentAttrs, useEditor } from '../..';
+import { SelectionHalo } from '../../Playground/SelectionHalo';
+import { TextInput } from '../..';
+import { BlockSelection, TextSelection } from '../..';
 
 export const Image = ({
     node,
@@ -13,7 +12,7 @@ export const Image = ({
 }: BlockComponentAttrs) => {
     const textSelection = selection as TextSelection;
     const [displayCaption, setDisplayCaption] = useState(false);
-    const editor = useContext(EditorContext);
+    const editor = useEditor();
 
     useEffect(() => {
         if (!textSelection) setDisplayCaption(false);

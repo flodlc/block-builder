@@ -1,4 +1,4 @@
-import { Coords } from '../../editor/view/types';
+import { Coords } from '../..';
 
 export type MentionPluginState = {
     close: () => void;

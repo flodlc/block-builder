@@ -1,14 +1,12 @@
 import React, {
     useCallback,
-    useContext,
     useEffect,
     useLayoutEffect,
     useRef,
     useState,
 } from 'react';
-import { EditorContext } from './contexts/EditorContext';
-import { ViewContext } from './contexts/ViewContext';
-import { AbstractSelection, TextSelection } from '../model/Selection';
+import { useView } from './contexts/ViewContext';
+import { AbstractSelection, TextSelection, useEditor } from '../model';
 
 export const Children = ({
     childrenIds,
@@ -53,8 +51,8 @@ const getSelection = ({
 
 export const Child = React.memo(
     ({ parentId, nodeId }: { parentId: string; nodeId: string }) => {
-        const editor = useContext(EditorContext);
-        const view = useContext(ViewContext);
+        const editor = useEditor();
+        const view = useView();
         const node = editor.state.nodes[nodeId];
         const selectionTypes = getSelection({
             nodeId,

@@ -2,16 +2,15 @@ import React, {
     memo,
     ReactElement,
     RefObject,
-    useContext,
     useLayoutEffect,
     useRef,
 } from 'react';
-import { Mark, MarkedNode, MarkedText } from '../../model/types';
-import { markText } from '../../transaction/MarkedText/markText';
-import { ViewContext } from '../contexts/ViewContext';
-import { CompiledSchema } from '../../model/schema';
+import { Mark, MarkedNode, MarkedText } from '../../model';
+import { markText } from '../../model';
+import { CompiledSchema } from '../../model';
 import { NodeView } from './NodeView';
 import { NodeComponentAttrs } from '../types';
+import { useView } from '../contexts/ViewContext';
 
 const MarksWrapper = ({
     pos,
@@ -90,7 +89,7 @@ const Marks = ({
     children: ReactElement[] | ReactElement | string;
     schema: CompiledSchema;
 }) => {
-    const view = useContext(ViewContext);
+    const view = useView();
 
     const mark = marks?.[0];
     if (mark) {

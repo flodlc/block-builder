@@ -1,5 +1,5 @@
-import { State } from '../../model/types';
-import { AbstractSelection } from '../../model/Selection';
+import { State } from '../../types';
+import { AbstractSelection } from '../../Selection';
 
 export const focus = ({
     state,

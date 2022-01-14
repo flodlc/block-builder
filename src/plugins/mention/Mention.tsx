@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { NodeComponentAttrs } from '../../editor/view/types';
+import { NodeComponentAttrs } from '../..';
 import { MentionValue } from './mention.types';
 
 function getValue(value: { type: string; date?: string; name?: string }) {

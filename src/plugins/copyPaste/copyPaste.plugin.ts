@@ -1,9 +1,6 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
-import {
-    isBlockSelection,
-    isTextSelection,
-} from '../../editor/model/Selection';
-import { serializeNode } from '../../editor/model/serlializers/htmlSerializer';
+import { PluginFactory } from '../..';
+import { isBlockSelection, isTextSelection } from '../..';
+import { serializeNode } from '../..';
 import { insertHtml } from '../commands/insertHtml';
 
 export const CopyPastePlugin: PluginFactory =

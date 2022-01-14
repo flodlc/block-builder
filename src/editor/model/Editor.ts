@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { applyStep, applyTransaction } from '../transaction/transactions';
+import { applyStep, applyTransaction } from './transaction/transactions';
 import {
     State,
     Node,
@@ -9,18 +9,24 @@ import {
     MarkedText,
     Schema,
 } from './types';
-import { TransactionBuilder } from '../transaction/TransactionBuilder';
-import { AppliedTransaction, Transaction } from '../transaction/types';
+import { TransactionBuilder } from './transaction/TransactionBuilder';
+import { AppliedTransaction, Transaction } from './transaction/types';
 import { ResolvedState, resolveState } from './StateResolver';
 import { compileSchema, CompiledSchema } from './schema';
-import { normalizeState } from './serlializers/modelNormalizer';
+import { normalizeState } from './serializers/modelNormalizer';
 
 export type EditorEvent = 'change' | 'tr' | 'input' | string;
 
 export class Editor {
+    private resolvedState?: ResolvedState;
+    private history: History;
+    private observers: Record<string, EventHandler[]> = {
+        change: [],
+        tr: [],
+        input: [],
+    };
+
     state: State;
-    resolvedState?: ResolvedState;
-    history: History;
     schema: CompiledSchema;
 
     constructor({
@@ -39,12 +45,6 @@ export class Editor {
 
     getJson = () =>
         getNodeJson(this.state, this.state.nodes[this.state.rootId]);
-
-    private observers: Record<string, EventHandler[]> = {
-        change: [],
-        tr: [],
-        input: [],
-    };
 
     runQuery = <T>(
         query: (resolvedState: ResolvedState, editor: Editor) => T
@@ -121,7 +121,7 @@ export class Editor {
         };
     };
 
-    applyTransaction(transaction: Transaction) {
+    private applyTransaction(transaction: Transaction) {
         const previousState = this.state;
         const { state, appliedTransaction } = applyTransaction({
             state: this.state,

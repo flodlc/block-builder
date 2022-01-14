@@ -1,4 +1,4 @@
-import { State } from '../model/types';
+import { State } from '../types';
 import { AppliedTransaction, Step, Transaction } from './types';
 import { insertAfter } from './steps/insertAfter';
 import { removeFrom } from './steps/removeFrom';

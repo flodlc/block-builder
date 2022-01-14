@@ -1,5 +1,4 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
-import { TextSelection } from '../../editor/model/Selection';
+import { PluginFactory, TextSelection } from '../..';
 import { BALLOON_EVENTS } from './balloon.const';
 import { BalloonPluginState } from './balloon.types';
 

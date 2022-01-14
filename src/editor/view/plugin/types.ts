@@ -1,4 +1,4 @@
-import { Editor } from '../../model/Editor';
+import { Editor } from '../../model';
 import React from 'react';
 import { View } from '../View';
 

@@ -1,15 +1,11 @@
-import { Editor } from '../../editor/model/Editor';
-import { parseHtml } from '../../editor/model/serlializers/htmlParser';
-import {
-    AbstractSelection,
-    BlockSelection,
-    TextSelection,
-} from '../../editor/model/Selection';
-import { Node } from '../../editor/model/types';
-import { TransactionBuilder } from '../../editor/transaction/TransactionBuilder';
-import { cutMarkedText } from '../../editor/transaction/MarkedText/cutMarkedText';
-import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
-import { getMarkedTextLength } from '../../editor/transaction/MarkedText/getMarkedTextLength';
+import { Editor } from '../..';
+import { parseHtml } from '../..';
+import { AbstractSelection, BlockSelection, TextSelection } from '../..';
+import { Node } from '../..';
+import { TransactionBuilder } from '../..';
+import { cutMarkedText } from '../..';
+import { joinMarkedTexts } from '../..';
+import { getMarkedTextLength } from '../..';
 
 export const insertHtml = (html: string, editor: Editor) => {
     const parsed = parseHtml({ html, schema: editor.schema });

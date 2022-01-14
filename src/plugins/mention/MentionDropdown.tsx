@@ -1,11 +1,11 @@
-import { Editor } from '../../editor/model/Editor';
+import { Editor } from '../..';
 import React, { useEffect, useState } from 'react';
-import { TextSelection } from '../../editor/model/Selection';
+import { TextSelection } from '../..';
 import { DATA } from './DATA';
 import { insertMention } from './insertMention.command';
 import { MENTION_EVENTS } from './mention.const';
 import { MentionPluginState } from './mention.types';
-import { Coords } from '../../editor/view/types';
+import { Coords } from '../..';
 
 export const MentionComponentWrapper = ({ editor }: { editor: Editor }) => {
     const [mentionState, setMentionState] =

@@ -1,4 +1,4 @@
-import { Editor } from '../../editor/model/Editor';
+import { Editor } from '../..';
 
 export const unwrap =
     ({ nodeId }: { nodeId: string }) =>

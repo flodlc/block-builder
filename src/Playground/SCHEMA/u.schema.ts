@@ -1,4 +1,4 @@
-import { MarkSchema } from '../../editor/model/types';
+import { MarkSchema } from '../../editor/model';
 
 export const uSchema: MarkSchema = {
     inline: true,

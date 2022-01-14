@@ -1,4 +1,4 @@
-import { State } from '../../model/types';
+import { State } from '../../types';
 import produce from 'immer';
 
 export const patch = ({

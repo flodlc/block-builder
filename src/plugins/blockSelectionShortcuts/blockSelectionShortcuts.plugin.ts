@@ -1,7 +1,7 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
 import { onBackspace } from './onBackspace';
 import { onEscape } from './onEscape';
 import { onEnter } from './onEnter';
+import { PluginFactory } from '../..';
 
 export const BlockSelectionShortcutsPlugin: PluginFactory =
     () =>

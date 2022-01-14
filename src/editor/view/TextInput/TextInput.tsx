@@ -1,15 +1,8 @@
-import React, {
-    ReactElement,
-    useContext,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from 'react';
-import { EditorContext } from '../contexts/EditorContext';
+import React, { ReactElement, useLayoutEffect, useRef, useState } from 'react';
 import { TextRenderer } from './TextRenderer';
-import { MarkedText } from '../../model/types';
+import { MarkedText, useEditor } from '../../model';
 import { getElementSelection } from './utils/getElementSelection';
-import { Range, TextSelection } from '../../model/Selection';
+import { Range, TextSelection } from '../../model';
 import { PlaceholderWrapper } from './Placeholder';
 import { useNodeDecorations } from './hooks/useNodeDecorations';
 import { useTextFromValue } from './hooks/useTextFromValue';
@@ -17,7 +10,7 @@ import { useTrailingElements } from './hooks/useTrailingElements';
 import { useTrackDomChanges } from './hooks/useTrackDomNodes';
 import { useRestoreSelection } from './hooks/useRestoreSelection';
 import { useRenderingKey } from './hooks/useRenderingKey';
-import { ViewContext } from '../contexts/ViewContext';
+import { useView } from '../contexts/ViewContext';
 import { useBackspaceHandler } from './hooks/useBackspaceHandler';
 import { useInputHander } from './hooks/useInputHander';
 import { useEventHandlers } from './hooks/useEventHandlers';
@@ -43,8 +36,8 @@ export const TextInput = ({
     keepPlaceholder?: boolean;
     contentEditable?: boolean;
 }) => {
-    const editor = useContext(EditorContext);
-    const view = useContext(ViewContext);
+    const editor = useEditor();
+    const view = useView();
     const ref = useRef<HTMLDivElement>(null);
     const firstLoadTime = useRef(Date.now());
     const composingRef = useRef<boolean>(false);

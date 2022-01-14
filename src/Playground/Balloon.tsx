@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Editor } from '../editor/model/Editor';
+import { Editor } from '../editor/model';
 import { BALLOON_EVENTS } from '../plugins/balloon/balloon.const';
 import { BalloonPluginState } from '../plugins/balloon/balloon.types';
 import { EditorApi } from './editorApi';

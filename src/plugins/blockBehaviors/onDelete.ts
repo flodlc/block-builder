@@ -1,7 +1,7 @@
-import { Editor } from '../../editor/model/Editor';
-import { TextSelection } from '../../editor/model/Selection';
-import { joinMarkedTexts } from '../../editor/transaction/MarkedText/joinMarkedTexts';
-import { TransactionBuilder } from '../../editor/transaction/TransactionBuilder';
+import { Editor } from '../..';
+import { TextSelection } from '../..';
+import { joinMarkedTexts } from '../..';
+import { TransactionBuilder } from '../..';
 
 export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;

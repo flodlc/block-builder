@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Editor } from '../../editor/model/Editor';
+import { Editor } from '../..';
 import { BLOCK_SELECTION_EVENTS, DraggingState } from './blockSelection.plugin';
 
 export const BlockSelectionWrapper = ({ editor }: { editor: Editor }) => {

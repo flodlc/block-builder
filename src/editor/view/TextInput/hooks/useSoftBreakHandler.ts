@@ -1,7 +1,7 @@
 import { View } from '../../View';
-import { MarkedText } from '../../../model/types';
-import { Range } from '../../../model/Selection';
-import { spliceText } from '../../../transaction/MarkedText/spliceText';
+import { MarkedText } from '../../../model';
+import { Range } from '../../../model';
+import { spliceText } from '../../../model';
 import { getElementSelection } from '../utils/getElementSelection';
 import { RefObject, useLayoutEffect } from 'react';
 

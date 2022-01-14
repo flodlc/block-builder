@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { MarkedText } from '../../../model/types';
+import { MarkedText } from '../../../model';
 
 export const useTextFromValue = (value: MarkedText) => {
     return useMemo(() => {

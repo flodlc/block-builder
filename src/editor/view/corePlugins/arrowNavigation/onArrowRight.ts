@@ -1,5 +1,5 @@
-import { Editor } from '../../../model/Editor';
-import { TextSelection } from '../../../model/Selection';
+import { Editor } from '../../../model';
+import { TextSelection } from '../../../model';
 import { View } from '../../View';
 
 const getTargetSelection = (editor: Editor, view: View) => {

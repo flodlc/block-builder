@@ -1,4 +1,4 @@
-import { PluginFactory } from '../../editor/view/plugin/types';
+import { PluginFactory } from '../..';
 import { Bold } from './Bold';
 
 export const BoldPlugin: PluginFactory = () => () => {

@@ -1,6 +1,6 @@
 import { RefObject, useRef, useState } from 'react';
 import { Decoration } from '../../types';
-import { MarkedText } from '../../../model/types';
+import { MarkedText } from '../../../model';
 import { getInputDiff } from '../utils/getInputDiff';
 
 export const useRenderingKey = ({

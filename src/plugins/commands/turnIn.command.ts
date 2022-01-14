@@ -1,5 +1,5 @@
-import { Editor } from '../../editor/model/Editor';
-import { isNodeSchema } from '../../editor/model/types';
+import { Editor } from '../..';
+import { isNodeSchema } from '../..';
 
 export const turnInCommand =
     ({

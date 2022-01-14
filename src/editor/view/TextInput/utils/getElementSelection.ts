@@ -1,5 +1,5 @@
 import { getPosition } from './getPosition';
-import { Range } from '../../../model/Selection';
+import { Range } from '../../../model';
 
 export const getElementSelection = (
     container: HTMLElement | null

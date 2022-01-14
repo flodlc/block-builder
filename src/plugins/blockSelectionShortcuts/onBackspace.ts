@@ -1,6 +1,9 @@
-import { Editor } from '../../editor/model/Editor';
-import { BlockSelection, TextSelection } from '../../editor/model/Selection';
-import { CompiledNodeSchema } from '../../editor/model/types';
+import {
+    BlockSelection,
+    CompiledNodeSchema,
+    Editor,
+    TextSelection,
+} from '../..';
 
 export const onBackspace = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as BlockSelection;

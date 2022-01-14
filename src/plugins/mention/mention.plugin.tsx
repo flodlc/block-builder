@@ -1,13 +1,9 @@
 import React from 'react';
-import { PluginFactory } from '../../editor/view/plugin/types';
+import { PluginFactory } from '../..';
 import { MentionDecoration } from './MentionDecoration';
-import {
-    isTextSelection,
-    Range,
-    TextSelection,
-} from '../../editor/model/Selection';
-import { Editor } from '../../editor/model/Editor';
-import { View } from '../../editor/view/View';
+import { isTextSelection, Range, TextSelection } from '../..';
+import { Editor } from '../..';
+import { View } from '../..';
 import escapeStringRegexp from 'escape-string-regexp';
 import { MentionComponentWrapper } from './MentionDropdown';
 import { Mention } from './Mention';

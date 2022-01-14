@@ -1,5 +1,5 @@
 import { getTextNodes } from './getTextNodes';
-import { Range as PositionRange } from '../../../model/Selection';
+import { Range as PositionRange } from '../../../model';
 
 export const restoreSelection = (
     container: HTMLElement,

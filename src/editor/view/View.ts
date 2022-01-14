@@ -5,13 +5,13 @@ import {
     MarkComponentAttrs,
     NodeComponentAttrs,
 } from './types';
-import { TextSelection } from '../model/Selection';
-import { Editor } from '../model/Editor';
+import { TextSelection } from '../model';
+import { Editor } from '../model';
 import React from 'react';
 import { getRange } from './TextInput/utils/restoreSelection';
-import { Node } from '../model/types';
+import { Node } from '../model';
 
-type NativEventType =
+type NativeEventType =
     | 'selectionchange'
     | 'keydown'
     | 'beforeinput'
@@ -25,7 +25,7 @@ export type EventManager = {
             type,
             nodeId,
         }: {
-            type: NativEventType;
+            type: NativeEventType;
             nodeId?: string;
         },
         event: Event
