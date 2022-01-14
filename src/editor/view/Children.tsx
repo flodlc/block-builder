@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { EditorContext } from './contexts/EditorContext';
 import { ViewContext } from './contexts/ViewContext';
-import { AbstractSelection } from '../model/Selection';
+import { AbstractSelection, TextSelection } from '../model/Selection';
 
 export const Children = ({
     childrenIds,
@@ -44,10 +44,10 @@ const getSelection = ({
     selection?: AbstractSelection;
 }) => {
     const isBlockSelection = selection?.isBlock();
-    const blockSelection = selection?.getNodeSelection(nodeId);
+    const textSelection = selection?.getNodeSelection(nodeId) as TextSelection;
     return {
-        insideSelection: !isBlockSelection ? blockSelection : undefined,
-        blockSelection: Boolean(isBlockSelection && blockSelection),
+        insideSelection: !isBlockSelection ? textSelection : undefined,
+        blockSelection: Boolean(isBlockSelection && textSelection),
     };
 };
 

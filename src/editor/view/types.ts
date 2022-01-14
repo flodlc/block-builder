@@ -22,7 +22,7 @@ export type Decoration = {
 export type BlockComponentAttrs = {
     parentId: string;
     node: Node;
-    selection: AbstractSelection;
+    selection?: AbstractSelection;
     blockSelected: boolean;
 };
 

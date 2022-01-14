@@ -8,12 +8,12 @@ export const patch = ({
 }: {
     state: State;
     nodeId: string;
-    patch: any;
+    patch: Record<string, any>;
 }) => {
     if (patch.childrenIds && Object.keys(patch).length === 1) {
         throw 'Cannot patch field childrenIds only. Use insert / delete steps instead.';
     }
-    let reversePatch = {} as any;
+    let reversePatch: Record<string, any> = {};
     const node = state.nodes[nodeId];
     return {
         state: produce(state, (draftState) => {

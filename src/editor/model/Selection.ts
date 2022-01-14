@@ -19,7 +19,7 @@ export abstract class AbstractSelection {
 
     abstract clone(): AbstractSelection;
 
-    abstract getNodeSelection(nodeId: string): any;
+    abstract getNodeSelection(nodeId: string): unknown;
 }
 
 export class BlockSelection extends AbstractSelection {

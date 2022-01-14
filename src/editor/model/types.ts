@@ -17,11 +17,11 @@ export type MarkedNode<T = any> = {
 };
 export type Mark<T = any> = { type: string; attrs?: T };
 
-export interface Node {
+export interface Node<T extends Record<string, any> = any> {
     id: string;
     type: string;
     text?: MarkedText;
-    attrs?: Record<string, any>;
+    attrs?: T;
     childrenIds?: string[];
 }
 

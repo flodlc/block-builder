@@ -4,8 +4,8 @@ import { SCHEMA } from './SCHEMA/SCHEMA';
 
 export const BIG_DATA = (() => {
     const schema = compileSchema({ schema: SCHEMA });
-    const nodes: any = {};
-    const docNode: any = {
+    const nodes: Record<string, Node> = {};
+    const docNode: Node = {
         id: 'doc',
         type: 'card',
         text: [{ text: 'My big note', marks: [] }],
@@ -20,7 +20,7 @@ export const BIG_DATA = (() => {
                 text: 'Suite aux faux pas de Nice, le club rhodanien voulait faire la bonne opération dans la course au podium.',
             },
         ] as MarkedText;
-        docNode.childrenIds.push(newNode.id);
+        (docNode.childrenIds as string[]).push(newNode.id);
         nodes[newNode.id] = newNode;
     }
     return nodes;
