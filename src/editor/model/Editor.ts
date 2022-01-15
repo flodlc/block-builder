@@ -43,7 +43,6 @@ export class Editor implements EditorInterface {
     }
 
     state: State;
-    selection?: AbstractSelection;
     schema: Schema;
 
     createNode = (type: string, node?: Partial<Node>): Node =>
@@ -147,7 +146,6 @@ export class Editor implements EditorInterface {
             this.normalizeAfterTransaction({ state, appliedTransaction });
 
         this.state = normalizedState;
-        this.selection = normalizedState.selection;
         delete this.resolvedState;
 
         this.trigger('tr');
@@ -180,7 +178,6 @@ export class Editor implements EditorInterface {
                 draft = newState;
             });
         this.state = { ...draft, selection: item.state.selection };
-        this.selection = item.state.selection;
         delete this.resolvedState;
         this.trigger('tr');
         this.trigger('change');

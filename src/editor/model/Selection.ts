@@ -52,12 +52,6 @@ export class BlockSelection extends AbstractSelection {
         return selected;
     }
 
-    addBlockToSelection(nodeId: string) {
-        const newMap = new Map<string, string>(this.nodeIds);
-        newMap.set(nodeId, nodeId);
-        return new BlockSelection(newMap);
-    }
-
     clone() {
         return new BlockSelection(this.nodeIds);
     }

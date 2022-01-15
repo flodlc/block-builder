@@ -10,8 +10,8 @@ export const patchNode = ({
     schema: Schema;
 }) => {
     const type = patch.type ?? node.type;
-    const text = patch.text ?? node.text ?? [];
-    const attrs = patch.attrs ?? node.attrs;
+    const text = [...(patch.text ?? node.text ?? [])];
+    const attrs = { ...(patch.attrs ?? node.attrs) };
     const nodeSchema = schema[type];
     if (!isNodeSchema(nodeSchema)) throw 'invalid node type';
 

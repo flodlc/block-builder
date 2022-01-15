@@ -1,7 +1,7 @@
 import { BlockSelection, Editor, TextSelection } from '../../indexed';
 
 export const onBackspace = ({ editor }: { editor: Editor }) => {
-    const selection = editor.selection as BlockSelection;
+    const selection = editor.state.selection as BlockSelection;
     const transaction = editor.createTransaction();
     selection.nodeIds.forEach((nodeId) => {
         const parentId = editor.runQuery(

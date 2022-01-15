@@ -17,7 +17,6 @@ type JsonNode = {
 export interface Editor {
     getJson: () => JsonNode;
     state: InternalEditor['state'];
-    selection: AbstractSelection;
     schema: Schema;
     createNode: (type: string, node?: Partial<Node>) => Node;
     parseHtml: (html: string) => {
