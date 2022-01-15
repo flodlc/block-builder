@@ -1,13 +1,12 @@
 import { unwrap } from './unwrap';
 import { nodesBehaviors } from './behaviors.config';
 import {
-    CompiledNodeSchema,
     Editor,
     getMarkedTextLength,
     joinMarkedTexts,
     TextSelection,
     View,
-} from '../..';
+} from '../../indexed';
 
 export const onBackspace = ({
     editor,
@@ -29,10 +28,9 @@ const tryReset = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
     if (node.type === 'text') return false;
-    const textSchema = editor.schema.text as CompiledNodeSchema;
     editor
         .createTransaction()
-        .patch({ nodeId: node.id, patch: textSchema.patch(node) })
+        .patch({ nodeId: node.id, patch: { type: 'text' } })
         .dispatch();
     return true;
 };

@@ -1,14 +1,17 @@
-import { Editor } from '../..';
-import { parseHtml } from '../..';
-import { AbstractSelection, BlockSelection, TextSelection } from '../..';
-import { Node } from '../..';
-import { TransactionBuilder } from '../..';
-import { cutMarkedText } from '../..';
-import { joinMarkedTexts } from '../..';
-import { getMarkedTextLength } from '../..';
+import {
+    Editor,
+    AbstractSelection,
+    BlockSelection,
+    TextSelection,
+    Node,
+    TransactionBuilder,
+    cutMarkedText,
+    joinMarkedTexts,
+    getMarkedTextLength,
+} from '../../indexed';
 
 export const insertHtml = (html: string, editor: Editor) => {
-    const parsed = parseHtml({ html, schema: editor.schema });
+    const parsed = editor.parseHtml(html);
     if (!editor.state.selection) return;
 
     insertLines({

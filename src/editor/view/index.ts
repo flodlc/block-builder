@@ -10,6 +10,5 @@ export { ReactView } from './ReactView';
 export { TextInput } from './TextInput/TextInput';
 export { Children } from './Children';
 
-export { View } from './View';
-export { useView } from './contexts/ViewContext';
+export type { View } from './types';
 export { useEditor } from './contexts/EditorContext';

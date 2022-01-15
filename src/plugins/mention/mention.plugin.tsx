@@ -1,9 +1,9 @@
 import React from 'react';
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { MentionDecoration } from './MentionDecoration';
-import { isTextSelection, Range, TextSelection } from '../..';
-import { Editor } from '../..';
-import { View } from '../..';
+import { isTextSelection, Range, TextSelection } from '../../indexed';
+import { Editor } from '../../indexed';
+import { View } from '../../indexed';
 import escapeStringRegexp from 'escape-string-regexp';
 import { MentionComponentWrapper } from './MentionDropdown';
 import { Mention } from './Mention';

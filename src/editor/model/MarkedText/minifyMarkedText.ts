@@ -1,4 +1,4 @@
-import { Mark, MarkedText } from '../../types';
+import { Mark, MarkedText } from '../types';
 
 export const minifyMarkedText = (text: MarkedText): MarkedText => {
     const minified: MarkedText = [];

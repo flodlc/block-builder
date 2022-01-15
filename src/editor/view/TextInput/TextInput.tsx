@@ -1,6 +1,6 @@
 import React, { ReactElement, useLayoutEffect, useRef, useState } from 'react';
 import { TextRenderer } from './TextRenderer';
-import { MarkedText, useEditor } from '../../model';
+import { MarkedText } from '../../model';
 import { getElementSelection } from './utils/getElementSelection';
 import { Range, TextSelection } from '../../model';
 import { PlaceholderWrapper } from './Placeholder';
@@ -12,10 +12,11 @@ import { useRestoreSelection } from './hooks/useRestoreSelection';
 import { useRenderingKey } from './hooks/useRenderingKey';
 import { useView } from '../contexts/ViewContext';
 import { useBackspaceHandler } from './hooks/useBackspaceHandler';
-import { useInputHander } from './hooks/useInputHander';
+import { useInputHandler } from './hooks/useInputHandler';
 import { useEventHandlers } from './hooks/useEventHandlers';
 import { useDeleteHandler } from './hooks/useDeleteHandler';
 import { useSoftBreakHandler } from './hooks/useSoftBreakHandler';
+import { useEditor } from '../contexts/EditorContext';
 
 export const TextInput = ({
     onChange = () => false,
@@ -105,7 +106,7 @@ export const TextInput = ({
         nodeId,
     });
 
-    useInputHander({
+    useInputHandler({
         ref,
         value,
         currentSavedText,
@@ -192,7 +193,6 @@ export const TextInput = ({
                     onChange={handleMarkChange}
                     value={value}
                     decorations={decorations}
-                    schema={editor.schema}
                 />
             </div>
             {!currentSavedText && (range || keepPlaceholder) && (

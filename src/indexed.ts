@@ -6,7 +6,6 @@ export * from './editor/view';
 // editor.on
 // editor.off
 // editor.runQuery
-// editor.schema.text
 // editor.state.nodes
 // editor.createTransaction
 // schema.allowText

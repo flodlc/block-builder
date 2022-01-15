@@ -1,7 +1,7 @@
-import { hasMark, markText, unmarkText } from '../..';
-import { cutMarkedText } from '../..';
-import { isTextSelection } from '../..';
-import { Editor } from '../..';
+import { hasMark, markText, unmarkText } from '../../indexed';
+import { cutMarkedText } from '../../indexed';
+import { isTextSelection } from '../../indexed';
+import { Editor } from '../../indexed';
 
 export const italicApi = (editor: Editor) => ({
     isItalic: () => {
@@ -35,9 +35,7 @@ export const italicApi = (editor: Editor) => ({
             .createTransaction()
             .patch({
                 nodeId: node.id,
-                patch: {
-                    text: newMarkedText,
-                },
+                patch: { text: newMarkedText },
             })
             .focus(selection.clone())
             .dispatch();

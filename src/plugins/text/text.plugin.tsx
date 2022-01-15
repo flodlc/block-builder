@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Text } from './Text';
 
 export const TextPlugin: PluginFactory = () => () => {

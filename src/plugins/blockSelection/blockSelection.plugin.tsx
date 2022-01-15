@@ -5,7 +5,7 @@ import {
     isTextSelection,
     PluginFactory,
     View,
-} from '../..';
+} from '../../indexed';
 import { BlockSelectionWrapper } from './BlockSelection';
 
 export type DraggingState = {

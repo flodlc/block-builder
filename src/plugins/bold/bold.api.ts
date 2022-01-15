@@ -1,7 +1,11 @@
-import { hasMark, markText, unmarkText } from '../..';
-import { cutMarkedText } from '../..';
-import { isTextSelection } from '../..';
-import { Editor } from '../..';
+import {
+    cutMarkedText,
+    Editor,
+    hasMark,
+    isTextSelection,
+    markText,
+    unmarkText,
+} from '../../indexed';
 
 export const boldApi = (editor: Editor) => ({
     isBold: () => {
@@ -33,12 +37,7 @@ export const boldApi = (editor: Editor) => ({
 
         editor
             .createTransaction()
-            .patch({
-                nodeId: node.id,
-                patch: {
-                    text: newMarkedText,
-                },
-            })
+            .patch({ nodeId: node.id, patch: { text: newMarkedText } })
             .focus(selection.clone())
             .dispatch();
     },

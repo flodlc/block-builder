@@ -1,13 +1,9 @@
-import { CompiledSchema } from '../schema';
-import {
-    CompiledNodeSchema,
-    isNodeSchema,
-    MarkedText,
-    Node as ModelNode,
-} from '../types';
-import { joinMarkedTexts } from '../transaction/MarkedText/joinMarkedTexts';
+import { isNodeSchema, MarkedText, Node as ModelNode, Schema } from '../types';
+import { joinMarkedTexts } from '../MarkedText/joinMarkedTexts';
 import { normalizeState } from './modelNormalizer';
 import { applyTransaction } from '../transaction/transactions';
+import { patchNode } from '../Node/patchNode';
+import { createNode } from '../Node/createNode';
 
 const blockTags: Record<string, boolean> = {
     address: true,
@@ -69,7 +65,7 @@ export const parseHtml = ({
     schema,
 }: {
     html: string;
-    schema: CompiledSchema;
+    schema: Schema;
 }) => {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html;
@@ -87,7 +83,8 @@ export const parseHtml = ({
                 nodes: state.nodes,
                 rootId: block.id,
             },
-            ({ transaction, state }) => applyTransaction({ state, transaction })
+            ({ transaction, state }) =>
+                applyTransaction({ state, transaction, schema })
         ).normalizedState;
     });
 
@@ -104,7 +101,7 @@ type Parsed = {
 
 const parseText = (
     domNode: Node,
-    schema: CompiledSchema,
+    schema: Schema,
     marks: { type: string }[] = []
 ): { text: string; marks: any[] }[] => {
     if (![1, 3].includes(domNode.nodeType)) return [];
@@ -128,11 +125,12 @@ const parseText = (
     }
 
     let mark: { type: string } | undefined;
-    Object.values(schema).some((schemaItem) => {
+    Object.keys(schema).some((type) => {
+        const schemaItem = schema[type];
         if (schemaItem.inline) {
             const returnedMark = schemaItem.parse?.(domNode as HTMLElement);
             if (returnedMark) {
-                mark = { ...returnedMark, type: schemaItem.type };
+                mark = { ...returnedMark, type };
                 return true;
             }
         }
@@ -146,22 +144,22 @@ const parseText = (
         .filter((item) => item.text);
 };
 
-const isInlineAllowed = (schema: CompiledSchema, parentType?: string) => {
+const isInlineAllowed = (schema: Schema, parentType?: string) => {
     if (!parentType) return false;
     const parentSchema = schema[parentType];
     return parentSchema.allowText;
 };
 
-const getDefaultType = (schema: CompiledSchema, parentType?: string) => {
+const getDefaultType = (schema: Schema, parentType?: string) => {
     return getAllowedChildTypes(schema, parentType)[0];
 };
 
-const doesAllowChildren = (schema: CompiledSchema, parentType?: string) => {
+const doesAllowChildren = (schema: Schema, parentType?: string) => {
     return !!getAllowedChildTypes(schema, parentType).length;
 };
 
 const getAllowedChildTypes = (
-    schema: CompiledSchema,
+    schema: Schema,
     parentType?: string
 ): string[] => {
     if (!parentType) return Object.keys(schema);
@@ -175,17 +173,19 @@ const findMatching = ({
     schema,
     domNode,
 }: {
-    schema: CompiledSchema;
+    schema: Schema;
     domNode: Node;
 }) => {
-    for (const schemaItem of Object.values(schema)) {
+    for (const type of Object.keys(schema)) {
+        const schemaItem = schema[type];
         const nodePatch =
             isNodeSchema(schemaItem) &&
             schemaItem.parse?.(domNode as HTMLElement);
         if (nodePatch) {
             return {
                 nodePatch,
-                schema: schemaItem as CompiledNodeSchema,
+                type,
+                schema: schemaItem,
             };
         }
     }
@@ -197,7 +197,7 @@ const parse = ({
     nodes = {},
     parentType,
 }: {
-    schema: CompiledSchema;
+    schema: Schema;
     domNode: Node;
     nodes: Record<string, ModelNode>;
     parentType?: string;
@@ -206,12 +206,16 @@ const parse = ({
 
     const matchedNode = findMatching({ schema, domNode });
 
-    if (matchedNode && !doesAllowChildren(schema, matchedNode?.schema.type)) {
-        const node = matchedNode.schema.create({
-            ...matchedNode.nodePatch,
-            text: matchedNode?.schema.allowText
-                ? parseText(domNode, schema)
-                : [],
+    if (matchedNode && !doesAllowChildren(schema, matchedNode?.type)) {
+        const node = createNode({
+            schema,
+            type: matchedNode.type,
+            node: {
+                ...matchedNode.nodePatch,
+                text: matchedNode?.schema.allowText
+                    ? parseText(domNode, schema)
+                    : [],
+            },
         });
         nodes[node.id] = node;
         return { blocks: [node] };
@@ -222,17 +226,22 @@ const parse = ({
         schema,
         domNode,
         matchedNode,
-        parentType: matchedNode?.schema.type ?? parentType,
+        parentType: matchedNode?.type ?? parentType,
     });
     blocks.forEach((child) => (nodes[child.id] = child));
 
-    if (!matchedNode?.schema?.type) return { inline: inlineText, blocks };
+    if (!matchedNode?.type) return { inline: inlineText, blocks };
 
-    const node = matchedNode.schema.patch({
-        ...matchedNode.schema.create(matchedNode.nodePatch),
-        text: matchedNode.schema.allowText ? inlineText : undefined,
-        childrenIds: blocks.map((item) => item.id),
+    const node = patchNode({
+        schema,
+        node: createNode({
+            type: matchedNode.type,
+            node: matchedNode.nodePatch,
+            schema,
+        }),
+        patch: { text: matchedNode.schema.allowText ? inlineText : undefined },
     });
+    node.childrenIds = blocks.map((item) => item.id);
     nodes[node.id] = node;
 
     return {
@@ -249,11 +258,11 @@ const parseChildren = ({
     matchedNode,
 }: {
     nodes: Record<string, ModelNode>;
-    schema: CompiledSchema;
+    schema: Schema;
     domNode: Node;
     parentType?: string;
     matchedNode?: {
-        schema: CompiledNodeSchema;
+        type: string;
         nodePatch: Partial<ModelNode>;
     };
 }) => {
@@ -267,7 +276,7 @@ const parseChildren = ({
                 domNode: childNode,
                 schema,
                 nodes,
-                parentType: matchedNode?.schema.type ?? parentType,
+                parentType: matchedNode?.type ?? parentType,
             });
             if (
                 !inlineText.length &&
@@ -284,12 +293,10 @@ const parseChildren = ({
                 blocks = [...blocks, ...parsed.blocks];
             } else {
                 if (!childNode.textContent?.trim()) return;
-                const def = getDefaultType(schema, parentType);
-                if (def) {
+                const defaultType = getDefaultType(schema, parentType);
+                if (defaultType) {
                     if (!openedBlock) {
-                        const nodeSchema = schema[def];
-                        if (!isNodeSchema(nodeSchema)) return;
-                        openedBlock = nodeSchema.create();
+                        openedBlock = createNode({ schema, type: defaultType });
                         blocks.push(openedBlock);
                     }
                 }
@@ -303,10 +310,8 @@ const parseChildren = ({
                 );
             } else {
                 if (!openedBlock) {
-                    const def = getDefaultType(schema, parentType);
-                    const nodeSchema = schema[def];
-                    if (!isNodeSchema(nodeSchema)) return;
-                    openedBlock = nodeSchema.create();
+                    const defaultType = getDefaultType(schema, parentType);
+                    openedBlock = createNode({ schema, type: defaultType });
                     blocks.push(openedBlock);
                 }
                 openedBlock.text = joinMarkedTexts(

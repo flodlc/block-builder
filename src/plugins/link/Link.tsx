@@ -1,5 +1,5 @@
 import React from 'react';
-import { MarkComponentAttrs } from '../..';
+import { MarkComponentAttrs } from '../../indexed';
 
 export const Link = ({
     children,

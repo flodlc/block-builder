@@ -1,5 +1,4 @@
-import { CompiledSchema } from '../schema';
-import { CompiledNodeSchema, Node, State } from '../types';
+import { NodeSchema, Node, State, Schema } from '../types';
 import { TransactionBuilder } from '../transaction/TransactionBuilder';
 import { AppliedTransaction, Transaction } from '../transaction/types';
 
@@ -9,7 +8,7 @@ export enum STATE_ERRORS {
 }
 
 export const normalizeState = (
-    schema: CompiledSchema,
+    schema: Schema,
     state: State,
     applyNormalizing: (args: {
         transaction: Transaction;
@@ -52,7 +51,7 @@ export const normalizeState = (
 };
 
 export const findErrorAndTransaction = (
-    schema: CompiledSchema,
+    schema: Schema,
     node: Node,
     state: State
 ): { error?: string; transaction?: Transaction } => {
@@ -78,8 +77,8 @@ export const findErrorAndTransaction = (
     return normalizeNode({ schema, node, childNode, state, error });
 };
 
-const setDefaultAttrs = (schema: CompiledSchema, node: Node) => {
-    const nodeSchema = schema[node.type] as CompiledNodeSchema;
+const setDefaultAttrs = (schema: Schema, node: Node) => {
+    const nodeSchema = schema[node.type] as NodeSchema;
 
     const attrsPatch = {} as any;
     for (const attr of Object.keys(nodeSchema.attrs)) {
@@ -102,12 +101,11 @@ const setDefaultAttrs = (schema: CompiledSchema, node: Node) => {
         .getTransaction();
 };
 
-const findError = (schema: CompiledSchema, node: Node, state: State) => {
-    const nodeSchema = schema[node.type] as CompiledNodeSchema;
+const findError = (schema: Schema, node: Node, state: State) => {
+    const nodeSchema = schema[node.type] as NodeSchema;
     for (const childId of node?.childrenIds?.slice().reverse() ?? []) {
         const childNode = state.nodes[childId];
-        const childNodeSchema = schema[childNode.type] as CompiledNodeSchema;
-        if (!isValidChild(schema, nodeSchema.type, childNodeSchema.type)) {
+        if (!isValidChild(schema, node.type, childNode.type)) {
             return { error: STATE_ERRORS.INVALID_CHILD, childNode };
         }
     }
@@ -128,13 +126,13 @@ const normalizeNode = ({
     state,
     error,
 }: {
-    schema: CompiledSchema;
+    schema: Schema;
     node: Node;
     childNode?: Node;
     state: State;
     error?: string;
 }) => {
-    const nodeSchema = schema[node.type] as CompiledNodeSchema;
+    const nodeSchema = schema[node.type] as NodeSchema;
     let transaction: Transaction | undefined = undefined;
     const transactionBuilder = new TransactionBuilder((steps) => {
         transaction = { steps, keepHistory: false };
@@ -154,7 +152,7 @@ const normalizeNode = ({
 };
 
 const isValidChild = (
-    schema: CompiledSchema,
+    schema: Schema,
     parentType: string,
     childType: string
 ) => {

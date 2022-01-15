@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Editor } from '../editor/model';
-import { ReactView } from '../editor/view/ReactView';
+import { ReactView } from '../editor/view';
 import { BIG_DATA, PLAYGROUND_DATA } from './DATA';
 import { BlockSelectionPlugin } from '../plugins/blockSelection/blockSelection.plugin';
 import { SuggestionPlugin } from '../plugins/suggestion/suggestion.plugin';
@@ -15,7 +14,7 @@ import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
-import { Node } from '../editor/model';
+import { createEditor, Editor, Node } from '../editor/model';
 import { ItalicPlugin } from '../plugins/italic/italic.plugin';
 import { BalloonPlugin } from '../plugins/balloon/balloonPlugin';
 import { Balloon } from './Balloon';
@@ -52,7 +51,7 @@ function Playground() {
     }, []);
 
     const [editor] = useState(
-        new Editor({
+        createEditor({
             rootId: 'doc',
             nodes: data,
             schema: SCHEMA,

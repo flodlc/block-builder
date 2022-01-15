@@ -1,4 +1,4 @@
-import { Coords } from '../..';
+import { Coords } from '../../indexed';
 
 export type SuggestionPluginState = {
     close: () => void;

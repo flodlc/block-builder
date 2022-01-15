@@ -1,6 +1,4 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Editor } from '../model';
-import { EditorContext } from '../model';
 import { Child } from './Children';
 import { ViewContext } from './contexts/ViewContext';
 import { Plugin, RegisteredPlugin } from './plugin/types';
@@ -9,6 +7,8 @@ import { View } from './View';
 import { useBindDom, useEventManager } from './useEventManager';
 import { ArrowNavigationPlugin } from './corePlugins/arrowNavigation/arrowNavigation.plugin';
 import { HistoryShortcutsPlugin } from './corePlugins/historyShortcuts/historyShortcuts.plugin';
+import { Editor } from '../model';
+import { EditorContext } from './contexts/EditorContext';
 
 export const GLOBAL_EDITABLE = false;
 const CORE_PLUGINS: Plugin[] = [

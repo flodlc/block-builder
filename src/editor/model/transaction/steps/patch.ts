@@ -1,34 +1,41 @@
-import { State } from '../../types';
-import produce from 'immer';
+import { Node, Schema, State } from '../../types';
+import { patchNode } from '../../Node/patchNode';
 
 export const patch = ({
     state,
     nodeId,
     patch,
+    schema,
 }: {
     state: State;
     nodeId: string;
-    patch: Record<string, any>;
+    patch: Partial<Pick<Node, 'type' | 'text' | 'attrs'>>;
+    schema: Schema;
 }) => {
-    if (patch.childrenIds && Object.keys(patch).length === 1) {
-        throw 'Cannot patch field childrenIds only. Use insert / delete steps instead.';
-    }
     let reversePatch: Record<string, any> = {};
     const node = state.nodes[nodeId];
-    return {
-        state: produce(state, (draftState) => {
-            reversePatch = Object.keys(patch).reduce((prev, key) => {
-                return {
-                    ...prev,
-                    // @ts-ignore
-                    [key]: node[key],
-                };
-            }, {});
-            draftState.nodes[nodeId] = {
-                ...draftState.nodes[nodeId],
-                ...patch,
-            };
+
+    const keys = Object.keys(patch) as ('type' | 'text' | 'attrs')[];
+    reversePatch = keys.reduce(
+        (prev, key) => ({
+            ...prev,
+            [key]: node[key],
         }),
+        {}
+    );
+
+    return {
+        state: {
+            ...state,
+            nodes: {
+                ...state.nodes,
+                [nodeId]: patchNode({
+                    node: state.nodes[nodeId],
+                    patch,
+                    schema,
+                }),
+            },
+        },
         reversedSteps: { name: 'patch', nodeId, patch: reversePatch },
     };
 };

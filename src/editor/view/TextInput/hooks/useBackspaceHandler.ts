@@ -31,7 +31,6 @@ export const useBackspaceHandler = ({
         if (!previousIsNodeView) return false;
         const newTextState = spliceText({
             text: value,
-            editor: view.editor,
             textInput: '',
             range: [
                 currentRange[0] < currentRange[1]

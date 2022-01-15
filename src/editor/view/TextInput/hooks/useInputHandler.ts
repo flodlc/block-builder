@@ -2,11 +2,10 @@ import { RefObject, useLayoutEffect } from 'react';
 import { View } from '../../View';
 import { MarkedText } from '../../../model';
 import { Range } from '../../../model';
-import { Editor } from '../../../model';
 import { spliceText } from '../../../model';
 import { getInputDiff } from '../utils/getInputDiff';
 
-export const useInputHander = ({
+export const useInputHandler = ({
     ref,
     view,
     nodeId,
@@ -23,7 +22,6 @@ export const useInputHander = ({
 }) => {
     const textHandler = () => {
         const textState = handleTextChange({
-            editor: view.editor,
             element: ref.current as HTMLElement,
             currentValue: value,
             previousText: currentSavedText,
@@ -40,13 +38,11 @@ export const useInputHander = ({
 };
 
 const handleTextChange = ({
-    editor,
     element,
     currentValue,
     previousText,
 }: {
     element: HTMLElement;
-    editor: Editor;
     currentValue: MarkedText;
     previousText: string;
 }) => {
@@ -54,7 +50,6 @@ const handleTextChange = ({
     if (!inputDiff) return undefined;
     const newTextState = spliceText({
         text: currentValue,
-        editor,
         textInput: inputDiff.textInput,
         range: inputDiff.inputRange,
     });

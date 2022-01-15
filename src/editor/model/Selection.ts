@@ -1,5 +1,5 @@
 import { State } from './types';
-import { getMarkedTextLength } from './transaction/MarkedText/getMarkedTextLength';
+import { getMarkedTextLength } from './MarkedText/getMarkedTextLength';
 import { resolveState } from './StateResolver';
 
 export abstract class AbstractSelection {

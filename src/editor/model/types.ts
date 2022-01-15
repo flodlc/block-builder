@@ -1,7 +1,6 @@
 import { AppliedTransaction } from './transaction/types';
 import { AbstractSelection } from './Selection';
 import { TransactionBuilder } from './transaction/TransactionBuilder';
-import { CompiledSchema } from './schema';
 
 export type MarkedText = MarkedNode[];
 
@@ -56,11 +55,8 @@ export type MarkSchema = {
     serialize?: (params: { serializedContent: string; mark: Mark }) => string;
     inline: true;
 };
-export type CompiledMarkSchema = MarkSchema & { type: string };
 
-export const isMarkSchema = (
-    value: SchemaItem
-): value is CompiledMarkSchema => {
+export const isMarkSchema = (value: SchemaItem): value is MarkSchema => {
     return !!value.inline;
 };
 
@@ -83,7 +79,7 @@ export type NodeSchema = {
         nextNode?: Node;
     }) => string;
     normalize?: (params: {
-        schema: CompiledSchema;
+        schema: Schema;
         state: State;
         child?: Node;
         node: Node;
@@ -92,17 +88,10 @@ export type NodeSchema = {
     }) => void | string;
     inline?: false;
 };
-export type CompiledNodeSchema = NodeSchema & {
-    type: string;
-    create: (node?: Partial<Node>) => Node;
-    patch: (node: Partial<Node>) => Node;
-};
 
 type SchemaItem = NodeSchema | MarkSchema;
 
-export const isNodeSchema = (
-    value: SchemaItem
-): value is CompiledNodeSchema => {
+export const isNodeSchema = (value: SchemaItem): value is NodeSchema => {
     return !value.inline;
 };
 

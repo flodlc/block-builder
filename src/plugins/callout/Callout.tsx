@@ -1,7 +1,7 @@
 import React from 'react';
-import { Children, useEditor } from '../..';
+import { Children, useEditor } from '../../indexed';
 import { SelectionHalo } from '../../Playground/SelectionHalo';
-import { BlockComponentAttrs } from '../..';
+import { BlockComponentAttrs } from '../../indexed';
 
 const EMOJIS = [
     '👌',

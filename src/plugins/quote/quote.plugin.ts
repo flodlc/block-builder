@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Quote } from './Quote';
 
 export const QuotePlugin: PluginFactory = () => () => {

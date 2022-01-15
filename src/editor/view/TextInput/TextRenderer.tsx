@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import { Mark, MarkedNode, MarkedText } from '../../model';
 import { markText } from '../../model';
-import { CompiledSchema } from '../../model';
 import { NodeView } from './NodeView';
 import { NodeComponentAttrs } from '../types';
 import { useView } from '../contexts/ViewContext';
@@ -17,13 +16,11 @@ const MarksWrapper = ({
     node,
     onChange,
     value,
-    schema,
 }: {
     pos: number;
     node: MarkedNode;
     value?: MarkedText;
     onChange: (text: MarkedText) => void;
-    schema: CompiledSchema;
 }) => {
     const getUpdateMark =
         ({ from, to }: { from: number; to: number }) =>
@@ -37,33 +34,20 @@ const MarksWrapper = ({
     const updateMarkRef = useRef(
         getUpdateMark({ from: pos, to: pos + node.text.length })
     );
-    return (
-        <MarksFactory
-            node={node}
-            updateMarkRef={updateMarkRef}
-            schema={schema}
-        />
-    );
+    return <MarksFactory node={node} updateMarkRef={updateMarkRef} />;
 };
 
 const MarksFactory = memo(
     ({
         node,
         updateMarkRef,
-        schema,
     }: {
         node: MarkedNode;
         updateMarkRef: RefObject<(mark: Mark) => void>;
-        schema: CompiledSchema;
     }) => {
         const updateMark = (mark: Mark) => updateMarkRef.current?.(mark);
         return (
-            <Marks
-                marks={node.marks}
-                node={node}
-                updateMark={updateMark}
-                schema={schema}
-            >
+            <Marks marks={node.marks} node={node} updateMark={updateMark}>
                 {node.text}
             </Marks>
         );
@@ -81,13 +65,11 @@ const Marks = ({
     marks,
     updateMark,
     children,
-    schema,
 }: {
     node: MarkedNode;
     marks?: Mark[];
     updateMark: (mark: Mark) => void;
     children: ReactElement[] | ReactElement | string;
-    schema: CompiledSchema;
 }) => {
     const view = useView();
 
@@ -101,7 +83,6 @@ const Marks = ({
                     node={node}
                     updateMark={updateMark}
                     marks={marks.slice(1)}
-                    schema={schema}
                 >
                     {children}
                 </Marks>
@@ -129,7 +110,6 @@ export const TextRenderer = React.memo(
     ({
         value,
         onChange,
-        schema,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         hashedKey,
         decorations = [],
@@ -141,7 +121,6 @@ export const TextRenderer = React.memo(
         decorations?: any[];
         hashedKey: number;
         onChange: (text: MarkedText) => void;
-        schema: CompiledSchema;
         willRender: () => void;
         didRender?: () => void;
     }) => {
@@ -168,7 +147,6 @@ export const TextRenderer = React.memo(
                                 onChange={onChange}
                                 value={value}
                                 node={markedNode}
-                                schema={schema}
                             />
                         );
                     })}

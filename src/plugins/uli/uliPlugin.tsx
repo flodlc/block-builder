@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Uli } from './Uli';
 export const UliPlugin: PluginFactory = () => () => {
     return {

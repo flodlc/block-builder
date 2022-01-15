@@ -1,10 +1,9 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { BlockComponentAttrs, useEditor } from '../..';
-import { Children } from '../..';
+import { BlockComponentAttrs, useEditor } from '../../indexed';
+import { Children } from '../../indexed';
 import { SelectionHalo } from '../../Playground/SelectionHalo';
-import { TextInput } from '../..';
-import { TextSelection } from '../..';
-import { CompiledNodeSchema } from '../..';
+import { TextInput } from '../../indexed';
+import { TextSelection } from '../../indexed';
 
 export const ToggleList = ({
     node,
@@ -21,7 +20,7 @@ export const ToggleList = ({
     }, [node.childrenIds]);
 
     const insertFirstChild = () => {
-        const newNode = (editor.schema.text as CompiledNodeSchema).create();
+        const newNode = editor.createNode('text');
         editor
             .createTransaction()
             .insertAfter({

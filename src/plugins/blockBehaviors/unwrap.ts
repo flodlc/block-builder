@@ -1,4 +1,4 @@
-import { Editor } from '../..';
+import { Editor } from '../../indexed';
 
 export const unwrap =
     ({ nodeId }: { nodeId: string }) =>

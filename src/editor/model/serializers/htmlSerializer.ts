@@ -1,4 +1,3 @@
-import { CompiledSchema } from '../schema';
 import {
     isMarkSchema,
     isNodeSchema,
@@ -6,12 +5,13 @@ import {
     MarkedNode,
     MarkedText,
     Node,
+    Schema,
 } from '../types';
-import { cutMarkedText } from '../transaction/MarkedText/cutMarkedText';
+import { cutMarkedText } from '../MarkedText/cutMarkedText';
 import { Range } from '../Selection';
 
 export const serializeNode = (
-    schema: CompiledSchema,
+    schema: Schema,
     node: Node,
     nodes: Record<string, Node>,
     deep: boolean,
@@ -60,22 +60,19 @@ export const serializeNode = (
     );
 };
 
-const serializeText = (schema: CompiledSchema, text: MarkedText) => {
+const serializeText = (schema: Schema, text: MarkedText) => {
     return text.reduce(
         (acc, section) => acc + serializeTextSection(schema, section),
         ''
     );
 };
 
-const serializeTextSection = (
-    schema: CompiledSchema,
-    section: MarkedNode
-): string => {
+const serializeTextSection = (schema: Schema, section: MarkedNode): string => {
     return serializeMarks(schema, section.marks ?? [], section.text);
 };
 
 const serializeMarks = (
-    schema: CompiledSchema,
+    schema: Schema,
     marks: Mark[],
     content: string
 ): string => {
@@ -87,7 +84,7 @@ const serializeMarks = (
 };
 
 const serializeMark = (
-    schema: CompiledSchema,
+    schema: Schema,
     mark: Mark,
     serializedContent: string
 ) => {

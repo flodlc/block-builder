@@ -1,7 +1,7 @@
 import { onBackspace } from './onBackspace';
 import { onEscape } from './onEscape';
 import { onEnter } from './onEnter';
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 
 export const BlockSelectionShortcutsPlugin: PluginFactory =
     () =>

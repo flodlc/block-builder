@@ -1,6 +1,6 @@
 import React from 'react';
 import { MentionPluginState } from './mention.types';
-import { MarkComponentAttrs } from '../..';
+import { MarkComponentAttrs } from '../../indexed';
 
 export const MentionDecoration = ({
     mark,

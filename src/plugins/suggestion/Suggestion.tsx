@@ -1,10 +1,10 @@
-import { Editor } from '../..';
+import { Editor } from '../../indexed';
 import React, { useEffect, useState } from 'react';
 import { SuggestionPluginState } from './suggestion.types';
 import { SUGGESTION_EVENTS } from './suggestion.const';
 import { deleteLastChars } from '../commands/deleteLastChars';
 import { getCommandList } from './commandList';
-import { Coords } from '../..';
+import { Coords } from '../../indexed';
 
 export const SuggestionComponentWrapper = ({ editor }: { editor: Editor }) => {
     const [suggestionState, setSuggestionState] =

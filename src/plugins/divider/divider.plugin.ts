@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Divider } from './Divider';
 
 export const DividerPlugin: PluginFactory = () => () => {

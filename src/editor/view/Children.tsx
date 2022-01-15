@@ -6,7 +6,8 @@ import React, {
     useState,
 } from 'react';
 import { useView } from './contexts/ViewContext';
-import { AbstractSelection, TextSelection, useEditor } from '../model';
+import { AbstractSelection, TextSelection } from '../model';
+import { useEditor } from './contexts/EditorContext';
 
 export const Children = ({
     childrenIds,
@@ -91,9 +92,7 @@ export const Child = React.memo(
         if (!node) return <></>;
 
         const Compo = view.blocks[node.type];
-        const nodeSchema = editor.schema[node.type];
         if (!Compo) throw `no component matching type ${node.type}`;
-        if (!nodeSchema) throw `no schema matching type ${node.type}`;
 
         return (
             <Compo

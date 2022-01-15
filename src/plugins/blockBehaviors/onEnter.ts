@@ -1,9 +1,8 @@
-import { Editor } from '../..';
-import { cutMarkedText } from '../..';
-import { TextSelection } from '../..';
+import { Editor } from '../../indexed';
+import { cutMarkedText } from '../../indexed';
+import { TextSelection } from '../../indexed';
+import { View } from '../../indexed';
 import { nodesBehaviors } from './behaviors.config';
-import { CompiledNodeSchema } from '../..';
-import { View } from '../..';
 
 export const onEnter = ({
     editor,
@@ -40,8 +39,7 @@ const insertLineAtTop = ({ editor }: { editor: Editor }) => {
         if (!parentId) return false;
         const { previousId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
 
-        const textSchema = editor.schema.text as CompiledNodeSchema;
-        const textNode = textSchema.create();
+        const textNode = editor.createNode('text');
         editor
             .createTransaction()
             .insertAfter({ parentId, after: previousId, node: textNode })
@@ -60,7 +58,7 @@ const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
     const tr = editor.createTransaction();
 
     if (view.hasDisplayedChildren(node.id)) {
-        const newNode = (editor.schema.text as CompiledNodeSchema).create({
+        const newNode = editor.createNode('text', {
             text: cutMarkedText(node.text, [selection?.range[1]]),
         });
         tr.insertAfter({ node: newNode, parentId: node.id });
@@ -74,10 +72,8 @@ const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
     } else {
         if (!parentId) return false;
         const shouldKeepFormat = nodesBehaviors[node.type].keepFormatOnEnter;
-        const newNodeSchema = editor.schema[
-            shouldKeepFormat ? node.type : 'text'
-        ] as CompiledNodeSchema;
-        const newNode = newNodeSchema.create({
+        const newNodeType = shouldKeepFormat ? node.type : 'text';
+        const newNode = editor.createNode(newNodeType, {
             text: cutMarkedText(node.text, [selection?.range[1]]),
         });
         tr.insertAfter({ node: newNode, parentId, after: node.id });
@@ -96,11 +92,9 @@ const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
 const tryReset = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const node = editor.state.nodes[selection.nodeId];
-    if (node.type === 'text') return false;
-    const textSchema = editor.schema.text as CompiledNodeSchema;
     editor
         .createTransaction()
-        .patch({ nodeId: node.id, patch: textSchema.patch(node) })
+        .patch({ nodeId: node.id, patch: { type: 'text' } })
         .dispatch();
     return true;
 };

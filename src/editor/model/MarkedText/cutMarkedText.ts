@@ -1,4 +1,4 @@
-import { MarkedText } from '../../types';
+import { MarkedText } from '../types';
 import { minifyMarkedText } from './minifyMarkedText';
 import { splitMarkedText } from './splitMarkedText';
 

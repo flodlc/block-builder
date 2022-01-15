@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Bold } from './Bold';
 
 export const BoldPlugin: PluginFactory = () => () => {

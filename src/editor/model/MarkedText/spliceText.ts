@@ -1,30 +1,24 @@
-import { MarkedNode, MarkedText } from '../../types';
+import { MarkedNode, MarkedText } from '../types';
 import { splitMarkedText } from './splitMarkedText';
 import { minifyMarkedText } from './minifyMarkedText';
-import { Range } from '../../Selection';
-import { Editor } from '../../Editor';
+import { Range } from '../Selection';
 
 export const spliceText = ({
     text,
     textInput,
     range,
-    editor,
 }: {
     text: MarkedText;
     textInput: string;
     range: Range;
-    editor: Editor;
 }) => {
     const splitNodes = splitMarkedText(text);
     const updatedText: MarkedText = splitNodes.slice();
 
     const previousCharNode = updatedText[range[0] - 1];
-    const previousMarks = previousCharNode?.marks?.filter(
-        (mark) => editor.schema[mark.type].allowText
-    );
     const newSection: MarkedNode = {
         text: textInput,
-        marks: previousMarks,
+        marks: previousCharNode?.marks,
     };
     range = [Math.max(range[0], 0), range[1]];
     updatedText.splice(range[0], range[1] - range[0], newSection);

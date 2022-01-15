@@ -1,6 +1,5 @@
-import { PluginFactory } from '../..';
-import { isBlockSelection, isTextSelection } from '../..';
-import { serializeNode } from '../..';
+import { PluginFactory } from '../../indexed';
+import { isBlockSelection, isTextSelection } from '../../indexed';
 import { insertHtml } from '../commands/insertHtml';
 
 export const CopyPastePlugin: PluginFactory =
@@ -25,10 +24,8 @@ export const CopyPastePlugin: PluginFactory =
             let html = '';
             if (isTextSelection(editor.state.selection)) {
                 const nodeId = editor.state.selection.nodeId;
-                html = serializeNode(
-                    editor.schema,
+                html = editor.serializeNode(
                     editor.state.nodes[nodeId],
-                    editor.state.nodes,
                     false,
                     editor.state.selection.range
                 );
@@ -39,10 +36,8 @@ export const CopyPastePlugin: PluginFactory =
                     (acc, nodeId) => {
                         return (
                             acc +
-                            serializeNode(
-                                editor.schema,
+                            editor.serializeNode(
                                 editor.state.nodes[nodeId],
-                                editor.state.nodes,
                                 true
                             )
                         );

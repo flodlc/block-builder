@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Heading } from './Heading';
 
 export const HeadingPlugin: PluginFactory = () => () => {

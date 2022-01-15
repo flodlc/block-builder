@@ -26,7 +26,6 @@ export const useSoftBreakHandler = ({
 
         const newTextState = spliceText({
             text: value,
-            editor: view.editor,
             textInput: '\n',
             range: currentRange,
         });

@@ -1,8 +1,8 @@
 import React from 'react';
-import { BlockComponentAttrs } from '../..';
-import { TextSelection } from '../..';
-import { TextInput } from '../..';
-import { Children } from '../..';
+import { BlockComponentAttrs } from '../../indexed';
+import { TextSelection } from '../../indexed';
+import { TextInput } from '../../indexed';
+import { Children } from '../../indexed';
 import { SelectionHalo } from '../../Playground/SelectionHalo';
 
 export const Uli: React.FC<BlockComponentAttrs> = ({

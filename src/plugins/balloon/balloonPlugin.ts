@@ -1,4 +1,4 @@
-import { PluginFactory, TextSelection } from '../..';
+import { PluginFactory, TextSelection } from '../../indexed';
 import { BALLOON_EVENTS } from './balloon.const';
 import { BalloonPluginState } from './balloon.types';
 

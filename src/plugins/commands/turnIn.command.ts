@@ -1,5 +1,4 @@
-import { Editor } from '../..';
-import { isNodeSchema } from '../..';
+import { Editor } from '../../indexed';
 
 export const turnInCommand =
     ({
@@ -35,17 +34,9 @@ const patchIn = ({
     type: string;
     attrs?: any;
 }) => {
-    const newTypeSchema = editor.schema[type];
-    if (!isNodeSchema(newTypeSchema)) return;
     editor
         .createTransaction()
-        .patch({
-            nodeId,
-            patch: newTypeSchema.patch({
-                ...editor.state.nodes[nodeId],
-                attrs,
-            }),
-        })
+        .patch({ nodeId, patch: { attrs, type } })
         .dispatch();
 };
 
@@ -61,9 +52,7 @@ const wrapIn = ({
     const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
     if (!parentId) return false;
 
-    const typeSchema = editor.schema[type];
-    if (!isNodeSchema(typeSchema)) return;
-    const wrappingNode = typeSchema.create();
+    const wrappingNode = editor.createNode(type);
     const node = editor.state.nodes[nodeId];
 
     editor

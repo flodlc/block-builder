@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { ToggleList } from './ToggleList';
 
 export const ToggleListPlugin: PluginFactory = () => () => {

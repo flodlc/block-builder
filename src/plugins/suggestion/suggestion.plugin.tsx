@@ -1,8 +1,8 @@
 import React from 'react';
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { SuggestionComponentWrapper } from './Suggestion';
-import { TextSelection } from '../..';
-import { Editor } from '../..';
+import { TextSelection } from '../../indexed';
+import { Editor } from '../../indexed';
 import { SuggestionPluginState } from './suggestion.types';
 import { MAX_SEARCH_LENGTH, SUGGESTION_EVENTS } from './suggestion.const';
 

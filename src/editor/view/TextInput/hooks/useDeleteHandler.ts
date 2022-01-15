@@ -27,7 +27,6 @@ export const useDeleteHandler = ({
 
         const newTextState = spliceText({
             text: value,
-            editor: view.editor,
             textInput: '',
             range: [
                 currentRange[1],

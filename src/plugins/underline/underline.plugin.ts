@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Underline } from './Underline';
 
 export const UnderlinePlugin: PluginFactory = () => () => {
@@ -6,9 +6,6 @@ export const UnderlinePlugin: PluginFactory = () => () => {
         key: 'underline',
         addMarks: () => ({
             u: Underline,
-        }),
-        addSchema: () => ({
-            u: { attrs: {}, allowText: true, allowChildren: true },
         }),
     };
 };

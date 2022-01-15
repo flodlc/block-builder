@@ -1,6 +1,6 @@
 import React from 'react';
-import { Children } from '../..';
-import { BlockComponentAttrs } from '../..';
+import { Children } from '../../indexed';
+import { BlockComponentAttrs } from '../../indexed';
 import { SelectionHalo } from '../../Playground/SelectionHalo';
 
 export const Quote: React.FC<BlockComponentAttrs> = ({

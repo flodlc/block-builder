@@ -1,5 +1,5 @@
-import { TextSelection } from '../..';
-import { Editor } from '../..';
+import { TextSelection } from '../../indexed';
+import { Editor } from '../../indexed';
 import { turnInCommand } from '../commands/turnIn.command';
 import { insertHtml } from '../commands/insertHtml';
 

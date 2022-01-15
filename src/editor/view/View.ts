@@ -2,52 +2,17 @@ import {
     BlockComponentAttrs,
     Coords,
     Decoration,
+    EventManager,
     MarkComponentAttrs,
     NodeComponentAttrs,
 } from './types';
-import { TextSelection } from '../model';
-import { Editor } from '../model';
+import { Editor, TextSelection } from '../model';
 import React from 'react';
 import { getRange } from './TextInput/utils/restoreSelection';
 import { Node } from '../model';
+import { View as ViewInterface } from './types';
 
-type NativeEventType =
-    | 'selectionchange'
-    | 'keydown'
-    | 'beforeinput'
-    | 'input'
-    | 'compositionstart'
-    | 'compositionend';
-
-export type EventManager = {
-    record: (
-        {
-            type,
-            nodeId,
-        }: {
-            type: NativeEventType;
-            nodeId?: string;
-        },
-        event: Event
-    ) => void;
-    observers: Record<
-        string,
-        {
-            nodeId?: string;
-            callback: ({ nodeId }: { nodeId?: string }) => boolean;
-        }[]
-    >;
-    on: (
-        { type, nodeId }: { type: string; nodeId?: string },
-        callback: ({ nodeId }: { nodeId?: string }) => boolean
-    ) => void;
-    off: (
-        { type, nodeId }: { type: string; nodeId?: string },
-        callback: ({ nodeId }: { nodeId?: string }) => boolean
-    ) => void;
-};
-
-export class View {
+export class View implements ViewInterface {
     editor: Editor;
     dom: HTMLElement;
     marks: Record<string, React.FC<MarkComponentAttrs | NodeComponentAttrs>>;

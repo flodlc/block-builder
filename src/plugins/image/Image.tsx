@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { BlockComponentAttrs, useEditor } from '../..';
+import { BlockComponentAttrs, useEditor } from '../../indexed';
 import { SelectionHalo } from '../../Playground/SelectionHalo';
-import { TextInput } from '../..';
-import { BlockSelection, TextSelection } from '../..';
+import { TextInput } from '../../indexed';
+import { BlockSelection, TextSelection } from '../../indexed';
 
 export const Image = ({
     node,

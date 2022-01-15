@@ -1,7 +1,7 @@
 import React from 'react';
-import { BlockComponentAttrs, useEditor } from '../..';
+import { BlockComponentAttrs, useEditor } from '../../indexed';
 import { SelectionHalo } from '../../Playground/SelectionHalo';
-import { BlockSelection } from '../..';
+import { BlockSelection } from '../../indexed';
 
 export const Divider: React.FC<BlockComponentAttrs> = ({
     node,

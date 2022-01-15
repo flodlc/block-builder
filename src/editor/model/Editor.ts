@@ -1,23 +1,25 @@
 import produce from 'immer';
 import { applyStep, applyTransaction } from './transaction/transactions';
 import {
-    State,
-    Node,
     EventHandler,
     History,
     HistoryItem,
     MarkedText,
+    Node,
     Schema,
+    State,
 } from './types';
 import { TransactionBuilder } from './transaction/TransactionBuilder';
 import { AppliedTransaction, Transaction } from './transaction/types';
 import { ResolvedState, resolveState } from './StateResolver';
-import { compileSchema, CompiledSchema } from './schema';
 import { normalizeState } from './serializers/modelNormalizer';
+import { parseHtml } from './serializers/htmlParser';
+import { serializeNode } from './serializers/htmlSerializer';
+import { AbstractSelection, Range } from './Selection';
+import { Editor as EditorInterface, EditorEvent } from './Editor.interface';
+import { createNode } from './Node/createNode';
 
-export type EditorEvent = 'change' | 'tr' | 'input' | string;
-
-export class Editor {
+export class Editor implements EditorInterface {
     private resolvedState?: ResolvedState;
     private history: History;
     private observers: Record<string, EventHandler[]> = {
@@ -25,9 +27,6 @@ export class Editor {
         tr: [],
         input: [],
     };
-
-    state: State;
-    schema: CompiledSchema;
 
     constructor({
         rootId,
@@ -38,22 +37,36 @@ export class Editor {
         nodes: Record<string, Node>;
         schema: Schema;
     }) {
-        this.schema = compileSchema({ schema });
+        this.schema = schema;
         this.history = { items: [] };
         this.state = nodes ? { rootId, nodes } : { rootId: 'doc', nodes: {} };
     }
+
+    state: State;
+    selection?: AbstractSelection;
+    schema: Schema;
+
+    createNode = (type: string, node?: Partial<Node>): Node =>
+        createNode({ schema: this.schema, node, type });
+
+    parseHtml = (html: string) => parseHtml({ html, schema: this.schema });
+
+    serializeNode = (node: Node, deep: boolean, range?: Range) =>
+        serializeNode(this.schema, node, this.state.nodes, deep, range);
 
     getJson = () =>
         getNodeJson(this.state, this.state.nodes[this.state.rootId]);
 
     runQuery = <T>(
-        query: (resolvedState: ResolvedState, editor: Editor) => T
+        query: (resolvedState: ResolvedState, editor: EditorInterface) => T
     ): T => {
         this.resolvedState = this.resolvedState ?? resolveState(this.state);
         return query(this.resolvedState, this);
     };
 
-    runCommand = (command: (editor: Editor) => void | boolean) => command(this);
+    runCommand = (
+        command: (editor: EditorInterface) => void | boolean
+    ): void | boolean => command(this);
 
     on = <T>(eventName: EditorEvent, handler: EventHandler<T>) => {
         this.observers[eventName] = this.observers[eventName] ?? [];
@@ -104,6 +117,7 @@ export class Editor {
                 return applyTransaction({
                     state,
                     transaction: normalizeTransaction,
+                    schema: this.schema,
                 });
             }
         );
@@ -126,12 +140,14 @@ export class Editor {
         const { state, appliedTransaction } = applyTransaction({
             state: this.state,
             transaction,
+            schema: this.schema,
         });
 
         const { normalizedAppliedTransaction, normalizedState, hasNormalized } =
             this.normalizeAfterTransaction({ state, appliedTransaction });
 
         this.state = normalizedState;
+        this.selection = normalizedState.selection;
         delete this.resolvedState;
 
         this.trigger('tr');
@@ -158,11 +174,13 @@ export class Editor {
                 // @ts-ignore
                 const { state: newState } = applyStep[reversedSteps.name]({
                     state: draft,
+                    schema: this.schema,
                     ...reversedSteps,
                 });
                 draft = newState;
             });
         this.state = { ...draft, selection: item.state.selection };
+        this.selection = item.state.selection;
         delete this.resolvedState;
         this.trigger('tr');
         this.trigger('change');

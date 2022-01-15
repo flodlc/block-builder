@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Italic } from './Italic';
 
 export const ItalicPlugin: PluginFactory = () => () => {

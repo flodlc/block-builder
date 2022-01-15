@@ -8,7 +8,7 @@ export class TransactionBuilder {
         patch,
     }: {
         nodeId: string;
-        patch: unknown;
+        patch: Partial<Pick<Node, 'type' | 'text' | 'attrs'>>;
     }): TransactionBuilder => {
         this.steps.push({ name: 'patch', nodeId, patch });
         return this;
@@ -50,7 +50,7 @@ export class TransactionBuilder {
         return { steps: this.steps, keepHistory };
     };
 
-    steps: Step[] = [];
+    private steps: Step[] = [];
 
     private readonly dispatchCallback: (
         steps: Step[],

@@ -1,4 +1,4 @@
-import { MarkedNode, MarkedText } from '../../types';
+import { MarkedNode, MarkedText } from '../types';
 
 export const splitMarkedText = (text: MarkedText) => {
     return text.reduce((prev, curr) => {

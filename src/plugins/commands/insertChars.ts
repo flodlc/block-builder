@@ -1,7 +1,7 @@
-import { TextSelection } from '../..';
-import { spliceText } from '../..';
-import { MarkedText } from '../..';
-import { Editor } from '../..';
+import { TextSelection } from '../../indexed';
+import { spliceText } from '../../indexed';
+import { MarkedText } from '../../indexed';
+import { Editor } from '../../indexed';
 
 export const insertChars =
     ({ textInput }: { textInput: string }) =>
@@ -11,7 +11,6 @@ export const insertChars =
         const node = editor.state.nodes[nodeId];
         const splicedText = spliceText({
             text: node.text as MarkedText,
-            editor,
             textInput,
             range: selection.range,
         });

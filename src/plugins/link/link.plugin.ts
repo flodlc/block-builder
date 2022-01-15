@@ -1,4 +1,4 @@
-import { PluginFactory } from '../..';
+import { PluginFactory } from '../../indexed';
 import { Link } from './Link';
 
 export const LinkPlugin: PluginFactory = () => () => {

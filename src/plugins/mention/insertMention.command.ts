@@ -1,7 +1,7 @@
-import { Editor } from '../..';
-import { insertNodeMark } from '../..';
-import { TextSelection } from '../..';
-import { spliceText } from '../..';
+import { Editor } from '../../indexed';
+import { insertNodeMark } from '../../indexed';
+import { TextSelection } from '../../indexed';
+import { spliceText } from '../../indexed';
 import { MentionValue } from './mention.types';
 
 export const insertMention =
@@ -20,7 +20,6 @@ export const insertMention =
 
         const { value, range } = spliceText({
             text: textWithMention,
-            editor,
             textInput: ' ',
             range: [selection.range[0] + 1, selection.range[0] + 1],
         });
@@ -29,9 +28,7 @@ export const insertMention =
             .createTransaction()
             .patch({
                 nodeId: node.id,
-                patch: {
-                    text: value,
-                },
+                patch: { text: value },
             })
             .focus(selection.setRange(range))
             .dispatch();

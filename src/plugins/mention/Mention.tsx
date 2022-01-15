@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { NodeComponentAttrs } from '../..';
+import { NodeComponentAttrs } from '../../indexed';
 import { MentionValue } from './mention.types';
 
 function getValue(value: { type: string; date?: string; name?: string }) {

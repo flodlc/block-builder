@@ -1,12 +1,7 @@
-import {
-    BlockSelection,
-    CompiledNodeSchema,
-    Editor,
-    TextSelection,
-} from '../..';
+import { BlockSelection, Editor, TextSelection } from '../../indexed';
 
 export const onBackspace = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as BlockSelection;
+    const selection = editor.selection as BlockSelection;
     const transaction = editor.createTransaction();
     selection.nodeIds.forEach((nodeId) => {
         const parentId = editor.runQuery(
@@ -32,8 +27,7 @@ export const onBackspace = ({ editor }: { editor: Editor }) => {
         });
         if (!parentId) return;
 
-        const textSchema = editor.schema.text as CompiledNodeSchema;
-        const node = textSchema.create();
+        const node = editor.createNode('text');
         transaction.insertAfter({
             parentId,
             after: previousId,

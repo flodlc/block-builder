@@ -1,9 +1,7 @@
-import { CompiledNodeSchema, MarkedText, Node } from '../editor/model';
-import { compileSchema } from '../editor/model/schema';
-import { SCHEMA } from './SCHEMA/SCHEMA';
+import { Node } from '../editor/model';
+import { v4 } from 'uuid';
 
 export const BIG_DATA = (() => {
-    const schema = compileSchema({ schema: SCHEMA });
     const nodes: Record<string, Node> = {};
     const docNode: Node = {
         id: 'doc',
@@ -13,13 +11,15 @@ export const BIG_DATA = (() => {
     };
     nodes['doc'] = docNode;
     for (let i = 0; i < 1000; i++) {
-        const textSchema = schema.text as CompiledNodeSchema;
-        const newNode = textSchema.create();
-        newNode.text = [
-            {
-                text: 'Suite aux faux pas de Nice, le club rhodanien voulait faire la bonne opération dans la course au podium.',
-            },
-        ] as MarkedText;
+        const newNode: Node = {
+            id: v4(),
+            type: 'text',
+            text: [
+                {
+                    text: 'Suite aux faux pas de Nice, le club rhodanien voulait faire la bonne opération dans la course au podium.',
+                },
+            ],
+        };
         (docNode.childrenIds as string[]).push(newNode.id);
         nodes[newNode.id] = newNode;
     }

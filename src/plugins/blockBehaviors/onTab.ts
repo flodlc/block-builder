@@ -1,6 +1,6 @@
 import { wrapInPrevious } from './wrapIn';
-import { Editor } from '../..';
-import { TextSelection } from '../..';
+import { Editor } from '../../indexed';
+import { TextSelection } from '../../indexed';
 import { unwrap } from './unwrap';
 
 export const onTab = ({ editor }: { editor: Editor }) => {
