@@ -1,16 +1,16 @@
 import { Editor, Node } from '../../indexed';
 import { TextSelection } from '../../indexed';
-import { joinMarkedTexts } from '../../indexed';
 import { TransactionBuilder } from '../../indexed';
 
 export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     const selection = editor.state.selection as TextSelection;
-    const textLength = selection.getTextLength(editor.state);
+    const node = editor.getNode(selection.nodeId);
+    if (!node) return false;
+    const textLength = node.getTextLength();
 
     const range = selection?.range;
     if (range?.[0] !== textLength || range?.[1] !== textLength) return false;
 
-    const node = editor.state.nodes[selection.nodeId];
     const nextId = editor.runQuery((resolvedState) => {
         const index = resolvedState.flatTree.indexOf(node.id);
         return resolvedState.flatTree[index + 1];
@@ -26,7 +26,7 @@ export const onDelete = ({ editor }: { editor: Editor }): boolean => {
         if (!parentId) return false;
         unwrapChildren({ nodeId: nextId, editor, transaction });
 
-        const text = joinMarkedTexts(node.text, next.text);
+        const text = Node.joinMarkedTexts(node.text, next.text);
         transaction
             .patch({ nodeId: node.id, patch: { text } })
             .removeFrom({ nodeId: nextId, parentId });

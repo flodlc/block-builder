@@ -13,9 +13,7 @@ export const Text: React.FC<BlockComponentAttrs> = ({
     const textSelection = selection as TextSelection;
     return (
         <div
-            className={
-                node.attrs?.level ? `heading_${node.attrs?.level}` : 'paragraph'
-            }
+            className={'paragraph'}
             data-uid={node.id}
             style={{ padding: '2px', position: 'relative' }}
         >

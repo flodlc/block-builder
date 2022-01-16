@@ -1,8 +1,8 @@
-import { isNodeSchema, MarkedText, Node as ModelNode, Schema } from '../types';
-import { joinMarkedTexts } from '../MarkedText/joinMarkedTexts';
+import { isNodeSchema, MarkedText, Schema } from '../types';
+import { Node as ModelNode } from './../Node/Node';
+
 import { normalizeState } from './modelNormalizer';
 import { applyTransaction } from '../transaction/transactions';
-import { patchNode } from '../Node/patchNode';
 import { createNode } from '../Node/createNode';
 
 const blockTags: Record<string, boolean> = {
@@ -232,16 +232,14 @@ const parse = ({
 
     if (!matchedNode?.type) return { inline: inlineText, blocks };
 
-    const node = patchNode({
+    const node = new ModelNode({
+        type: matchedNode.type,
         schema,
-        node: createNode({
-            type: matchedNode.type,
-            node: matchedNode.nodePatch,
-            schema,
-        }),
-        patch: { text: matchedNode.schema.allowText ? inlineText : undefined },
+        text: matchedNode.schema.allowText ? inlineText : undefined,
+        childrenIds: blocks.map((item) => item.id),
+        ...matchedNode.nodePatch,
     });
-    node.childrenIds = blocks.map((item) => item.id);
+
     nodes[node.id] = node;
 
     return {
@@ -289,7 +287,10 @@ const parseChildren = ({
                 inlineText = first?.text ?? [];
             }
             if (parsed) {
-                inlineText = joinMarkedTexts(inlineText, parsed.inline ?? []);
+                inlineText = ModelNode.joinMarkedTexts(
+                    inlineText,
+                    parsed.inline ?? []
+                );
                 blocks = [...blocks, ...parsed.blocks];
             } else {
                 if (!childNode.textContent?.trim()) return;
@@ -304,7 +305,7 @@ const parseChildren = ({
         } else {
             if (!childNode.textContent) return;
             if (isInlineAllowed(schema, parentType) && !openedBlock) {
-                inlineText = joinMarkedTexts(
+                inlineText = ModelNode.joinMarkedTexts(
                     inlineText,
                     parseText(childNode, schema)
                 );
@@ -314,10 +315,12 @@ const parseChildren = ({
                     openedBlock = createNode({ schema, type: defaultType });
                     blocks.push(openedBlock);
                 }
-                openedBlock.text = joinMarkedTexts(
-                    openedBlock.text,
-                    parseText(childNode, schema)
-                );
+                openedBlock = openedBlock.patch({
+                    text: ModelNode.joinMarkedTexts(
+                        openedBlock.text,
+                        parseText(childNode, schema)
+                    ),
+                });
             }
         }
     });

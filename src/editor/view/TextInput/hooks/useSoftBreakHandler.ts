@@ -1,7 +1,6 @@
 import { View } from '../../View';
-import { MarkedText } from '../../../model';
+import { MarkedText, Node } from '../../../model';
 import { Range } from '../../../model';
-import { spliceText } from '../../../model';
 import { getElementSelection } from '../utils/getElementSelection';
 import { RefObject, useLayoutEffect } from 'react';
 
@@ -24,7 +23,7 @@ export const useSoftBreakHandler = ({
         const currentRange = getElementSelection(ref.current) ?? range;
         if (!currentRange) return false;
 
-        const newTextState = spliceText({
+        const newTextState = Node.spliceText({
             text: value,
             textInput: '\n',
             range: currentRange,

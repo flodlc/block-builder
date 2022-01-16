@@ -5,10 +5,11 @@ import {
     History,
     HistoryItem,
     MarkedText,
-    Node,
     Schema,
     State,
 } from './types';
+import { Node, JsonNode } from './Node/Node';
+
 import { TransactionBuilder } from './transaction/TransactionBuilder';
 import { AppliedTransaction, Transaction } from './transaction/types';
 import { ResolvedState, resolveState } from './StateResolver';
@@ -18,6 +19,7 @@ import { serializeNode } from './serializers/htmlSerializer';
 import { Range } from './Selection';
 import { Editor as EditorInterface, EditorEvent } from './Editor.interface';
 import { createNode } from './Node/createNode';
+import _ from 'lodash';
 
 export class Editor implements EditorInterface {
     private resolvedState?: ResolvedState;
@@ -27,6 +29,7 @@ export class Editor implements EditorInterface {
         tr: [],
         input: [],
     };
+    private schema: Schema;
 
     constructor({
         rootId,
@@ -34,18 +37,23 @@ export class Editor implements EditorInterface {
         schema,
     }: {
         rootId: string;
-        nodes: Record<string, Node>;
+        nodes: Record<string, JsonNode>;
         schema: Schema;
     }) {
         this.schema = schema;
         this.history = { items: [] };
-        this.state = nodes ? { rootId, nodes } : { rootId: 'doc', nodes: {} };
+        const mountedNodes = _.mapValues(
+            nodes,
+            (item) => new Node({ ...item, schema })
+        );
+        this.state = nodes
+            ? { rootId, nodes: mountedNodes }
+            : { rootId: 'doc', nodes: {} };
     }
 
     state: State;
-    schema: Schema;
 
-    createNode = (type: string, node?: Partial<Node>): Node =>
+    createNode = (type: string, node?: Partial<JsonNode>): Node =>
         createNode({ schema: this.schema, node, type });
 
     getParentId = (nodeId: string) => {
@@ -207,15 +215,15 @@ export class Editor implements EditorInterface {
 }
 
 function getNodeJson(state: State, node: Node) {
-    type JsonNode = {
+    type JsonNodeWithChildren = {
         id: string;
         type: string;
         text?: MarkedText;
-        children?: JsonNode[];
+        children?: JsonNodeWithChildren[];
         attrs?: any;
     };
 
-    const nodeJson: JsonNode = {
+    const nodeJson: JsonNodeWithChildren = {
         id: node.id,
         type: node.type,
     };

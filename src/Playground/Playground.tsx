@@ -14,7 +14,7 @@ import { CardPlugin } from '../plugins/Card/card.plugin';
 import { QuotePlugin } from '../plugins/quote/quote.plugin';
 import { HeadingPlugin } from '../plugins/heading/heading.plugin';
 import { DividerPlugin } from '../plugins/divider/divider.plugin';
-import { createEditor, Editor, Node } from '../editor/model';
+import { createEditor, Node } from '../editor/model';
 import { ItalicPlugin } from '../plugins/italic/italic.plugin';
 import { BalloonPlugin } from '../plugins/balloon/balloonPlugin';
 import { Balloon } from './Balloon';
@@ -26,9 +26,10 @@ import { LinkPlugin } from '../plugins/link/link.plugin';
 import { UliPlugin } from '../plugins/uli/uliPlugin';
 import { ImagePlugin } from '../plugins/image/image.plugin';
 import { ToggleListPlugin } from '../plugins/toggleList/toggleList.plugin';
+import { JsonNode } from '../editor/model';
 
 function Playground() {
-    const resetNote = (dataSet: Record<string, Node>) => () => {
+    const resetNote = (dataSet: Record<string, JsonNode>) => () => {
         localStorage.clear();
         localStorage.setItem('nodes', JSON.stringify(dataSet));
         localStorage.setItem('last_saved', new Date().toISOString());
@@ -67,7 +68,7 @@ function Playground() {
 
     const log = {
         editor: () => console.log(editor),
-        state: () => console.log(JSON.parse(JSON.stringify(editor.state))),
+        state: () => console.log(editor.state),
         json: () => console.log(JSON.parse(JSON.stringify(editor.getJson()))),
     };
 

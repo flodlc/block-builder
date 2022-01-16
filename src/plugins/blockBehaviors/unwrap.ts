@@ -32,7 +32,7 @@ export const unwrap =
                 });
             });
 
-        if (!editor.schema[parent.type].allowText && indexInParent === 0) {
+        if (!parent.allowText && indexInParent === 0) {
             tr.removeFrom({ nodeId: parentId, parentId: granParenId });
         }
         tr.dispatch();

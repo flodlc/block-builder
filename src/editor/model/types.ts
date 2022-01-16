@@ -1,6 +1,7 @@
 import { AppliedTransaction } from './transaction/types';
 import { AbstractSelection } from './Selection';
 import { TransactionBuilder } from './transaction/TransactionBuilder';
+import { Node } from './Node/Node';
 
 export type MarkedText = MarkedNode[];
 
@@ -15,14 +16,6 @@ export type MarkedNode<T = any> = {
     attrs?: T;
 };
 export type Mark<T = any> = { type: string; attrs?: T };
-
-export interface Node<T extends Record<string, any> = any> {
-    id: string;
-    type: string;
-    text?: MarkedText;
-    attrs?: T;
-    childrenIds?: string[];
-}
 
 export interface State {
     nodes: Record<string, Node>;

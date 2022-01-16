@@ -1,5 +1,4 @@
 import { State } from './types';
-import { getMarkedTextLength } from './MarkedText/getMarkedTextLength';
 import { resolveState } from './StateResolver';
 
 export abstract class AbstractSelection {
@@ -78,11 +77,6 @@ export class TextSelection extends AbstractSelection {
     getTextBefore(state: State) {
         const text = this.getCurrentText(state);
         return text.slice(0, this.range[0]);
-    }
-
-    getTextLength(state: State) {
-        const node = state.nodes[this.nodeId];
-        return getMarkedTextLength(node.text ?? []);
     }
 
     isSame(selection?: AbstractSelection | TextSelection) {

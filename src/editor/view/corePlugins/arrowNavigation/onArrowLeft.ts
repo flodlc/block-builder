@@ -1,6 +1,5 @@
 import { Editor } from '../../../model';
 import { TextSelection } from '../../../model';
-import { getMarkedTextLength } from '../../../model';
 import { View } from '../../View';
 
 const getTargetSelection = (editor: Editor, view: View) => {
@@ -8,7 +7,7 @@ const getTargetSelection = (editor: Editor, view: View) => {
     const previousNode = view.getNextDisplayedTextField(selection.nodeId, -1);
     if (!previousNode) return;
 
-    const previousNodeTextLength = getMarkedTextLength(previousNode.text ?? []);
+    const previousNodeTextLength = previousNode.getTextLength();
     return new TextSelection(previousNode?.id, [
         previousNodeTextLength,
         previousNodeTextLength,

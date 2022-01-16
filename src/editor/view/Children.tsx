@@ -1,10 +1,4 @@
-import React, {
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useView } from './contexts/ViewContext';
 import { AbstractSelection, TextSelection } from '../model';
 import { useEditor } from './contexts/EditorContext';

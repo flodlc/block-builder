@@ -1,7 +1,8 @@
-import { MarkedText, Node, Schema } from './types';
+import { MarkedText } from './types';
 import { AbstractSelection, Range } from './Selection';
 import { Editor as InternalEditor } from './Editor';
 import { ResolvedState } from './StateResolver';
+import { Node } from './Node/Node';
 
 export type EventHandler<T = any> = (data: T) => void;
 export type EditorEvent = 'change' | 'tr' | 'input' | string;
@@ -17,8 +18,8 @@ type JsonNode = {
 export interface Editor {
     getJson: () => JsonNode;
     state: InternalEditor['state'];
-    schema: Schema;
-    createNode: (type: string, node?: Partial<Node>) => Node;
+    // schema: Schema;
+    createNode: (type: string, node?: Partial<JsonNode>) => Node;
     getParentId: (nodeId: string) => string | undefined;
     isLastChild: (nodeId: string) => boolean;
     isFirstChild: (nodeId: string) => boolean;

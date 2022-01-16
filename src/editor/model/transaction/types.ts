@@ -1,5 +1,5 @@
-import { Node } from '../types';
 import { AbstractSelection } from '../Selection';
+import { Node, JsonNode } from '../Node/Node';
 
 interface PatchStep {
     name: 'patch';
@@ -15,7 +15,7 @@ interface RemoveFromStep {
 
 interface InsertAfterStep {
     name: 'insertAfter';
-    node: Node;
+    node: JsonNode | Node;
     after?: string;
     parentId: string;
 }

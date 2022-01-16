@@ -1,20 +1,13 @@
-import {
-    cutMarkedText,
-    Editor,
-    hasMark,
-    isTextSelection,
-    markText,
-    unmarkText,
-} from '../../indexed';
+import { Editor, isTextSelection, Node } from '../../indexed';
 
 export const boldApi = (editor: Editor) => ({
     isBold: () => {
         const selection = editor.state.selection;
         if (!isTextSelection(selection)) return;
-        const node = editor.state.nodes[selection.nodeId];
-        if (!node.text) return false;
-        const textFragment = cutMarkedText(node.text, selection.range);
-        return hasMark(textFragment, { type: 'b' });
+        const node = editor.getNode(selection.nodeId);
+        if (!node?.text) return false;
+        const textFragment = Node.copyText(node.text, selection.range);
+        return Node.hasMark(textFragment, { type: 'b' });
     },
     toggleBold: () => {
         const selection = editor.state.selection;
@@ -22,15 +15,15 @@ export const boldApi = (editor: Editor) => ({
 
         const boldStatus = boldApi(editor).isBold();
 
-        const node = editor.state.nodes[selection.nodeId];
-        if (!node.text) return;
+        const node = editor.getNode(selection.nodeId);
+        if (!node?.text) return false;
 
         const newMarkedText = boldStatus
-            ? unmarkText(node.text, {
+            ? Node.unmarkText(node.text, {
                   mark: { type: 'b' },
                   range: selection.range,
               })
-            : markText(node.text, {
+            : Node.markText(node.text, {
                   mark: { type: 'b' },
                   range: selection.range,
               });

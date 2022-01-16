@@ -2,7 +2,6 @@ import { Editor as EditorClass } from './Editor';
 import type { ResolvedState } from './StateResolver';
 import type { Range } from './Selection';
 import type {
-    Node,
     Schema,
     MarkSchema,
     NodeSchema,
@@ -20,44 +19,24 @@ import {
 } from './Selection';
 import { resolveState } from './StateResolver';
 import { STATE_ERRORS } from './serializers/modelNormalizer';
-import { cutMarkedText } from './MarkedText/cutMarkedText';
-import { joinMarkedTexts } from './MarkedText/joinMarkedTexts';
-import { getMarkedTextLength } from './MarkedText/getMarkedTextLength';
-import { spliceText } from './MarkedText/spliceText';
-import { splitMarkedText } from './MarkedText/splitMarkedText';
-import { isCharNodeView } from './MarkedText/isCharNodeView';
-import {
-    markText,
-    hasMark,
-    unmarkText,
-    insertNodeMark,
-} from './MarkedText/markText';
+import { Node, JsonNode } from './Node/Node';
 
 export type {
     ResolvedState,
     MarkedText,
     Mark,
     MarkedNode,
-    Node,
     Range,
     Schema,
     MarkSchema,
     NodeSchema,
     Editor,
     TransactionBuilder,
+    JsonNode,
 };
 
 export {
-    cutMarkedText,
-    joinMarkedTexts,
-    getMarkedTextLength,
-    spliceText,
-    splitMarkedText,
-    isCharNodeView,
-    markText,
-    hasMark,
-    unmarkText,
-    insertNodeMark,
+    Node,
     AbstractSelection,
     TextSelection,
     BlockSelection,

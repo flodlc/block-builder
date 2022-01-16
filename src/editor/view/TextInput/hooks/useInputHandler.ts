@@ -1,8 +1,7 @@
 import { RefObject, useLayoutEffect } from 'react';
 import { View } from '../../View';
-import { MarkedText } from '../../../model';
+import { MarkedText, Node } from '../../../model';
 import { Range } from '../../../model';
-import { spliceText } from '../../../model';
 import { getInputDiff } from '../utils/getInputDiff';
 
 export const useInputHandler = ({
@@ -48,7 +47,7 @@ const handleTextChange = ({
 }) => {
     const inputDiff = getInputDiff(previousText, element);
     if (!inputDiff) return undefined;
-    const newTextState = spliceText({
+    const newTextState = Node.spliceText({
         text: currentValue,
         textInput: inputDiff.textInput,
         range: inputDiff.inputRange,

@@ -1,6 +1,5 @@
 import { Editor } from '../../../model';
 import { TextSelection } from '../../../model';
-import { getMarkedTextLength } from '../../../model';
 import { View } from '../../View';
 import { Coords } from '../../types';
 
@@ -34,7 +33,7 @@ const getPreviousTargetSelection = (editor: Editor, view: View) => {
         selection.range[0]
     );
     if (!selectionRect) return;
-    const previousNodeTextLength = getMarkedTextLength(previousNode.text ?? []);
+    const previousNodeTextLength = previousNode.getTextLength();
     let targetPos = previousNodeTextLength;
     let targetDistance = 100000;
     for (let pos = previousNodeTextLength; pos >= 0; pos--) {

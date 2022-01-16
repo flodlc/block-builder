@@ -5,8 +5,7 @@ import React, {
     useLayoutEffect,
     useRef,
 } from 'react';
-import { Mark, MarkedNode, MarkedText } from '../../model';
-import { markText } from '../../model';
+import { Mark, MarkedNode, MarkedText, Node } from '../../model';
 import { NodeView } from './NodeView';
 import { NodeComponentAttrs } from '../types';
 import { useView } from '../contexts/ViewContext';
@@ -25,7 +24,7 @@ const MarksWrapper = ({
     const getUpdateMark =
         ({ from, to }: { from: number; to: number }) =>
         (mark: Mark) => {
-            const updatedMarkedText = markText(value as MarkedText, {
+            const updatedMarkedText = Node.markText(value as MarkedText, {
                 mark,
                 range: [from, to],
             });
@@ -130,7 +129,10 @@ export const TextRenderer = React.memo(
         const decoratedText =
             value &&
             ((decorations ?? []).reduce((prev, curr) => {
-                return markText(prev, { mark: curr.mark, range: curr.range });
+                return Node.markText(prev, {
+                    mark: curr.mark,
+                    range: curr.range,
+                });
             }, value) as MarkedText);
 
         let pos = 0;

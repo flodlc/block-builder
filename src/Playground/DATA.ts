@@ -1,9 +1,9 @@
-import { Node } from '../editor/model';
+import { JsonNode } from '../editor/model';
 import { v4 } from 'uuid';
 
 export const BIG_DATA = (() => {
-    const nodes: Record<string, Node> = {};
-    const docNode: Node = {
+    const nodes: Record<string, JsonNode> = {};
+    const docNode: JsonNode = {
         id: 'doc',
         type: 'card',
         text: [{ text: 'My big note', marks: [] }],
@@ -11,7 +11,7 @@ export const BIG_DATA = (() => {
     };
     nodes['doc'] = docNode;
     for (let i = 0; i < 1000; i++) {
-        const newNode: Node = {
+        const newNode: JsonNode = {
             id: v4(),
             type: 'text',
             text: [
@@ -34,7 +34,7 @@ export const SINGLE_TEXT_DATA = {
     },
 };
 
-export const PLAYGROUND_DATA: Record<string, Node> = {
+export const PLAYGROUND_DATA: Record<string, JsonNode> = {
     doc: {
         id: 'doc',
         type: 'card',

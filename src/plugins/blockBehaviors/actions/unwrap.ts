@@ -7,15 +7,15 @@ export const unwrap = ({
     nodeId: string;
     editor: Editor;
 }) => {
-    const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
-    if (!parentId) return false;
-    const granParenId = editor.runQuery(
-        ({ nodes }) => nodes[parentId].parentId
-    );
-    if (!granParenId) return false;
+    const node = editor.getNode(nodeId);
+    if (!node) return false;
 
-    const parent = editor.state.nodes[parentId];
-    const node = editor.state.nodes[nodeId];
+    const parentId = editor.getParentId(nodeId);
+    const parent = parentId && editor.getNode(parentId);
+    if (!parent) return false;
+
+    const granParenId = editor.getParentId(parentId);
+    if (!granParenId) return false;
 
     const tr = editor
         .createTransaction()
@@ -36,7 +36,7 @@ export const unwrap = ({
             });
         });
 
-    if (!editor.schema[parent.type].allowText && indexInParent === 0) {
+    if (!parent.allowText && indexInParent === 0) {
         tr.removeFrom({ nodeId: parentId, parentId: granParenId });
     }
     tr.dispatch();

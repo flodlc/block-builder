@@ -1,6 +1,5 @@
 import { Editor } from '../../../model';
 import { TextSelection } from '../../../model';
-import { getMarkedTextLength } from '../../../model';
 import { View } from '../../View';
 import { Coords } from '../../types';
 
@@ -13,7 +12,7 @@ const isLastLine = (editor: Editor, view: View) => {
     );
     const endRectOfCurrentEditable = view.getCoordsAtPos(
         currentNode.id,
-        selection.getTextLength(editor.state)
+        currentNode.getTextLength()
     );
 
     return (
@@ -40,7 +39,7 @@ const getNextTargetSelection = (editor: Editor, view: View) => {
         selection.range[0]
     );
     if (!selectionRect) return;
-    const previousNodeTextLength = getMarkedTextLength(nextNode.text ?? []);
+    const previousNodeTextLength = nextNode.getTextLength();
     let targetPos = previousNodeTextLength;
     let targetDistance = 100000;
     for (let pos = 0; pos <= previousNodeTextLength; pos++) {

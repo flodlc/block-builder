@@ -1,5 +1,4 @@
-import { Editor } from '../../indexed';
-import { cutMarkedText } from '../../indexed';
+import { Editor, Node } from '../../indexed';
 import { TextSelection } from '../../indexed';
 import { View } from '../../indexed';
 import { nodesBehaviors } from './behaviors.config';
@@ -60,10 +59,11 @@ const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
 
     if (view.hasDisplayedChildren(node.id)) {
         const newNode = editor.createNode('text', {
-            text: cutMarkedText(node.text, [selection?.range[1]]),
+            text: Node.copyText(node.text, [selection?.range[1]]),
         });
         tr.insertAfter({ node: newNode, parentId: node.id });
-        const text = cutMarkedText(node.text, [
+
+        const text = Node.copyText(node.text, [
             undefined,
             selection?.range?.[0],
         ]);
@@ -75,10 +75,10 @@ const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
         const shouldKeepFormat = nodesBehaviors[node.type].keepFormatOnEnter;
         const newNodeType = shouldKeepFormat ? node.type : 'text';
         const newNode = editor.createNode(newNodeType, {
-            text: cutMarkedText(node.text, [selection?.range[1]]),
+            text: Node.copyText(node.text, [selection?.range[1]]),
         });
         tr.insertAfter({ node: newNode, parentId, after: node.id });
-        const text = cutMarkedText(node.text, [
+        const text = Node.copyText(node.text, [
             undefined,
             selection?.range?.[0],
         ]);

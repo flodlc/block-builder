@@ -9,8 +9,7 @@ export const wrapInPrevious =
         const node = editor.state.nodes[nodeId];
         const target = editor.state.nodes[previousId];
 
-        const targetSchema = editor.schema[target.type];
-        if (!targetSchema.allowChildren) return false;
+        if (!target.allowChildren) return false;
 
         const wrappingLastChild =
             target.childrenIds?.[(target.childrenIds?.length ?? 0) - 1];

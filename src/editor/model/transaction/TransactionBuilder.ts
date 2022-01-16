@@ -1,6 +1,6 @@
-import { Node } from '../types';
 import { Step } from './types';
 import { AbstractSelection } from '../Selection';
+import { Node, JsonNode } from '../Node/Node';
 
 export class TransactionBuilder {
     patch = ({
@@ -30,7 +30,7 @@ export class TransactionBuilder {
         after,
         parentId,
     }: {
-        node: Node;
+        node: JsonNode | Node;
         after?: string;
         parentId: string;
     }): TransactionBuilder => {

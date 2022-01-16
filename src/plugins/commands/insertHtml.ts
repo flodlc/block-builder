@@ -5,9 +5,6 @@ import {
     TextSelection,
     Node,
     TransactionBuilder,
-    cutMarkedText,
-    joinMarkedTexts,
-    getMarkedTextLength,
 } from '../../indexed';
 
 export const insertHtml = (html: string, editor: Editor) => {
@@ -48,19 +45,18 @@ const insertLines = ({
             .patch({
                 nodeId: node.id,
                 patch: {
-                    text: joinMarkedTexts(
-                        cutMarkedText(node.text, [0, textSelection.range[0]]),
+                    text: Node.joinMarkedTexts(
+                        Node.copyText(node.text, [0, textSelection.range[0]]),
                         firstBlock.text,
                         blockIds.length === 1
-                            ? cutMarkedText(node.text, [textSelection.range[1]])
+                            ? Node.copyText(node.text, [textSelection.range[1]])
                             : undefined
                     ),
                 },
             })
             .focus(
                 new TextSelection(node.id, [0, 0]).setCollapsedRange(
-                    textSelection.range[0] +
-                        getMarkedTextLength(firstBlock.text ?? [])
+                    textSelection.range[0] + firstBlock.getTextLength()
                 )
             )
             .dispatch();
@@ -94,7 +90,7 @@ const insertLine = (
 ) => {
     const node = nodes[blockId];
     tr.insertAfter({
-        node: { ...node, childrenIds: [] },
+        node: node.patch({ childrenIds: [] }),
         parentId,
         after: prev,
     });

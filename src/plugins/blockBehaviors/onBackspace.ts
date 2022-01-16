@@ -1,12 +1,6 @@
 import { unwrap } from './unwrap';
 import { nodesBehaviors } from './behaviors.config';
-import {
-    Editor,
-    getMarkedTextLength,
-    joinMarkedTexts,
-    TextSelection,
-    View,
-} from '../../indexed';
+import { Editor, Node, TextSelection, View } from '../../indexed';
 import { tryReset } from './actions/tryReset';
 
 export const onBackspace = ({
@@ -28,34 +22,38 @@ export const onBackspace = ({
 const tryUnwrap = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const nodeId = selection.nodeId;
-    if (editor.isLastChild(nodeId) || editor.isFirstChild(nodeId)) return false;
-
+    const node = editor.getNode(nodeId);
+    if (!node) return false;
     const parentId = editor.getParentId(nodeId);
     if (!parentId) return false;
     const parent = editor.getNode(parentId);
     if (!parent) return false;
-
     if (!nodesBehaviors[parent.type].unwrapOnBackspaceParent) return false;
-    const parentSchema = editor.schema[parent.type];
-    if (parentSchema.allowText) return false;
 
+    if (
+        (!editor.isFirstChild(nodeId) || parent.allowText) &&
+        !editor.isLastChild(nodeId)
+    ) {
+        return false;
+    }
     const unwrapped = editor.runCommand(unwrap({ nodeId: selection.nodeId }));
     return unwrapped !== false;
 };
 
 const tryRemove = ({ editor, view }: { editor: Editor; view: View }) => {
     const selection = editor.state.selection as TextSelection;
-    const node = editor.state.nodes[selection.nodeId];
+    const node = editor.getNode(selection.nodeId);
+    if (!node) return false;
 
     const prev = view.getNextDisplayedNode(node.id, -1);
     if (!prev) return false;
 
-    const { parentId } = editor.runQuery(({ nodes }) => nodes[node.id]);
+    const parentId = editor.getParentId(node.id);
     if (!parentId) return false;
 
     const transaction = editor.createTransaction();
 
-    if (editor.schema[prev.type].allowText) {
+    if (prev.allowText) {
         (node.childrenIds ?? [])
             .slice()
             .reverse()
@@ -63,14 +61,14 @@ const tryRemove = ({ editor, view }: { editor: Editor; view: View }) => {
                 transaction
                     .removeFrom({ parentId: node.id, nodeId: childId })
                     .insertAfter({
-                        node: editor.state.nodes[childId],
+                        node: editor.getNode(childId) as Node,
                         parentId,
                         after: node.id,
                     });
             });
 
-        const prevTextLength = prev.text ? getMarkedTextLength(prev.text) : 0;
-        const prevText = joinMarkedTexts(prev.text, node.text);
+        const prevTextLength = prev.getTextLength();
+        const prevText = Node.joinMarkedTexts(prev.text, node.text);
         transaction
             .removeFrom({ parentId, nodeId: node.id })
             .patch({ nodeId: prev.id, patch: { text: prevText } })

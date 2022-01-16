@@ -1,43 +1,46 @@
-import { State, Node } from './types';
+import { State } from './types';
 
-export interface ResolvedNode extends Node {
+export interface ResolvedNode {
+    id: string;
+    type: string;
     parentId?: string;
     index?: number;
     previousId?: string;
     nextId?: string;
-    depth?: number;
+    childrenIds?: string[];
 }
 
 export type ResolvedNodes = Record<string, ResolvedNode>;
 
-export interface ResolvedState extends State {
-    nodes: ResolvedNodes;
+export interface ResolvedState {
+    nodes: Record<string, ResolvedNode>;
     flatTree: string[];
 }
 
 export function resolveState(state: State): ResolvedState {
-    const draft = JSON.parse(JSON.stringify(state)) as State;
-    const nodes = draft.nodes;
-    const flatTree: string[] = [draft.rootId];
-    dive(draft.nodes[draft.rootId], 0, draft.nodes, (nodeId) =>
+    const flatTree: string[] = [state.rootId];
+    dive(state.nodes[state.rootId], 0, state.nodes, (nodeId) =>
         flatTree.push(nodeId)
     );
 
+    const nodes = { ...state.nodes } as ResolvedNodes;
     flatTree.forEach((nodeId) => {
-        const node = nodes[nodeId];
+        const node = state.nodes[nodeId];
         if (node.childrenIds) {
             node.childrenIds.forEach((childId, index) => {
-                const childNode: ResolvedNode = nodes[childId];
-                childNode.parentId = node.id;
-                childNode.index = index;
-                childNode.previousId = node.childrenIds?.[index - 1];
-                childNode.nextId = node.childrenIds?.[index + 1];
+                nodes[childId] = {
+                    ...state.nodes[childId],
+                    parentId: node.id,
+                    index: index,
+                    previousId: node.childrenIds?.[index - 1],
+                    nextId: node.childrenIds?.[index + 1],
+                };
             });
         }
     });
 
     return {
-        ...draft,
+        nodes,
         flatTree,
     };
 }
@@ -46,23 +49,15 @@ const dive = (
     parent: ResolvedNode,
     index: number,
     resolvedNodes: ResolvedNodes,
-    callback: (nodeId: string) => void,
-    depth = 0
+    callback: (nodeId: string) => void
 ) => {
     if (parent?.childrenIds) {
         for (let i = 0; i < parent?.childrenIds.length; i++) {
             const childId = parent?.childrenIds?.[i];
             if (childId) {
                 callback(childId);
-                dive(
-                    resolvedNodes[childId],
-                    i,
-                    resolvedNodes,
-                    callback,
-                    depth + 1
-                );
+                dive(resolvedNodes[childId], i, resolvedNodes, callback);
             }
         }
     }
-    parent.depth = depth;
 };

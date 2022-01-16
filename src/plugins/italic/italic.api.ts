@@ -1,5 +1,4 @@
-import { hasMark, markText, unmarkText } from '../../indexed';
-import { cutMarkedText } from '../../indexed';
+import { Node } from '../../indexed';
 import { isTextSelection } from '../../indexed';
 import { Editor } from '../../indexed';
 
@@ -7,10 +6,10 @@ export const italicApi = (editor: Editor) => ({
     isItalic: () => {
         const selection = editor.state.selection;
         if (!isTextSelection(selection)) return;
-        const node = editor.state.nodes[selection.nodeId];
-        if (!node.text) return false;
-        const textFragment = cutMarkedText(node.text, selection.range);
-        return hasMark(textFragment, { type: 'i' });
+        const node = editor.getNode(selection.nodeId);
+        if (!node?.text) return false;
+        const textFragment = Node.copyText(node.text, selection.range);
+        return Node.hasMark(textFragment, { type: 'i' });
     },
     toggleItalic: () => {
         const selection = editor.state.selection;
@@ -18,15 +17,15 @@ export const italicApi = (editor: Editor) => ({
 
         const boldStatus = italicApi(editor).isItalic();
 
-        const node = editor.state.nodes[selection.nodeId];
-        if (!node.text) return;
+        const node = editor.getNode(selection.nodeId);
+        if (!node?.text) return false;
 
         const newMarkedText = boldStatus
-            ? unmarkText(node.text, {
+            ? Node.unmarkText(node.text, {
                   mark: { type: 'i' },
                   range: selection.range,
               })
-            : markText(node.text, {
+            : Node.markText(node.text, {
                   mark: { type: 'i' },
                   range: selection.range,
               });

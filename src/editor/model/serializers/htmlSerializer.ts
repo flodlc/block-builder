@@ -4,10 +4,10 @@ import {
     Mark,
     MarkedNode,
     MarkedText,
-    Node,
     Schema,
 } from '../types';
-import { cutMarkedText } from '../MarkedText/cutMarkedText';
+import { Node } from '../Node/Node';
+
 import { Range } from '../Selection';
 
 export const serializeNode = (
@@ -24,7 +24,7 @@ export const serializeNode = (
 
     const textHtml = serializeText(
         schema,
-        range ? cutMarkedText(node.text, range) : node.text ?? []
+        range ? Node.copyText(node.text, range) : node.text ?? []
     );
 
     let contentHTML = '';

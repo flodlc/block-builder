@@ -1,6 +1,6 @@
 import { TextSelection } from '../../indexed';
 import { Editor } from '../../indexed';
-import { turnInCommand } from '../commands/turnIn.command';
+import { wrapIn } from '../commands/turnIn.command';
 import { insertHtml } from '../commands/insertHtml';
 
 export const getCommandList = ({ editor }: { editor: Editor }) => [
@@ -17,15 +17,18 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(
-                turnInCommand({
+            editor
+                .createTransaction()
+                .patch({
                     nodeId,
-                    type: 'image',
-                    attrs: {
-                        src: 'https://images.unsplash.com/photo-1449034446853-66c86144b0ad?ixlib=rb-1.2.1&q=85&fm=jpg&crop=entropy&cs=srgb&w=3600',
+                    patch: {
+                        type: 'image',
+                        attrs: {
+                            src: 'https://images.unsplash.com/photo-1449034446853-66c86144b0ad?ixlib=rb-1.2.1&q=85&fm=jpg&crop=entropy&cs=srgb&w=3600',
+                        },
                     },
                 })
-            );
+                .dispatch();
         },
     },
     {
@@ -33,9 +36,18 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(
-                turnInCommand({ nodeId, type: 'heading', attrs: { level: 1 } })
-            );
+            editor
+                .createTransaction()
+                .patch({
+                    nodeId,
+                    patch: {
+                        type: 'heading',
+                        attrs: {
+                            level: 1,
+                        },
+                    },
+                })
+                .dispatch();
         },
     },
     {
@@ -43,7 +55,15 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(turnInCommand({ nodeId, type: 'toggleList' }));
+            editor
+                .createTransaction()
+                .patch({
+                    nodeId,
+                    patch: {
+                        type: 'toggleList',
+                    },
+                })
+                .dispatch();
         },
     },
     {
@@ -51,9 +71,18 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(
-                turnInCommand({ nodeId, type: 'heading', attrs: { level: 2 } })
-            );
+            editor
+                .createTransaction()
+                .patch({
+                    nodeId,
+                    patch: {
+                        type: 'heading',
+                        attrs: {
+                            level: 2,
+                        },
+                    },
+                })
+                .dispatch();
         },
     },
     {
@@ -61,7 +90,15 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(turnInCommand({ nodeId, type: 'text' }));
+            editor
+                .createTransaction()
+                .patch({
+                    nodeId,
+                    patch: {
+                        type: 'text',
+                    },
+                })
+                .dispatch();
         },
     },
     {
@@ -69,7 +106,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(turnInCommand({ nodeId, type: 'quote' }));
+            wrapIn({ editor, nodeId, type: 'quote' });
         },
     },
     {
@@ -77,7 +114,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            editor.runCommand(turnInCommand({ nodeId, type: 'callout' }));
+            wrapIn({ editor, nodeId, type: 'callout' });
         },
     },
 ];

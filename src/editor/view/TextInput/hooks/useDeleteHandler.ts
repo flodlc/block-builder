@@ -1,5 +1,5 @@
 import { getElementSelection } from '../utils/getElementSelection';
-import { spliceText } from '../../../model';
+import { Node } from '../../../model';
 import { RefObject, useLayoutEffect } from 'react';
 import { View } from '../../View';
 import { Range } from '../../../model';
@@ -25,7 +25,7 @@ export const useDeleteHandler = ({
         if (!currentRange) return false;
         if (currentRange[0] !== currentRange[1]) return false;
 
-        const newTextState = spliceText({
+        const newTextState = Node.spliceText({
             text: value,
             textInput: '',
             range: [

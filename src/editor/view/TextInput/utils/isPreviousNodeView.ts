@@ -1,9 +1,7 @@
-import { MarkedText } from '../../../model';
-import { isCharNodeView } from '../../../model';
-import { splitMarkedText } from '../../../model';
+import { MarkedText, Node } from '../../../model';
 
 export const isPreviousNodeView = (text: MarkedText, pos: number) => {
-    const splitText = splitMarkedText(text);
+    const splitText = Node.splitMarkedText(text);
     const char = splitText?.[pos - 1];
-    return !!char && isCharNodeView({ char: char });
+    return !!char && Node.isCharNodeView({ char: char });
 };

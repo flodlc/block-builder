@@ -1,46 +1,6 @@
 import { Editor } from '../../indexed';
 
-export const turnInCommand =
-    ({
-        nodeId,
-        type,
-        attrs,
-        allowRoot = false,
-    }: {
-        nodeId: string;
-        type: string;
-        attrs?: any;
-        allowRoot?: boolean;
-    }) =>
-    (editor: Editor) => {
-        const isRoot = editor.state.rootId === nodeId;
-        if (isRoot && !allowRoot) return false;
-
-        if (editor.schema[type].allowText) {
-            return patchIn({ editor, nodeId, type, attrs });
-        } else {
-            return wrapIn({ editor, nodeId, type });
-        }
-    };
-
-const patchIn = ({
-    editor,
-    nodeId,
-    type,
-    attrs,
-}: {
-    editor: Editor;
-    nodeId: string;
-    type: string;
-    attrs?: any;
-}) => {
-    editor
-        .createTransaction()
-        .patch({ nodeId, patch: { attrs, type } })
-        .dispatch();
-};
-
-const wrapIn = ({
+export const wrapIn = ({
     editor,
     nodeId,
     type,
