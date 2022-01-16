@@ -19,6 +19,10 @@ export interface Editor {
     state: InternalEditor['state'];
     schema: Schema;
     createNode: (type: string, node?: Partial<Node>) => Node;
+    getParentId: (nodeId: string) => string | undefined;
+    isLastChild: (nodeId: string) => boolean;
+    isFirstChild: (nodeId: string) => boolean;
+    getNode: (nodeId: string) => Node | undefined;
     parseHtml: (html: string) => {
         blockIds: string[];
         nodes: Record<string, Node>;

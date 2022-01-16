@@ -1,4 +1,4 @@
-import { Editor } from '../../indexed';
+import { Editor, Node } from '../../indexed';
 import { TextSelection } from '../../indexed';
 import { joinMarkedTexts } from '../../indexed';
 import { TransactionBuilder } from '../../indexed';
@@ -22,7 +22,7 @@ export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     if (node.childrenIds?.length && editor.state.rootId !== node.id) {
         unwrapChildren({ nodeId: node.id, editor, transaction });
     } else {
-        const { parentId } = editor.runQuery(({ nodes }) => nodes[nextId]);
+        const parentId = editor.getParentId(nextId);
         if (!parentId) return false;
         unwrapChildren({ nodeId: nextId, editor, transaction });
 
@@ -46,12 +46,12 @@ const unwrapChildren = ({
 }) => {
     const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
     if (!parentId) return;
-    const node = editor.state.nodes[nodeId];
-    (node.childrenIds ?? [])
+    const node = editor.getNode(nodeId);
+    (node?.childrenIds ?? [])
         .slice()
         .reverse()
         .forEach((childId) => {
-            const child = editor.state.nodes[childId];
+            const child = editor.getNode(childId) as Node;
             transaction
                 .removeFrom({ parentId: nodeId, nodeId: childId })
                 .insertAfter({ node: child, parentId, after: nodeId });

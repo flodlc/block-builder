@@ -7,6 +7,7 @@ import {
     TextSelection,
     View,
 } from '../../indexed';
+import { tryReset } from './actions/tryReset';
 
 export const onBackspace = ({
     editor,
@@ -24,35 +25,20 @@ export const onBackspace = ({
     );
 };
 
-const tryReset = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as TextSelection;
-    const node = editor.state.nodes[selection.nodeId];
-    if (node.type === 'text') return false;
-    editor
-        .createTransaction()
-        .patch({ nodeId: node.id, patch: { type: 'text' } })
-        .dispatch();
-    return true;
-};
-
 const tryUnwrap = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
-    const { parentId } = editor.runQuery(
-        ({ nodes }) => nodes[selection.nodeId]
-    );
+    const nodeId = selection.nodeId;
+    if (editor.isLastChild(nodeId) || editor.isFirstChild(nodeId)) return false;
+
+    const parentId = editor.getParentId(nodeId);
     if (!parentId) return false;
-    const parent = editor.state.nodes[parentId];
+    const parent = editor.getNode(parentId);
+    if (!parent) return false;
+
     if (!nodesBehaviors[parent.type].unwrapOnBackspaceParent) return false;
-
     const parentSchema = editor.schema[parent.type];
-    const currentIndex = parent.childrenIds?.indexOf(selection.nodeId) ?? -1;
+    if (parentSchema.allowText) return false;
 
-    if (
-        (currentIndex > 0 || parentSchema.allowText) &&
-        currentIndex < (parent.childrenIds?.length ?? 0) - 1
-    ) {
-        return false;
-    }
     const unwrapped = editor.runCommand(unwrap({ nodeId: selection.nodeId }));
     return unwrapped !== false;
 };

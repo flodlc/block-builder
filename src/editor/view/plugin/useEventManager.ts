@@ -1,6 +1,6 @@
 import { RefObject, useLayoutEffect, useRef } from 'react';
 import _ from 'lodash';
-import { EventManager } from './types';
+import { EventManager } from '../types';
 
 export const getNodeIdFromSelection = () => {
     const node = getSelection()?.focusNode;

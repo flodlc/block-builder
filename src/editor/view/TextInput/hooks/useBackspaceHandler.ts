@@ -41,6 +41,7 @@ export const useBackspaceHandler = ({
         });
         // restoreSelection(ref.current as HTMLElement, newTextState.range);
         setTimeout(() => {
+            console.log('oooo');
             restoreSelection(ref.current as HTMLElement, newTextState.range);
             onInput(newTextState.value, newTextState.range);
         }, 0);

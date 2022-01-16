@@ -15,8 +15,8 @@ export const unwrap =
 
         const tr = editor
             .createTransaction()
-            .insertAfter({ parentId: granParenId, after: parentId, node })
-            .removeFrom({ parentId, nodeId });
+            .removeFrom({ parentId, nodeId })
+            .insertAfter({ parentId: granParenId, after: parentId, node });
 
         const indexInParent = parent.childrenIds?.indexOf(nodeId) ?? 0;
 

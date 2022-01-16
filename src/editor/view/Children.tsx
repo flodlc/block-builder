@@ -16,14 +16,6 @@ export const Children = ({
     childrenIds?: string[];
     parentId: string;
 }) => {
-    const scrollRef = useRef(0);
-    scrollRef.current = document.scrollingElement?.scrollTop ?? 0;
-    useLayoutEffect(() => {
-        if (!document.scrollingElement) return;
-        if (document.scrollingElement.scrollTop === scrollRef.current) return;
-        document.scrollingElement.scrollTop = scrollRef.current;
-    });
-
     return (
         <>
             <div data-children-uid={parentId} />
@@ -94,6 +86,11 @@ export const Child = React.memo(
         const Compo = view.blocks[node.type];
         if (!Compo) throw `no component matching type ${node.type}`;
 
+        const inParentList =
+            parentId === 'undefined' ||
+            !!editor.state.nodes[parentId]?.childrenIds?.includes(nodeId);
+
+        if (!inParentList) return <></>;
         return (
             <Compo
                 parentId={parentId}

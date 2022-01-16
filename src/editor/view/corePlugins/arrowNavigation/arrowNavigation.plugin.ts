@@ -3,7 +3,7 @@ import { onArrowUp } from './onArrowUp';
 import { onArrowDown } from './onArrowDown';
 import { onArrowLeft } from './onArrowLeft';
 import { onArrowRight } from './onArrowRight';
-import { GLOBAL_EDITABLE } from '../../ReactView';
+import { GLOBAL_EDITABLE } from '../../config';
 
 export const ArrowNavigationPlugin: PluginFactory =
     () =>

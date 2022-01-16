@@ -1,8 +1,7 @@
 import React, { ReactElement, useLayoutEffect, useRef, useState } from 'react';
 import { TextRenderer } from './TextRenderer';
-import { MarkedText } from '../../model';
 import { getElementSelection } from './utils/getElementSelection';
-import { Range, TextSelection } from '../../model';
+import { Range, TextSelection, MarkedText } from '../../model';
 import { PlaceholderWrapper } from './Placeholder';
 import { useNodeDecorations } from './hooks/useNodeDecorations';
 import { useTextFromValue } from './hooks/useTextFromValue';

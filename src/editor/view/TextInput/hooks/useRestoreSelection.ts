@@ -88,7 +88,6 @@ const restoreSelectionIfNeeded = (
     const currentRange = getElementSelection(container);
     const force = range && !currentRange;
     if (composing && !force) return;
-
     if (TextSelection.areSameRange(currentRange, range)) return;
     restoreSelection(container, range);
 };

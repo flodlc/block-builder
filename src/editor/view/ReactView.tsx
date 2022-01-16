@@ -1,20 +1,13 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Child } from './Children';
 import { ViewContext } from './contexts/ViewContext';
-import { Plugin, RegisteredPlugin } from './plugin/types';
-import { registerPlugins } from './plugin/registerPlugins';
-import { View } from './View';
-import { useBindDom, useEventManager } from './useEventManager';
-import { ArrowNavigationPlugin } from './corePlugins/arrowNavigation/arrowNavigation.plugin';
-import { HistoryShortcutsPlugin } from './corePlugins/historyShortcuts/historyShortcuts.plugin';
+import { Plugin } from './plugin/types';
 import { Editor } from '../model';
 import { EditorContext } from './contexts/EditorContext';
-
-export const GLOBAL_EDITABLE = false;
-const CORE_PLUGINS: Plugin[] = [
-    ArrowNavigationPlugin(),
-    HistoryShortcutsPlugin(),
-];
+import { GLOBAL_EDITABLE } from './config';
+import { useKeepScroll } from './hooks/useKeepScroll';
+import { useCreateView } from './hooks/useCreateView';
+import { useRegisterPlugins } from './hooks/useRegisterPlugins';
 
 export const ReactView = ({
     editor,
@@ -25,33 +18,10 @@ export const ReactView = ({
     plugins?: Plugin[];
     slot: React.ReactElement;
 }) => {
-    const [view, setView] = useState<View | undefined>(undefined);
-
     const ref = useRef<HTMLDivElement>(null);
-
-    const [registeredPlugins, setRegisteredPlugins] = useState<
-        RegisteredPlugin[] | undefined
-    >(undefined);
-
-    const eventManager = useEventManager();
-    useBindDom(ref, eventManager);
-
-    useLayoutEffect(() => {
-        if (!ref.current) return;
-        const view = new View(editor, ref.current, eventManager);
-        const registeredPlugins = registerPlugins({
-            editor,
-            plugins: [...CORE_PLUGINS, ...plugins],
-            view,
-            dom: ref.current,
-        });
-        setRegisteredPlugins(registeredPlugins);
-        setView(view);
-        return () =>
-            registeredPlugins?.forEach((registeredPlugin) =>
-                registeredPlugin.destroy?.()
-            );
-    }, []);
+    const view = useCreateView(editor, ref);
+    const registeredPlugins = useRegisterPlugins(editor, plugins, ref, view);
+    useKeepScroll(editor);
 
     const rootNode = editor.state.nodes[editor.state.rootId];
     return (

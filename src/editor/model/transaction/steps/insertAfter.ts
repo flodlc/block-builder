@@ -1,4 +1,4 @@
-import { Node, State } from '../../types';
+import { Node, Schema, State } from '../../types';
 import produce from 'immer';
 
 export const insertAfter = ({
@@ -6,17 +6,21 @@ export const insertAfter = ({
     node,
     after,
     parentId,
+    schema,
 }: {
     state: State;
     node: Node;
     after?: string;
     parentId: string;
+    schema: Schema;
 }) => {
     return {
         state: produce(state, (draftState) => {
             draftState.nodes[node.id] = node;
             const parentNode = draftState.nodes[parentId];
-
+            if (!schema[parentNode.type].allowChildren) {
+                throw new Error('Parent type cannot have children');
+            }
             parentNode.childrenIds = parentNode?.childrenIds ?? [];
 
             if (parentNode?.childrenIds) {

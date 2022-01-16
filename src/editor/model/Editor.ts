@@ -15,7 +15,7 @@ import { ResolvedState, resolveState } from './StateResolver';
 import { normalizeState } from './serializers/modelNormalizer';
 import { parseHtml } from './serializers/htmlParser';
 import { serializeNode } from './serializers/htmlSerializer';
-import { AbstractSelection, Range } from './Selection';
+import { Range } from './Selection';
 import { Editor as EditorInterface, EditorEvent } from './Editor.interface';
 import { createNode } from './Node/createNode';
 
@@ -47,6 +47,28 @@ export class Editor implements EditorInterface {
 
     createNode = (type: string, node?: Partial<Node>): Node =>
         createNode({ schema: this.schema, node, type });
+
+    getParentId = (nodeId: string) => {
+        return this.runQuery(({ nodes }) => nodes[nodeId].parentId);
+    };
+
+    getNode = (nodeId: string) => this.state.nodes[nodeId];
+
+    isLastChild = (nodeId: string) => {
+        const parentId = this.getParentId(nodeId);
+        if (!parentId) return false;
+        const parent = this.state.nodes[parentId];
+        const currentIndex = parent.childrenIds?.indexOf(nodeId) ?? -1;
+        return currentIndex === (parent.childrenIds?.length ?? 0) - 1;
+    };
+
+    isFirstChild = (nodeId: string) => {
+        const parentId = this.getParentId(nodeId);
+        if (!parentId) return false;
+        const parent = this.state.nodes[parentId];
+        const currentIndex = parent.childrenIds?.indexOf(nodeId) ?? -1;
+        return currentIndex === 0;
+    };
 
     parseHtml = (html: string) => parseHtml({ html, schema: this.schema });
 
@@ -149,7 +171,6 @@ export class Editor implements EditorInterface {
         delete this.resolvedState;
 
         this.trigger('tr');
-
         if (transaction.keepHistory || hasNormalized) {
             this.history = produce(this.history, (history) => {
                 history.items.push({
@@ -159,6 +180,7 @@ export class Editor implements EditorInterface {
             });
             this.trigger('change');
         }
+        this.trigger('tr_applied');
         return { state, normalizedAppliedTransaction };
     }
 

@@ -3,6 +3,7 @@ import { cutMarkedText } from '../../indexed';
 import { TextSelection } from '../../indexed';
 import { View } from '../../indexed';
 import { nodesBehaviors } from './behaviors.config';
+import { tryReset } from './actions/tryReset';
 
 export const onEnter = ({
     editor,
@@ -11,7 +12,7 @@ export const onEnter = ({
     editor: Editor;
     view: View;
 }): boolean => {
-    if (tryUnwrap({ editor })) {
+    if (tryResetOnEmpty({ editor })) {
         return true;
     } else if (insertLineAtTop({ editor })) {
         return true;
@@ -21,11 +22,11 @@ export const onEnter = ({
     return false;
 };
 
-const tryUnwrap = ({ editor }: { editor: Editor }) => {
+const tryResetOnEmpty = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
-    const node = editor.state.nodes[selection.nodeId];
+    const node = editor.getNode(selection.nodeId);
+    if (!node) return false;
     if (node.text?.length) return false;
-
     if (nodesBehaviors[node.type].resetOnEmptyEnter) {
         return tryReset({ editor });
     }
@@ -34,9 +35,9 @@ const tryUnwrap = ({ editor }: { editor: Editor }) => {
 const insertLineAtTop = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;
     const nodeId = selection.nodeId;
-    const { parentId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
+    const parentId = editor.getParentId(nodeId);
+    if (!parentId) return false;
     if (selection.range[0] === 0) {
-        if (!parentId) return false;
         const { previousId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
 
         const textNode = editor.createNode('text');
@@ -45,15 +46,15 @@ const insertLineAtTop = ({ editor }: { editor: Editor }) => {
             .insertAfter({ parentId, after: previousId, node: textNode })
             .focus(selection.clone())
             .dispatch();
-
         return true;
     }
 };
 
 const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
     const selection = editor.state.selection as TextSelection;
-    const node = editor.state.nodes[selection.nodeId];
-    const { parentId } = editor.runQuery(({ nodes }) => nodes[node.id]);
+    const node = editor.getNode(selection.nodeId);
+    if (!node) return false;
+    const parentId = editor.getParentId(node.id);
 
     const tr = editor.createTransaction();
 
@@ -86,15 +87,5 @@ const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
             .dispatch();
     }
 
-    return true;
-};
-
-const tryReset = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as TextSelection;
-    const node = editor.state.nodes[selection.nodeId];
-    editor
-        .createTransaction()
-        .patch({ nodeId: node.id, patch: { type: 'text' } })
-        .dispatch();
     return true;
 };

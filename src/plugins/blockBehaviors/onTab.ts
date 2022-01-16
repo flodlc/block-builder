@@ -1,4 +1,4 @@
-import { wrapInPrevious } from './wrapIn';
+import { wrapInPrevious } from './actions/wrapIn';
 import { Editor } from '../../indexed';
 import { TextSelection } from '../../indexed';
 import { unwrap } from './unwrap';
