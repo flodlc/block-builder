@@ -2,7 +2,7 @@ import { Editor, isTextSelection, Node } from '../../indexed';
 
 export const boldApi = (editor: Editor) => ({
     isBold: () => {
-        const selection = editor.state.selection;
+        const selection = editor.selection;
         if (!isTextSelection(selection)) return;
         const node = editor.getNode(selection.nodeId);
         if (!node?.text) return false;
@@ -10,7 +10,7 @@ export const boldApi = (editor: Editor) => ({
         return Node.hasMark(textFragment, { type: 'b' });
     },
     toggleBold: () => {
-        const selection = editor.state.selection;
+        const selection = editor.selection;
         if (!isTextSelection(selection)) return;
 
         const boldStatus = boldApi(editor).isBold();

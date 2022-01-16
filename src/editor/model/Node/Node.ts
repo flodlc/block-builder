@@ -13,6 +13,7 @@ import { spliceText } from '../MarkedText/spliceText';
 import { splitMarkedText } from '../MarkedText/splitMarkedText';
 import { isCharNodeView } from '../MarkedText/isCharNodeView';
 import { isNodeviewAtPos } from '../MarkedText/isNodeviewAtPos';
+import { getStringText } from '../MarkedText/getStringText';
 
 export type JsonNode<T extends Record<string, any> = any> = {
     id: string;
@@ -102,6 +103,7 @@ export class Node<T extends Record<string, any> = any> {
         });
     }
 
+    static getStringText = getStringText;
     static copyText = cutMarkedText;
     static joinMarkedTexts = joinMarkedTexts;
     static spliceText = spliceText;

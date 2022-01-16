@@ -7,7 +7,7 @@ export const BlockSelectionShortcutsPlugin: PluginFactory =
     () =>
     ({ editor }) => {
         const onKeyDown = (e: KeyboardEvent) => {
-            if (!editor.state.selection?.isBlock()) return;
+            if (!editor.selection?.isBlock()) return;
             if (e.key === 'r' && e.metaKey) return;
             if (e.metaKey) return;
 

@@ -4,7 +4,7 @@ import { View } from '../../View';
 import { Coords } from '../../types';
 
 const isLastLine = (editor: Editor, view: View) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const currentNode = editor.getNode(selection.nodeId);
     if (!currentNode) return false;
     const currentCaretCoords = view.getCoordsAtPos(
@@ -31,7 +31,7 @@ const getDistance = (selectionRect: Coords, charRect: Coords) => {
 };
 
 const getNextTargetSelection = (editor: Editor, view: View) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const nextNode = view.getNextDisplayedTextField(selection.nodeId);
     if (!nextNode) return;
 

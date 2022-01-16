@@ -30,6 +30,7 @@ export class Editor implements EditorInterface {
         input: [],
     };
     private schema: Schema;
+    private state: State;
 
     constructor({
         rootId,
@@ -51,7 +52,15 @@ export class Editor implements EditorInterface {
             : { rootId: 'doc', nodes: {} };
     }
 
-    state: State;
+    get nodes() {
+        return this.state.nodes;
+    }
+    get selection() {
+        return this.state.selection;
+    }
+    get rootId() {
+        return this.state.rootId;
+    }
 
     createNode = (type: string, node?: Partial<JsonNode>): Node =>
         createNode({ schema: this.schema, node, type });

@@ -31,13 +31,13 @@ export const BlockSelectionPlugin: PluginFactory =
         let draggingState: DraggingState | void;
 
         const onkeydown = (e: KeyboardEvent) => {
-            if (!isTextSelection(editor.state.selection)) return;
-            if (e.key === 'Escape' && editor.state.selection) {
+            if (!isTextSelection(editor.selection)) return;
+            if (e.key === 'Escape' && editor.selection) {
                 e.preventDefault();
                 e.stopPropagation();
                 editor
                     .createTransaction()
-                    .focus(new BlockSelection([editor.state.selection.nodeId]))
+                    .focus(new BlockSelection([editor.selection.nodeId]))
                     .dispatch(false);
             }
         };
@@ -47,7 +47,7 @@ export const BlockSelectionPlugin: PluginFactory =
                 start: getMouseEventRectInView(e, view),
             });
             startNodeId = getNodeIdFromPoint(e.clientX, e.clientY);
-            if (editor.state.selection?.isBlock()) {
+            if (editor.selection?.isBlock()) {
                 editor.createTransaction().focus().dispatch(false);
             }
         };
@@ -69,7 +69,7 @@ export const BlockSelectionPlugin: PluginFactory =
             if (!draggingState) return;
             const nodeId = getNodeIdFromPoint(e.clientX, e.clientY);
             if (
-                !editor.state.selection?.isBlock() &&
+                !editor.selection?.isBlock() &&
                 startNodeId &&
                 startNodeId === nodeId
             )
@@ -88,7 +88,7 @@ export const BlockSelectionPlugin: PluginFactory =
                 view.dom,
                 draggingState.start,
                 currentMousePosition
-            ).filter((nodeId) => nodeId !== editor.state.rootId);
+            ).filter((nodeId) => nodeId !== editor.rootId);
             requestAnimationFrame(() => {
                 hasSelectedBlocks = true;
                 editor

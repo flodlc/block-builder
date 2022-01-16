@@ -61,14 +61,13 @@ function Playground() {
 
     useEffect(() => {
         editor.on('change', () => {
-            localStorage.setItem('nodes', JSON.stringify(editor.state.nodes));
+            localStorage.setItem('nodes', JSON.stringify(editor.nodes));
             localStorage.setItem('last_saved', new Date().toISOString());
         });
     }, []);
 
     const log = {
         editor: () => console.log(editor),
-        state: () => console.log(editor.state),
         json: () => console.log(JSON.parse(JSON.stringify(editor.getJson()))),
     };
 
@@ -110,7 +109,6 @@ function Playground() {
             <div className="header">
                 <div className="header_content">
                     <button onClick={log.editor}>Editor</button>
-                    <button onClick={log.state}>State</button>
                     <button onClick={log.json}>Json</button>
                     <button onClick={resetNote(PLAYGROUND_DATA)}>Reset</button>
                     <button onClick={resetNote(BIG_DATA)}>Reset 2</button>

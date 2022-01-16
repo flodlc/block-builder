@@ -22,7 +22,7 @@ export const onEnter = ({
 };
 
 const tryResetOnEmpty = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const node = editor.getNode(selection.nodeId);
     if (!node) return false;
     if (node.text?.length) return false;
@@ -32,7 +32,7 @@ const tryResetOnEmpty = ({ editor }: { editor: Editor }) => {
 };
 
 const insertLineAtTop = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const nodeId = selection.nodeId;
     const parentId = editor.getParentId(nodeId);
     if (!parentId) return false;
@@ -50,7 +50,7 @@ const insertLineAtTop = ({ editor }: { editor: Editor }) => {
 };
 
 const insertNodeAfter = ({ editor, view }: { editor: Editor; view: View }) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const node = editor.getNode(selection.nodeId);
     if (!node) return false;
     const parentId = editor.getParentId(node.id);

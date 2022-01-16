@@ -5,7 +5,7 @@ import { Editor } from '../../indexed';
 export const insertChars =
     ({ textInput }: { textInput: string }) =>
     (editor: Editor) => {
-        const selection = editor.state.selection as TextSelection;
+        const selection = editor.selection as TextSelection;
         const nodeId = selection.nodeId;
         const node = editor.getNode(nodeId);
         if (!node) return;

@@ -47,7 +47,7 @@ export const TextInput = ({
 
     const onInput = (newValue: MarkedText, newRange?: Range) => {
         if (onChange(newValue, newRange)) return;
-        const selection = editor.state.selection as TextSelection;
+        const selection = editor.selection as TextSelection;
         const tr = editor.createTransaction();
         tr.patch({
             nodeId,
@@ -161,7 +161,7 @@ export const TextInput = ({
         composing: composingRef.current,
         updateRange: (newRange: Range) => {
             const newTextSelection = new TextSelection(nodeId, newRange);
-            if (newTextSelection.isSame(editor.state.selection)) return;
+            if (newTextSelection.isSame(editor.selection)) return;
             editor.createTransaction().focus(newTextSelection).dispatch(false);
         },
     });

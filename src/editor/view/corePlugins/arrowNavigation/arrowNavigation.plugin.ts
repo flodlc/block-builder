@@ -9,7 +9,7 @@ export const ArrowNavigationPlugin: PluginFactory =
     () =>
     ({ dom, editor, view }) => {
         const onKeyDown = (e: KeyboardEvent) => {
-            if (!editor.state.selection?.isText()) return;
+            if (!editor.selection?.isText()) return;
             if (e.key === 'ArrowUp') {
                 if (GLOBAL_EDITABLE) return;
                 onArrowUp(e, editor, view);

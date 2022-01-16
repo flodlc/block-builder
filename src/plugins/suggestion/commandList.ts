@@ -15,7 +15,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
         label: 'Turn in Image',
         callback: () => {
-            const selection = editor.state.selection as TextSelection;
+            const selection = editor.selection as TextSelection;
             const nodeId = selection.nodeId;
             editor
                 .createTransaction()
@@ -34,7 +34,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
         label: 'Turn in Heading 1',
         callback: () => {
-            const selection = editor.state.selection as TextSelection;
+            const selection = editor.selection as TextSelection;
             const nodeId = selection.nodeId;
             editor
                 .createTransaction()
@@ -53,7 +53,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
         label: 'Turn in Toggle List',
         callback: () => {
-            const selection = editor.state.selection as TextSelection;
+            const selection = editor.selection as TextSelection;
             const nodeId = selection.nodeId;
             editor
                 .createTransaction()
@@ -69,7 +69,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
         label: 'Turn in Heading 2',
         callback: () => {
-            const selection = editor.state.selection as TextSelection;
+            const selection = editor.selection as TextSelection;
             const nodeId = selection.nodeId;
             editor
                 .createTransaction()
@@ -88,7 +88,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
         label: 'Turn in text',
         callback: () => {
-            const selection = editor.state.selection as TextSelection;
+            const selection = editor.selection as TextSelection;
             const nodeId = selection.nodeId;
             editor
                 .createTransaction()
@@ -104,7 +104,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
         label: 'Turn in a Quote',
         callback: () => {
-            const selection = editor.state.selection as TextSelection;
+            const selection = editor.selection as TextSelection;
             const nodeId = selection.nodeId;
             editor
                 .createTransaction()
@@ -115,7 +115,7 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
         label: 'Turn in a Callout',
         callback: () => {
-            const selection = editor.state.selection as TextSelection;
+            const selection = editor.selection as TextSelection;
             const nodeId = selection.nodeId;
             editor
                 .createTransaction()

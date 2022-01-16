@@ -3,7 +3,7 @@ import { TextSelection } from '../../../model';
 import { View } from '../../View';
 
 const getTargetSelection = (editor: Editor, view: View) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const previousNode = view.getNextDisplayedTextField(selection.nodeId, -1);
     if (!previousNode) return;
 
@@ -15,7 +15,7 @@ const getTargetSelection = (editor: Editor, view: View) => {
 };
 
 export const onArrowLeft = (e: KeyboardEvent, editor: Editor, view: View) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const range = selection.range;
     if (range[0] < range[1]) return;

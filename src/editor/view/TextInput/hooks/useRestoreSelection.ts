@@ -56,7 +56,7 @@ export const useRestoreSelection = ({
         if (!ref.current || !range) return;
         restoreSelectionIfNeeded(
             ref.current as HTMLDivElement,
-            (view.editor.state.selection as TextSelection)?.range,
+            (view.editor.selection as TextSelection)?.range,
             composing
         );
         if (timeout.current) clearTimeout(timeout.current);
@@ -96,7 +96,7 @@ const debouncedRestoreSelectionIfNeeded = _.debounce(
     (container: HTMLDivElement, editor: Editor, composing: boolean) =>
         restoreSelectionIfNeeded(
             container,
-            (editor.state.selection as TextSelection)?.range,
+            (editor.selection as TextSelection)?.range,
             composing
         ),
     20,

@@ -3,7 +3,7 @@ import { TextSelection } from '../../indexed';
 import { TransactionBuilder } from '../../indexed';
 
 export const onDelete = ({ editor }: { editor: Editor }): boolean => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const node = editor.getNode(selection.nodeId);
     if (!node) return false;
     const textLength = node.getTextLength();
@@ -12,7 +12,7 @@ export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     if (range?.[0] !== textLength || range?.[1] !== textLength) return false;
 
     const transaction = editor.createTransaction();
-    if (node.childrenIds?.length && editor.state.rootId !== node.id) {
+    if (node.childrenIds?.length && editor.rootId !== node.id) {
         unwrapChildren({ nodeId: node.id, editor, transaction });
     } else {
         const nextId = editor.runQuery((resolvedState) => {

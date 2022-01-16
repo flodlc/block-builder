@@ -9,11 +9,11 @@ import {
 
 export const insertHtml = (html: string, editor: Editor) => {
     const parsed = editor.parseHtml(html);
-    if (!editor.state.selection) return;
+    if (!editor.selection) return;
 
     insertLines({
         editor,
-        selection: editor.state.selection,
+        selection: editor.selection,
         blockIds: parsed.blockIds as string[],
         nodes: parsed.nodes,
     });
@@ -64,8 +64,7 @@ const insertLines = ({
         return;
     }
 
-    const parentId =
-        editor.getParentId(textSelection.nodeId) ?? editor.state.rootId;
+    const parentId = editor.getParentId(textSelection.nodeId) ?? editor.rootId;
 
     const tr = editor.createTransaction();
     blockIds?.forEach((blockId, i) => {

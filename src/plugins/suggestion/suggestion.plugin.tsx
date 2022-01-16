@@ -1,5 +1,5 @@
 import React from 'react';
-import { PluginFactory } from '../../indexed';
+import { Node, PluginFactory } from '../../indexed';
 import { SuggestionComponentWrapper } from './Suggestion';
 import { TextSelection } from '../../indexed';
 import { Editor } from '../../indexed';
@@ -31,7 +31,7 @@ export const SuggestionPlugin: PluginFactory =
                 e.preventDefault();
                 state = editor.trigger(SUGGESTION_EVENTS.changed, undefined);
             } else if (char === '/') {
-                const selection = editor.state.selection as TextSelection;
+                const selection = editor.selection as TextSelection;
                 if (view.isDecorated(selection)) {
                     return;
                 }
@@ -48,8 +48,9 @@ export const SuggestionPlugin: PluginFactory =
                             undefined
                         );
                     },
-                    nodeTextLength: selection.getCurrentText(editor.state)
-                        .length,
+                    nodeTextLength: editor
+                        .getNode(selection.nodeId)
+                        ?.getTextLength(),
                     triggeringExpression: '/',
                     slashPosition: selection.range[0] - 1,
                     startBoundingRect,
@@ -80,7 +81,7 @@ const onTr = ({
     state?: SuggestionPluginState;
 }) => {
     if (!state) return state;
-    if (!editor.state.selection?.isText()) return undefined;
+    if (!editor.selection?.isText()) return undefined;
 
     const searchText = getSearchText({ editor, pluginState: state });
     if (searchText === undefined || searchText.length > MAX_SEARCH_LENGTH)
@@ -99,8 +100,10 @@ const getSearchText = ({
     editor: Editor;
     pluginState: SuggestionPluginState;
 }): string | undefined => {
-    const selection = editor.state.selection as TextSelection;
-    const nodeText = selection.getCurrentText(editor.state);
+    const selection = editor.selection as TextSelection;
+    const nodeText = Node.getStringText(
+        editor.getNode(selection.nodeId)?.text ?? []
+    );
     const nodeTextLength = nodeText?.length ?? 0;
 
     const previousSearchText = pluginState.searchText;

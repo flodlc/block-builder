@@ -4,7 +4,7 @@ import { Editor } from '../../indexed';
 
 export const underlineApi = (editor: Editor) => ({
     isUnderline: () => {
-        const selection = editor.state.selection;
+        const selection = editor.selection;
         if (!isTextSelection(selection)) return;
         const node = editor.getNode(selection.nodeId);
         if (!node?.text) return false;
@@ -12,7 +12,7 @@ export const underlineApi = (editor: Editor) => ({
         return Node.hasMark(textFragment, { type: 'u' });
     },
     toggleUnderline: () => {
-        const selection = editor.state.selection;
+        const selection = editor.selection;
         if (!isTextSelection(selection)) return;
         const underlineStatus = underlineApi(editor).isUnderline();
 

@@ -43,7 +43,7 @@ export const Child = React.memo(
         const node = editor.getNode(nodeId);
         const selectionTypes = getSelection({
             nodeId,
-            selection: editor.state.selection,
+            selection: editor.selection,
         });
 
         const [nodeState, setNodeState] = useState({
@@ -55,7 +55,7 @@ export const Child = React.memo(
         const onChange = useCallback(() => {
             const selectionTypes = getSelection({
                 nodeId,
-                selection: editor.state.selection,
+                selection: editor.selection,
             });
 
             const newNode = editor.getNode(nodeId);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PluginFactory } from '../../indexed';
+import { Node, PluginFactory } from '../../indexed';
 import { MentionDecoration } from './MentionDecoration';
 import { isTextSelection, Range, TextSelection } from '../../indexed';
 import { Editor } from '../../indexed';
@@ -24,10 +24,13 @@ export const MentionPlugin: PluginFactory =
                 return;
             }
 
-            const selection = editor.state.selection;
+            const selection = editor.selection;
             if (!isTextSelection(selection)) return;
 
-            const previousText = selection.getTextBefore(editor.state);
+            const text = Node.getStringText(
+                editor.getNode(selection.nodeId)?.text ?? []
+            );
+            const previousText = text.slice(0, selection.range[0]);
             EXPRESSIONS.some((expression) => {
                 const regex = new RegExp(
                     `${escapeStringRegexp(expression.slice())}$`
@@ -52,8 +55,9 @@ export const MentionPlugin: PluginFactory =
                             undefined
                         );
                     },
-                    nodeTextLength: selection.getCurrentText(editor.state)
-                        .length,
+                    nodeTextLength: editor
+                        .getNode(selection.nodeId)
+                        ?.getTextLength(),
                     triggeringExpression: expression,
                     slashPosition: selection.range[0] - expression.length,
                     startBoundingRect: startBoundingCoords,
@@ -108,7 +112,7 @@ const updateDecoration = ({
     editor: Editor;
     view: View;
 }) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     if (suggestionState) {
         view.clearDecorations('mention');
         const slashPosition = suggestionState.slashPosition as number;
@@ -138,7 +142,7 @@ export const onTr = ({
     state?: MentionPluginState;
 }) => {
     if (!state) return undefined;
-    if (!editor.state.selection?.isText()) return state;
+    if (!editor.selection?.isText()) return state;
 
     const searchText = getSearchText({
         editor,
@@ -160,8 +164,10 @@ const getSearchText = ({
     editor: Editor;
     pluginState: MentionPluginState;
 }): string | undefined => {
-    const selection = editor.state.selection as TextSelection;
-    const nodeText = selection.getCurrentText(editor.state);
+    const selection = editor.selection as TextSelection;
+    const nodeText = Node.getStringText(
+        editor.getNode(selection.nodeId)?.text ?? []
+    );
     const nodeTextLength = nodeText?.length ?? 0;
 
     const previousSearchText = pluginState.searchText;

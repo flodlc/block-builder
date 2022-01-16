@@ -17,8 +17,11 @@ type JsonNode = {
 
 export interface Editor {
     getJson: () => JsonNode;
-    state: InternalEditor['state'];
+    // state: InternalEditor['state'];
+    nodes: Record<string, Node>;
     // schema: Schema;
+    selection: AbstractSelection | undefined;
+    rootId: string;
     createNode: (type: string, node?: Partial<JsonNode>) => Node;
     getParentId: (nodeId: string) => string | undefined;
     isLastChild: (nodeId: string) => boolean;

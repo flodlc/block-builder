@@ -10,7 +10,7 @@ export const BalloonPlugin: PluginFactory =
         };
 
         const trHandler = () => {
-            const textSelection = editor.state.selection as TextSelection;
+            const textSelection = editor.selection as TextSelection;
             const range = textSelection?.isText() && textSelection.range;
             if (!range || range[0] === range[1]) {
                 hide();
@@ -33,7 +33,7 @@ export const BalloonPlugin: PluginFactory =
         };
 
         const clickHandler = (e: MouseEvent) => {
-            const textSelection = editor.state.selection as TextSelection;
+            const textSelection = editor.selection as TextSelection;
             const range = textSelection?.isText() && textSelection.range;
             const target = e.target as HTMLElement;
             if (

@@ -1,7 +1,7 @@
 import { Editor, TextSelection } from '../../../editor/model';
 
 export const tryReset = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const node = editor.getNode(selection.nodeId);
     if (!node) return false;
     if (node.type === 'text') return false;

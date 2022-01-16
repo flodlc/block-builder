@@ -4,7 +4,7 @@ import { Editor } from '../../indexed';
 
 export const italicApi = (editor: Editor) => ({
     isItalic: () => {
-        const selection = editor.state.selection;
+        const selection = editor.selection;
         if (!isTextSelection(selection)) return;
         const node = editor.getNode(selection.nodeId);
         if (!node?.text) return false;
@@ -12,7 +12,7 @@ export const italicApi = (editor: Editor) => ({
         return Node.hasMark(textFragment, { type: 'i' });
     },
     toggleItalic: () => {
-        const selection = editor.state.selection;
+        const selection = editor.selection;
         if (!isTextSelection(selection)) return;
 
         const boldStatus = italicApi(editor).isItalic();

@@ -39,7 +39,7 @@ export const MentionComponent = ({
 }) => {
     const getSearchSelection = () => {
         if (searchText === undefined || slashPosition === undefined) return;
-        const selection = editor.state.selection as TextSelection;
+        const selection = editor.selection as TextSelection;
         return selection.setRange([
             slashPosition,
             slashPosition +

@@ -5,7 +5,7 @@ import { MentionValue } from './mention.types';
 export const insertMention =
     ({ selection, data }: { selection?: TextSelection; data: MentionValue }) =>
     (editor: Editor) => {
-        selection = selection ?? (editor.state.selection as TextSelection);
+        selection = selection ?? (editor.selection as TextSelection);
         if (!selection) return;
         const node = editor.getNode(selection.nodeId);
         if (!node?.text) return;

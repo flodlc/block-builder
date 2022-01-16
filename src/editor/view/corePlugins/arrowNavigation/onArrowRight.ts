@@ -3,14 +3,14 @@ import { TextSelection } from '../../../model';
 import { View } from '../../View';
 
 const getTargetSelection = (editor: Editor, view: View) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const nextNode = view.getNextDisplayedTextField(selection.nodeId);
     if (!nextNode) return;
     return new TextSelection(nextNode?.id, [0, 0]);
 };
 
 export const onArrowRight = (e: KeyboardEvent, editor: Editor, view: View) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const previousNodeTextLength =
         editor.getNode(selection.nodeId)?.getTextLength() ?? 0;
     if (e.metaKey || e.ctrlKey || e.altKey) return;

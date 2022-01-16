@@ -10,17 +10,17 @@ export const onBackspace = ({
     editor: Editor;
     view: View;
 }): boolean => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     if (selection?.range?.[0] !== 0 || selection?.range?.[1] !== 0)
         return false;
-    if (selection.nodeId === editor.state.rootId) return true;
+    if (selection.nodeId === editor.rootId) return true;
     return [tryReset, tryUnwrap, tryRemove].some((callback) =>
         callback({ editor, view })
     );
 };
 
 const tryUnwrap = ({ editor }: { editor: Editor }) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const nodeId = selection.nodeId;
     const node = editor.getNode(nodeId);
     if (!node) return false;
@@ -41,7 +41,7 @@ const tryUnwrap = ({ editor }: { editor: Editor }) => {
 };
 
 const tryRemove = ({ editor, view }: { editor: Editor; view: View }) => {
-    const selection = editor.state.selection as TextSelection;
+    const selection = editor.selection as TextSelection;
     const node = editor.getNode(selection.nodeId);
     if (!node) return false;
 

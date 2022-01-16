@@ -40,17 +40,6 @@ export class BlockSelection extends AbstractSelection {
         return Boolean(this.nodeIds.get(nodeId));
     }
 
-    getFirstLevelBlockIds(state: State) {
-        const resolvedState = resolveState(state);
-        const selected = new Map<string, string>();
-        Array.from(this.nodeIds.values()).forEach((nodeId) => {
-            const node = resolvedState.nodes[nodeId];
-            if (node.parentId && selected.get(node.parentId)) return;
-            selected.set(nodeId, nodeId);
-        });
-        return selected;
-    }
-
     clone() {
         return new BlockSelection(this.nodeIds);
     }
@@ -67,16 +56,6 @@ export class TextSelection extends AbstractSelection {
         this.type = 'text';
         this.nodeId = nodeId;
         this.range = range;
-    }
-
-    getCurrentText(state: State) {
-        const node = state.nodes[this.nodeId];
-        return node.text?.reduce((prev, curr) => prev + curr.text, '') ?? '';
-    }
-
-    getTextBefore(state: State) {
-        const text = this.getCurrentText(state);
-        return text.slice(0, this.range[0]);
     }
 
     isSame(selection?: AbstractSelection | TextSelection) {
