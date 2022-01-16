@@ -76,6 +76,7 @@ export type NodeSchema = {
         state: State;
         child?: Node;
         node: Node;
+        parentId?: string;
         error?: string;
         transaction: TransactionBuilder;
     }) => void | string;

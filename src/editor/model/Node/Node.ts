@@ -12,6 +12,7 @@ import { joinMarkedTexts } from '../MarkedText/joinMarkedTexts';
 import { spliceText } from '../MarkedText/spliceText';
 import { splitMarkedText } from '../MarkedText/splitMarkedText';
 import { isCharNodeView } from '../MarkedText/isCharNodeView';
+import { isNodeviewAtPos } from '../MarkedText/isNodeviewAtPos';
 
 export type JsonNode<T extends Record<string, any> = any> = {
     id: string;
@@ -106,6 +107,7 @@ export class Node<T extends Record<string, any> = any> {
     static spliceText = spliceText;
     static splitMarkedText = splitMarkedText;
     static isCharNodeView = isCharNodeView;
+    static isNodeViewAtPos = isNodeviewAtPos;
     static markText = markText;
     static hasMark = hasMark;
     static unmarkText = unmarkText;

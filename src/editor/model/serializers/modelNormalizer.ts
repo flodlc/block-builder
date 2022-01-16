@@ -54,14 +54,16 @@ export const normalizeState = (
 export const findErrorAndTransaction = (
     schema: Schema,
     node: Node,
-    state: State
+    state: State,
+    parentId?: string
 ): { error?: string; transaction?: Transaction } => {
     for (const childId of node?.childrenIds?.slice().reverse() ?? []) {
         const childNode = state.nodes[childId];
         const childErrorData = findErrorAndTransaction(
             schema,
             childNode,
-            state
+            state,
+            node.id
         );
         if (childErrorData.error || childErrorData.transaction)
             return childErrorData;
@@ -75,7 +77,7 @@ export const findErrorAndTransaction = (
         };
     }
     const { error, childNode } = findError(schema, node, state);
-    return normalizeNode({ schema, node, childNode, state, error });
+    return normalizeNode({ schema, node, childNode, state, error, parentId });
 };
 
 const setDefaultAttrs = (schema: Schema, node: Node) => {
@@ -126,12 +128,14 @@ const normalizeNode = ({
     childNode,
     state,
     error,
+    parentId,
 }: {
     schema: Schema;
     node: Node;
     childNode?: Node;
     state: State;
     error?: string;
+    parentId?: string;
 }) => {
     const nodeSchema = schema[node.type] as NodeSchema;
     let transaction: Transaction | undefined = undefined;
@@ -144,6 +148,7 @@ const normalizeNode = ({
         node,
         error,
         schema,
+        parentId,
         transaction: transactionBuilder,
     });
     return {

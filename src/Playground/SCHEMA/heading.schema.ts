@@ -1,5 +1,4 @@
 import { NodeSchema } from '../../editor/model';
-import { resolveState } from '../../editor/model';
 import { STATE_ERRORS } from '../../editor/model';
 
 export const headingSchema: NodeSchema = {
@@ -15,10 +14,8 @@ export const headingSchema: NodeSchema = {
             },
         };
     },
-    normalize: ({ child, error, transaction, node, state }) => {
+    normalize: ({ child, error, transaction, node, parentId }) => {
         if (error === STATE_ERRORS.INVALID_CHILD && child) {
-            const resolvedState = resolveState(state);
-            const parentId = resolvedState.nodes[node.id].parentId;
             if (!parentId) return;
             transaction
                 .removeFrom({ parentId: node.id, nodeId: child.id })

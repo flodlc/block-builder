@@ -1,5 +1,4 @@
 import { getElementSelection } from '../utils/getElementSelection';
-import { isPreviousNodeView } from '../utils/isPreviousNodeView';
 import { Node } from '../../../model';
 import { RefObject, useLayoutEffect } from 'react';
 import { View } from '../../View';
@@ -26,7 +25,10 @@ export const useBackspaceHandler = ({
         const currentRange = getElementSelection(ref.current) ?? range;
         if (!currentRange) return false;
         if (currentRange[0] === 0 && currentRange[1] === 0) return false;
-        const previousIsNodeView = isPreviousNodeView(value, currentRange[0]);
+        const previousIsNodeView = Node.isNodeViewAtPos(
+            value,
+            currentRange[0] - 1
+        );
 
         if (!previousIsNodeView) return false;
         const newTextState = Node.spliceText({

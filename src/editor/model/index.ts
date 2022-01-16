@@ -17,7 +17,6 @@ import {
     isTextSelection,
     isBlockSelection,
 } from './Selection';
-import { resolveState } from './StateResolver';
 import { STATE_ERRORS } from './serializers/modelNormalizer';
 import { Node, JsonNode } from './Node/Node';
 
@@ -42,7 +41,6 @@ export {
     BlockSelection,
     isTextSelection,
     isBlockSelection,
-    resolveState,
     STATE_ERRORS,
 };
 
