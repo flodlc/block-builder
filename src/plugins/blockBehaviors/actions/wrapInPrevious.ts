@@ -6,10 +6,11 @@ export const wrapInPrevious =
         const { previousId } = editor.runQuery(({ nodes }) => nodes[nodeId]);
         if (!previousId) return false;
 
-        const node = editor.state.nodes[nodeId];
-        const target = editor.state.nodes[previousId];
+        const node = editor.getNode(nodeId);
+        if (!node) return false;
 
-        if (!target.allowChildren) return false;
+        const target = editor.getNode(previousId);
+        if (!target?.allowChildren) return false;
 
         const wrappingLastChild =
             target.childrenIds?.[(target.childrenIds?.length ?? 0) - 1];

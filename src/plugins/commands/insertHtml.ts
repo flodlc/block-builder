@@ -33,7 +33,8 @@ const insertLines = ({
     if (!selection?.isText()) return;
     const textSelection = selection as TextSelection;
 
-    const node = editor.state.nodes[textSelection.nodeId];
+    const node = editor.getNode(textSelection.nodeId);
+    if (!node) return;
     const firstBlock = nodes[blockIds[0]];
     if (
         blockIds.length === 1 &&
@@ -63,11 +64,8 @@ const insertLines = ({
         return;
     }
 
-    let parentId = editor.runQuery(
-        (resolvedState) =>
-            resolvedState.nodes[textSelection.nodeId]?.parentId as string
-    );
-    if (!parentId) parentId = editor.state.rootId;
+    const parentId =
+        editor.getParentId(textSelection.nodeId) ?? editor.state.rootId;
 
     const tr = editor.createTransaction();
     blockIds?.forEach((blockId, i) => {

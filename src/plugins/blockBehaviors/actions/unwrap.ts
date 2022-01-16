@@ -28,11 +28,13 @@ export const unwrap = ({
         ?.slice(indexInParent + 1)
         .reverse()
         .forEach((nextSiblingId) => {
+            const nextSibling = editor.getNode(nextSiblingId);
+            if (!nextSibling) return;
             tr.removeFrom({ nodeId: nextSiblingId, parentId });
             tr.insertAfter({
                 parentId: nodeId,
                 after: node.childrenIds?.[node.childrenIds?.length - 1],
-                node: editor.state.nodes[nextSiblingId],
+                node: nextSibling,
             });
         });
 

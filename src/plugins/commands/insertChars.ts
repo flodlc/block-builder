@@ -7,7 +7,8 @@ export const insertChars =
     (editor: Editor) => {
         const selection = editor.state.selection as TextSelection;
         const nodeId = selection.nodeId;
-        const node = editor.state.nodes[nodeId];
+        const node = editor.getNode(nodeId);
+        if (!node) return;
         const splicedText = Node.spliceText({
             text: node.text as MarkedText,
             textInput,

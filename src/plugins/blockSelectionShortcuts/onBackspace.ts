@@ -4,9 +4,7 @@ export const onBackspace = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as BlockSelection;
     const transaction = editor.createTransaction();
     selection.nodeIds.forEach((nodeId) => {
-        const parentId = editor.runQuery(
-            (resolvedState) => resolvedState.nodes[nodeId].parentId
-        );
+        const parentId = editor.getParentId(nodeId);
         if (!parentId) return;
         transaction.removeFrom({ nodeId, parentId });
     });
@@ -14,13 +12,13 @@ export const onBackspace = ({ editor }: { editor: Editor }) => {
     // To discuss...
     const addNewLine = true;
     if (addNewLine) {
-        const { previousId, parentId } = editor.runQuery((resolvedState) => {
+        const { previousId, parentId } = editor.runQuery(({ nodes }) => {
             const ids = Array.from(selection.nodeIds.keys());
             for (const id of ids) {
-                if (!resolvedState.nodes[id].parentId) continue;
+                if (!nodes[id].parentId) continue;
                 return {
-                    parentId: resolvedState.nodes[id].parentId,
-                    previousId: resolvedState.nodes[id].previousId,
+                    parentId: nodes[id].parentId,
+                    previousId: nodes[id].previousId,
                 };
             }
             return {};

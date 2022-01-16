@@ -68,5 +68,10 @@ export type TransactionBuilder = {
     }) => TransactionBuilder;
 
     focus: (selection?: AbstractSelection) => TransactionBuilder;
+
+    pipe: (
+        action: (transaction: TransactionBuilder) => any
+    ) => TransactionBuilder;
+
     dispatch: (keepHistory?: boolean) => void;
 };

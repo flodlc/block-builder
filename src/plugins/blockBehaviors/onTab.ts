@@ -1,7 +1,7 @@
-import { wrapInPrevious } from './actions/wrapIn';
 import { Editor } from '../../indexed';
 import { TextSelection } from '../../indexed';
 import { unwrap } from './unwrap';
+import { wrapInPrevious } from './actions/wrapInPrevious';
 
 export const onTab = ({ editor }: { editor: Editor }) => {
     const selection = editor.state.selection as TextSelection;

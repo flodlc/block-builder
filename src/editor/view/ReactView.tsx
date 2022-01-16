@@ -23,7 +23,7 @@ export const ReactView = ({
     const registeredPlugins = useRegisterPlugins(editor, plugins, ref, view);
     useKeepScroll(editor);
 
-    const rootNode = editor.state.nodes[editor.state.rootId];
+    const rootNode = editor.getNode(editor.state.rootId);
     return (
         <div style={{ position: 'relative' }}>
             <div

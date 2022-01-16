@@ -96,7 +96,7 @@ export class View implements ViewInterface {
             while (cursorIndex < resolvedState.flatTree.length) {
                 const cursorId = resolvedState.flatTree[cursorIndex];
                 if (this.hasDisplayedTextField(cursorId)) {
-                    return this.editor.state.nodes[cursorId];
+                    return this.editor.getNode(cursorId);
                 }
                 cursorIndex = cursorIndex + direction;
             }
@@ -110,7 +110,7 @@ export class View implements ViewInterface {
             while (cursorIndex < resolvedState.flatTree.length) {
                 const cursorId = resolvedState.flatTree[cursorIndex];
                 if (this.isNodeDisplayed(cursorId)) {
-                    return this.editor.state.nodes[cursorId];
+                    return this.editor.getNode(cursorId);
                 }
                 cursorIndex = cursorIndex + direction;
             }

@@ -46,6 +46,13 @@ export class TransactionBuilder {
         this.dispatchCallback(this.steps, keepHistory);
     };
 
+    pipe = (
+        action: (transaction: TransactionBuilder) => any
+    ): TransactionBuilder => {
+        action(this);
+        return this;
+    };
+
     getTransaction = (keepHistory = true) => {
         return { steps: this.steps, keepHistory };
     };

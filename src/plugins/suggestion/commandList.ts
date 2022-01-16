@@ -1,7 +1,7 @@
 import { TextSelection } from '../../indexed';
 import { Editor } from '../../indexed';
-import { wrapIn } from '../commands/turnIn.command';
 import { insertHtml } from '../commands/insertHtml';
+import { wrapIn } from '../commands/wrapIn';
 
 export const getCommandList = ({ editor }: { editor: Editor }) => [
     {
@@ -106,7 +106,10 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            wrapIn({ editor, nodeId, type: 'quote' });
+            editor
+                .createTransaction()
+                .pipe(wrapIn({ editor, nodeId, type: 'quote' }))
+                .dispatch();
         },
     },
     {
@@ -114,7 +117,10 @@ export const getCommandList = ({ editor }: { editor: Editor }) => [
         callback: () => {
             const selection = editor.state.selection as TextSelection;
             const nodeId = selection.nodeId;
-            wrapIn({ editor, nodeId, type: 'callout' });
+            editor
+                .createTransaction()
+                .pipe(wrapIn({ editor, nodeId, type: 'callout' }))
+                .dispatch();
         },
     },
 ];

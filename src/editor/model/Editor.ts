@@ -73,7 +73,7 @@ export class Editor implements EditorInterface {
     isFirstChild = (nodeId: string) => {
         const parentId = this.getParentId(nodeId);
         if (!parentId) return false;
-        const parent = this.state.nodes[parentId];
+        const parent = this.getNode(parentId);
         const currentIndex = parent.childrenIds?.indexOf(nodeId) ?? -1;
         return currentIndex === 0;
     };

@@ -40,7 +40,7 @@ export const Child = React.memo(
     ({ parentId, nodeId }: { parentId: string; nodeId: string }) => {
         const editor = useEditor();
         const view = useView();
-        const node = editor.state.nodes[nodeId];
+        const node = editor.getNode(nodeId);
         const selectionTypes = getSelection({
             nodeId,
             selection: editor.state.selection,
@@ -58,13 +58,14 @@ export const Child = React.memo(
                 selection: editor.state.selection,
             });
 
+            const newNode = editor.getNode(nodeId);
             if (
-                nodeState.node !== editor.state.nodes[nodeId] ||
+                nodeState.node !== newNode ||
                 nodeState.nodeSelection !== selectionTypes.insideSelection ||
                 nodeState.blockSelected !== selectionTypes.blockSelection
             ) {
                 setNodeState({
-                    node: editor.state.nodes[nodeId],
+                    node: newNode,
                     nodeSelection: selectionTypes.insideSelection,
                     blockSelected: selectionTypes.blockSelection,
                 });
@@ -82,9 +83,9 @@ export const Child = React.memo(
 
         const inParentList =
             parentId === 'undefined' ||
-            !!editor.state.nodes[parentId]?.childrenIds?.includes(nodeId);
+            !!editor.getNode(parentId)?.childrenIds?.includes(nodeId);
 
-        if (!inParentList) return <></>;
+        if (!inParentList || !nodeState.node) return <></>;
         return (
             <Compo
                 parentId={parentId}

@@ -5,7 +5,8 @@ import { Coords } from '../../types';
 
 const isLastLine = (editor: Editor, view: View) => {
     const selection = editor.state.selection as TextSelection;
-    const currentNode = editor.state.nodes[selection.nodeId];
+    const currentNode = editor.getNode(selection.nodeId);
+    if (!currentNode) return false;
     const currentCaretCoords = view.getCoordsAtPos(
         currentNode.id,
         selection.range[0]

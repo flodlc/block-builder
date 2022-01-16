@@ -23,9 +23,10 @@ export const CopyPastePlugin: PluginFactory =
             if (!editor.state.selection) return;
             let html = '';
             if (isTextSelection(editor.state.selection)) {
-                const nodeId = editor.state.selection.nodeId;
+                const node = editor.getNode(editor.state.selection.nodeId);
+                if (!node) return;
                 html = editor.serializeNode(
-                    editor.state.nodes[nodeId],
+                    node,
                     false,
                     editor.state.selection.range
                 );
@@ -34,13 +35,9 @@ export const CopyPastePlugin: PluginFactory =
                     editor.state.selection.getFirstLevelBlockIds(editor.state);
                 html = Array.from(firstLevelNodeIds.values()).reduce(
                     (acc, nodeId) => {
-                        return (
-                            acc +
-                            editor.serializeNode(
-                                editor.state.nodes[nodeId],
-                                true
-                            )
-                        );
+                        const node = editor.getNode(nodeId);
+                        if (!node) return acc;
+                        return acc + editor.serializeNode(node, true);
                     },
                     ''
                 );

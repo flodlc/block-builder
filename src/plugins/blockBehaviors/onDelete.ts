@@ -11,17 +11,16 @@ export const onDelete = ({ editor }: { editor: Editor }): boolean => {
     const range = selection?.range;
     if (range?.[0] !== textLength || range?.[1] !== textLength) return false;
 
-    const nextId = editor.runQuery((resolvedState) => {
-        const index = resolvedState.flatTree.indexOf(node.id);
-        return resolvedState.flatTree[index + 1];
-    });
-    if (!nextId) return false;
-    const next = editor.state.nodes[nextId];
-
     const transaction = editor.createTransaction();
     if (node.childrenIds?.length && editor.state.rootId !== node.id) {
         unwrapChildren({ nodeId: node.id, editor, transaction });
     } else {
+        const nextId = editor.runQuery((resolvedState) => {
+            const index = resolvedState.flatTree.indexOf(node.id);
+            return resolvedState.flatTree[index + 1];
+        });
+        const next = nextId && editor.getNode(nextId);
+        if (!next) return false;
         const parentId = editor.getParentId(nextId);
         if (!parentId) return false;
         unwrapChildren({ nodeId: nextId, editor, transaction });

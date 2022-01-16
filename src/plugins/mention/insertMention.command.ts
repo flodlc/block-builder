@@ -7,8 +7,8 @@ export const insertMention =
     (editor: Editor) => {
         selection = selection ?? (editor.state.selection as TextSelection);
         if (!selection) return;
-        const node = editor.state.nodes[selection.nodeId];
-        if (!node.text) return;
+        const node = editor.getNode(selection.nodeId);
+        if (!node?.text) return;
 
         const textWithMention = Node.insertNodeMark(node.text, {
             type: 'mention',
