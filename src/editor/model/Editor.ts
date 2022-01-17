@@ -52,14 +52,15 @@ export class Editor implements EditorInterface {
             : { rootId: 'doc', nodes: {} };
     }
 
-    get nodes() {
-        return this.state.nodes;
-    }
     get selection() {
         return this.state.selection;
     }
     get rootId() {
         return this.state.rootId;
+    }
+
+    getNodes() {
+        return this.state.nodes;
     }
 
     createNode = (type: string, node?: Partial<JsonNode>): Node =>

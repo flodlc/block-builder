@@ -61,7 +61,7 @@ function Playground() {
 
     useEffect(() => {
         editor.on('change', () => {
-            localStorage.setItem('nodes', JSON.stringify(editor.nodes));
+            localStorage.setItem('nodes', JSON.stringify(editor.getNodes()));
             localStorage.setItem('last_saved', new Date().toISOString());
         });
     }, []);
